@@ -36,17 +36,18 @@ export default function CookiePolicyPage() {
               I dati sono anonimizzati e utilizzati solo per migliorare il servizio.
             </p>
 
-            <h3 className="text-base font-semibold text-[#0a1f44] mt-4">Cookie di marketing</h3>
+            <h3 className="text-base font-semibold text-[#0a1f44] mt-4">Cookie di terze parti</h3>
             <p className="text-[#64748b]">
-              Utilizziamo Meta Pixel per campagne pubblicitarie mirate.
-              Questi cookie vengono attivati solo con il consenso esplicito dell&apos;utente.
+              Al momento non utilizziamo cookie di marketing o profilazione di terze parti.
+              In futuro, eventuali cookie di terze parti verranno attivati solo con il consenso esplicito dell&apos;utente
+              e questa policy verrà aggiornata di conseguenza.
             </p>
 
             <h2 className="text-lg font-bold text-[#0a1f44] mt-6">3. Gestione dei cookie</h2>
             <p className="text-[#64748b]">
               Al primo accesso al sito, viene mostrato un banner per il consenso ai cookie.
-              L&apos;utente può modificare le proprie preferenze in qualsiasi momento attraverso
-              le impostazioni del browser.
+              L&apos;utente può modificare le proprie preferenze in qualsiasi momento cliccando
+              su &quot;Gestisci cookie&quot; nel footer del sito, oppure attraverso le impostazioni del browser.
             </p>
 
             <h2 className="text-lg font-bold text-[#0a1f44] mt-6">4. Contatti</h2>

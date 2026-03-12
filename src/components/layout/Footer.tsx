@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { resetConsent } from "@/components/CookieBanner";
 
 const footerColumns = [
   {
@@ -213,9 +216,17 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-border bg-primary-dark">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <p className="text-center text-xs text-white/70">
-            &copy; {new Date().getFullYear()} Privatio S.r.l. &mdash; P.IVA 12345678901
-          </p>
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-4">
+            <p className="text-xs text-white/70">
+              &copy; {new Date().getFullYear()} Privatio S.r.l. &mdash; P.IVA 12345678901
+            </p>
+            <button
+              onClick={resetConsent}
+              className="text-xs text-white/50 hover:text-white/80 transition-colors underline"
+            >
+              Gestisci cookie
+            </button>
+          </div>
         </div>
       </div>
     </footer>

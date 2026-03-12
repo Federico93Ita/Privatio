@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 
-const COOKIE_KEY = "privatio-cookie-consent";
+export const COOKIE_KEY = "privatio-cookie-consent";
 
 type ConsentStatus = "accepted" | "declined" | null;
 
-function getConsent(): ConsentStatus {
+export function getConsent(): ConsentStatus {
   if (typeof window === "undefined") return null;
   const value = localStorage.getItem(COOKIE_KEY);
   if (value === "accepted" || value === "declined") return value;
@@ -15,6 +15,11 @@ function getConsent(): ConsentStatus {
 
 export function hasAnalyticsConsent(): boolean {
   return getConsent() === "accepted";
+}
+
+export function resetConsent() {
+  localStorage.removeItem(COOKIE_KEY);
+  window.location.reload();
 }
 
 export default function CookieBanner() {

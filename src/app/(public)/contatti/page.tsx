@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import ContactForm from "./ContactForm";
 
 export const metadata = {
   title: "Contatti",
@@ -58,7 +59,7 @@ export default function ContattiPage() {
                     Se vuoi vendere il tuo immobile senza pagare commissioni, inizia dal form di inserimento.
                   </p>
                   <a href="/vendi" className="text-[#0e8ff1] font-medium text-sm hover:underline">
-                    Inserisci il tuo immobile →
+                    Inserisci il tuo immobile &rarr;
                   </a>
                 </div>
 
@@ -68,42 +69,13 @@ export default function ContattiPage() {
                     Scopri come entrare nel network Privatio e ricevere clienti venditori qualificati.
                   </p>
                   <a href="/agenzie" className="text-[#0e8ff1] font-medium text-sm hover:underline">
-                    Diventa partner →
+                    Diventa partner &rarr;
                   </a>
                 </div>
               </div>
 
-              {/* Contact form placeholder */}
-              <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-                <h3 className="font-semibold text-[#0a1f44] mb-4">Scrivici un messaggio</h3>
-                <form className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-[#1e293b] mb-1">Nome</label>
-                    <input type="text" placeholder="Il tuo nome" className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#1e293b] mb-1">Email</label>
-                    <input type="email" placeholder="email@esempio.it" className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#1e293b] mb-1">Oggetto</label>
-                    <select className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]">
-                      <option value="">Seleziona</option>
-                      <option value="vendita">Voglio vendere casa</option>
-                      <option value="acquisto">Cerco un immobile</option>
-                      <option value="agenzia">Partnership agenzia</option>
-                      <option value="altro">Altro</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#1e293b] mb-1">Messaggio</label>
-                    <textarea rows={5} placeholder="Scrivi il tuo messaggio..." className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] resize-none" />
-                  </div>
-                  <button type="submit" className="w-full py-3 bg-[#0e8ff1] text-white rounded-lg font-semibold hover:bg-[#0a1f44] transition-colors">
-                    Invia messaggio
-                  </button>
-                </form>
-              </div>
+              {/* Contact form */}
+              <ContactForm />
             </div>
           </div>
         </section>
