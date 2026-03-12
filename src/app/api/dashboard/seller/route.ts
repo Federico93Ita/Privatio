@@ -24,42 +24,57 @@ export async function GET() {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
     }
 
-    // Fetch the seller's most recent (or active) property
-    const property = await prisma.property.findFirst({
-      where: { sellerId: session.user.id },
-      orderBy: { createdAt: "desc" },
-      include: {
-        photos: { orderBy: { order: "asc" }, take: 1 },
-        assignment: {
-          include: {
-            agency: {
-              select: {
-                name: true,
-                phone: true,
-                email: true,
-                logoUrl: true,
-                rating: true,
-                agents: {
-                  select: { id: true, name: true },
-                  take: 1,
-                },
+    // Include block reused for both queries
+    const propertyInclude = {
+      photos: { orderBy: { order: "asc" as const }, take: 1 },
+      assignment: {
+        include: {
+          agency: {
+            select: {
+              name: true,
+              phone: true,
+              email: true,
+              logoUrl: true,
+              rating: true,
+              agents: {
+                select: { id: true, name: true },
+                take: 1,
               },
             },
           },
         },
-        contract: true,
-        visits: {
-          orderBy: { scheduledAt: "desc" },
-        },
-        leads: {
-          orderBy: { createdAt: "desc" },
-          take: 5,
-        },
-        _count: {
-          select: { leads: true, visits: true },
-        },
       },
+      contract: true,
+      visits: {
+        orderBy: { scheduledAt: "desc" as const },
+      },
+      leads: {
+        orderBy: { createdAt: "desc" as const },
+        take: 5,
+      },
+      _count: {
+        select: { leads: true, visits: true },
+      },
+    };
+
+    // Prefer a property with an active agency assignment (most advanced in pipeline)
+    let property = await prisma.property.findFirst({
+      where: {
+        sellerId: session.user.id,
+        assignment: { isNot: null },
+      },
+      orderBy: { createdAt: "desc" },
+      include: propertyInclude,
     });
+
+    // Fallback: most recent property regardless of assignment
+    if (!property) {
+      property = await prisma.property.findFirst({
+        where: { sellerId: session.user.id },
+        orderBy: { createdAt: "desc" },
+        include: propertyInclude,
+      });
+    }
 
     if (!property) {
       return NextResponse.json({

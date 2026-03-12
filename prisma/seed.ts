@@ -418,6 +418,84 @@ async function main() {
   });
   console.log("Property assigned to agency");
 
+  // Create sample buyer leads for the main property (for seller dashboard)
+  const buyerLeadsData = [
+    {
+      propertyId: property.id,
+      name: "Laura Bianchi",
+      email: "laura.bianchi@email.it",
+      phone: "+39 339 7654321",
+      message: "Buongiorno, sarei interessata a visionare l'appartamento. È possibile fissare una visita nel weekend?",
+    },
+    {
+      propertyId: property.id,
+      name: "Roberto Ferrara",
+      email: "r.ferrara@gmail.com",
+      phone: "+39 347 2223344",
+      message: "Vorrei sapere se il prezzo è trattabile e se ci sono spese condominiali.",
+    },
+    {
+      propertyId: property.id,
+      name: "Giulia Martinelli",
+      email: "giulia.mart@outlook.it",
+      phone: "+39 328 5551234",
+      message: "Sono molto interessata. Potrebbe inviarmi la planimetria e le spese annuali?",
+    },
+    {
+      propertyId: property.id,
+      name: "Alessandro Conti",
+      email: "a.conti@pec.it",
+      phone: "+39 366 9998877",
+      message: "Buonasera, l'immobile è ancora disponibile? Vorrei organizzare una visita.",
+    },
+  ];
+
+  for (const lead of buyerLeadsData) {
+    await prisma.buyerLead.create({
+      data: {
+        ...lead,
+        createdAt: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000), // random in last 14 days
+      },
+    });
+  }
+  console.log(`${buyerLeadsData.length} buyer leads created`);
+
+  // Create sample visits for the main property (for seller dashboard)
+  const visitsData = [
+    {
+      propertyId: property.id,
+      buyerName: "Laura Bianchi",
+      buyerEmail: "laura.bianchi@email.it",
+      buyerPhone: "+39 339 7654321",
+      scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+      status: "CONFIRMED" as const,
+      notes: "Visita confermata per sabato mattina alle 10:00",
+    },
+    {
+      propertyId: property.id,
+      buyerName: "Alessandro Conti",
+      buyerEmail: "a.conti@pec.it",
+      buyerPhone: "+39 366 9998877",
+      scheduledAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+      status: "PENDING" as const,
+      notes: null,
+    },
+    {
+      propertyId: property.id,
+      buyerName: "Giulia Martinelli",
+      buyerEmail: "giulia.mart@outlook.it",
+      buyerPhone: "+39 328 5551234",
+      scheduledAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      status: "PENDING" as const,
+      notes: "Preferisce orario pomeridiano",
+    },
+  ];
+
+  for (const visit of visitsData) {
+    await prisma.visit.create({ data: visit });
+  }
+  console.log(`${visitsData.length} visits created`);
+
   // Create sample seller lead
   await prisma.sellerLead.create({
     data: {
