@@ -82,6 +82,28 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleLeadAction(leadId: string, action: "approve" | "reject") {
+    if (action === "reject" && !window.confirm("Sei sicuro di voler rifiutare questa agenzia?")) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/leads/agency/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(action === "approve" ? "Agenzia approvata! Email inviata." : "Agenzia rifiutata. Email inviata.");
+        loadData();
+      } else {
+        alert(data.error || "Errore");
+      }
+    } catch (err) {
+      alert("Errore nell'operazione");
+    }
+  }
+
   async function handleAssign(propertyId: string) {
     try {
       const res = await fetch("/api/admin/assign", {
@@ -416,6 +438,7 @@ export default function AdminDashboard() {
                           <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Zona</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Stato</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Data</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Azioni</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -429,6 +452,7 @@ export default function AdminDashboard() {
                               <span className={`text-xs px-2 py-1 rounded-full ${
                                 lead.status === "NEW" ? "bg-green-100 text-green-700" :
                                 lead.status === "CONTACTED" ? "bg-blue-100 text-blue-700" :
+                                lead.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" :
                                 lead.status === "CONVERTED" ? "bg-purple-100 text-purple-700" :
                                 lead.status === "LOST" ? "bg-red-100 text-red-700" :
                                 "bg-gray-100 text-gray-700"
@@ -436,12 +460,31 @@ export default function AdminDashboard() {
                                 {lead.status === "NEW" ? "Nuovo" :
                                  lead.status === "CONTACTED" ? "Contattato" :
                                  lead.status === "ONBOARDING" ? "Onboarding" :
+                                 lead.status === "APPROVED" ? "Approvato" :
                                  lead.status === "CONVERTED" ? "Convertito" :
-                                 lead.status === "LOST" ? "Perso" : lead.status}
+                                 lead.status === "LOST" ? "Rifiutato" : lead.status}
                               </span>
                             </td>
                             <td className="py-3 px-4 text-sm text-[#64748b]">
                               {new Date(lead.createdAt).toLocaleDateString("it-IT")}
+                            </td>
+                            <td className="py-3 px-4">
+                              {(lead.status === "NEW" || lead.status === "CONTACTED") && (
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleLeadAction(lead.id, "approve")}
+                                    className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-medium"
+                                  >
+                                    Approva
+                                  </button>
+                                  <button
+                                    onClick={() => handleLeadAction(lead.id, "reject")}
+                                    className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium"
+                                  >
+                                    Rifiuta
+                                  </button>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         ))}

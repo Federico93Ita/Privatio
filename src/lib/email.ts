@@ -331,3 +331,133 @@ export function welcomeEmail(name: string) {
     `,
   };
 }
+
+export function agencyApprovedEmail(contactName: string, agencyName: string, registrationUrl: string) {
+  return {
+    subject: "La tua agenzia è stata approvata — Privatio Partner",
+    html: `
+      <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 32px; letter-spacing: -0.5px;">Privatio Partner</h1>
+          <p style="color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 16px;">Network Agenzie Immobiliari</p>
+        </div>
+
+        <div style="padding: 30px; background: white;">
+          <h2 style="color: #0a1f44; margin-top: 0;">Complimenti ${esc(contactName)}!</h2>
+          <p style="color: #475569; line-height: 1.7; font-size: 15px;">
+            Siamo lieti di comunicarti che <strong>${esc(agencyName)}</strong> è stata
+            <strong style="color: #10b981;">approvata</strong> per entrare nel network Privatio Partner.
+            Abbiamo valutato attentamente la tua candidatura e siamo convinti che la collaborazione
+            sarà vantaggiosa per entrambi.
+          </p>
+
+          <div style="background: #f0f9ff; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <h3 style="color: #0a1f44; margin-top: 0; font-size: 18px;">Come funziona per le agenzie partner</h3>
+
+            <div style="margin-bottom: 16px;">
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">1. Completa la registrazione</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                Clicca il link in fondo a questa email per creare il tuo account agenzia
+                e scegliere il piano più adatto alle tue esigenze.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">2. Ricevi immobili nella tua zona</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                I venditori della tua area vengono automaticamente assegnati alla tua agenzia.
+                Riceverai una notifica per ogni nuovo immobile.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">3. Gestisci tutto dalla dashboard</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                Sopralluoghi, foto, pubblicazione annunci, visite e trattative:
+                tutto gestibile dalla tua dashboard dedicata.
+              </p>
+            </div>
+
+            <div>
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">4. Cresci senza costi di acquisizione</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                Nessun costo per lead o acquisizione clienti. Paghi solo l'abbonamento
+                mensile e ricevi immobili pronti da gestire.
+              </p>
+            </div>
+          </div>
+
+          <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <h3 style="color: #0a1f44; margin-top: 0; font-size: 18px;">Piani disponibili</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; vertical-align: top; width: 48%;">
+                  <p style="margin: 0; color: #0a1f44; font-weight: bold; font-size: 16px;">BASE</p>
+                  <p style="margin: 4px 0 8px; color: #0e8ff1; font-size: 24px; font-weight: bold;">€49<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
+                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">Fino a 5 immobili<br/>Dashboard base<br/>Supporto email</p>
+                </td>
+                <td style="width: 4%;"></td>
+                <td style="padding: 12px; border: 2px solid #0e8ff1; border-radius: 8px; vertical-align: top; width: 48%; background: #f0f9ff;">
+                  <p style="margin: 0; color: #0a1f44; font-weight: bold; font-size: 16px;">PRO <span style="background: #0e8ff1; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; vertical-align: middle;">CONSIGLIATO</span></p>
+                  <p style="margin: 4px 0 8px; color: #0e8ff1; font-size: 24px; font-weight: bold;">€99<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
+                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">Immobili illimitati<br/>Dashboard avanzata<br/>Supporto prioritario<br/>Badge premium</p>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="text-align: center; margin: 32px 0 16px;">
+            <a href="${registrationUrl}"
+               style="background: #0e8ff1; color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+              Completa la Registrazione
+            </a>
+          </div>
+          <p style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 8px;">
+            Questo link è riservato esclusivamente a ${esc(agencyName)}.
+          </p>
+        </div>
+
+        <div style="padding: 24px 30px; background: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="color: #64748b; font-size: 14px; margin: 0 0 4px;">Hai domande? Rispondi a questa email, siamo qui per aiutarti.</p>
+          <p style="color: #94a3b8; font-size: 13px; margin: 0;">Privatio Partner — Network Agenzie Immobiliari</p>
+        </div>
+      </div>
+    `,
+  };
+}
+
+export function agencyRejectedEmail(contactName: string, agencyName: string) {
+  return {
+    subject: "Aggiornamento sulla tua candidatura — Privatio",
+    html: `
+      <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 32px;">Privatio Partner</h1>
+        </div>
+        <div style="padding: 30px; background: white;">
+          <h2 style="color: #0a1f44; margin-top: 0;">Ciao ${esc(contactName)},</h2>
+          <p style="color: #475569; line-height: 1.7; font-size: 15px;">
+            Ti ringraziamo per l'interesse dimostrato nel voler far parte del network Privatio Partner
+            con <strong>${esc(agencyName)}</strong>.
+          </p>
+          <p style="color: #475569; line-height: 1.7; font-size: 15px;">
+            Dopo un'attenta valutazione, al momento non siamo in grado di procedere con l'attivazione
+            della partnership. Il nostro processo di selezione è molto rigoroso per garantire il massimo
+            livello di qualità ai nostri clienti venditori.
+          </p>
+          <p style="color: #475569; line-height: 1.7; font-size: 15px;">
+            Questo non preclude future collaborazioni. Ti invitiamo a ripresentare la candidatura
+            in futuro, saremo felici di rivalutarla.
+          </p>
+          <p style="color: #475569; margin-top: 24px; font-size: 15px;">
+            Cordiali saluti,<br/>
+            <strong>Il team Privatio</strong>
+          </p>
+        </div>
+        <div style="padding: 24px 30px; background: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="color: #94a3b8; font-size: 13px; margin: 0;">Privatio — Vendi casa. Zero commissioni.</p>
+        </div>
+      </div>
+    `,
+  };
+}

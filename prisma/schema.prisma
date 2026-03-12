@@ -253,22 +253,25 @@ enum LeadStatus {
   NEW
   CONTACTED
   ONBOARDING
+  APPROVED
   CONVERTED
   LOST
 }
 
 model AgencyLead {
-  id          String     @id @default(cuid())
-  agencyName  String
-  contactName String
-  email       String
-  phone       String
-  city        String
-  province    String
-  agentCount  Int?
-  message     String?    @db.Text
-  status      LeadStatus @default(NEW)
-  createdAt   DateTime   @default(now())
+  id            String     @id @default(cuid())
+  agencyName    String
+  contactName   String
+  email         String
+  phone         String
+  city          String
+  province      String
+  agentCount    Int?
+  message       String?    @db.Text
+  status        LeadStatus @default(NEW)
+  approvalToken String?
+  approvedAt    DateTime?
+  createdAt     DateTime   @default(now())
 }
 
 model Message {

@@ -15,6 +15,7 @@ const agencyRegisterSchema = z.object({
   province: z.string().min(2, "Provincia richiesta"),
   description: z.string().optional(),
   coverageRadius: z.number().min(5).max(50).default(15),
+  approvalToken: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -44,6 +45,20 @@ export async function POST(req: NextRequest) {
     });
     if (existingAgency) {
       return NextResponse.json({ error: "Agenzia già registrata" }, { status: 409 });
+    }
+
+    // Validate approval token if provided
+    let approvedLead = null;
+    if (data.approvalToken) {
+      approvedLead = await prisma.agencyLead.findFirst({
+        where: { approvalToken: data.approvalToken, status: "APPROVED" },
+      });
+      if (!approvedLead) {
+        return NextResponse.json(
+          { error: "Token di approvazione non valido o già utilizzato" },
+          { status: 400 }
+        );
+      }
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 12);
@@ -78,6 +93,14 @@ export async function POST(req: NextRequest) {
 
       return { agency, user };
     });
+
+    // Mark lead as converted if registered via approval token
+    if (approvedLead) {
+      await prisma.agencyLead.update({
+        where: { id: approvedLead.id },
+        data: { status: "CONVERTED" },
+      });
+    }
 
     // Welcome email
     await sendEmail({
