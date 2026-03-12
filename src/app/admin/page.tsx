@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice } from "@/lib/utils";
 
@@ -24,6 +25,15 @@ export default function AdminDashboard() {
   const [agencyLeads, setAgencyLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "properties" | "agencies" | "leads" | "assignments">("overview");
+  const searchParams = useSearchParams();
+
+  // Read initial tab from URL query param
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "properties" || tab === "agencies" || tab === "leads" || tab === "assignments") {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     loadData();
