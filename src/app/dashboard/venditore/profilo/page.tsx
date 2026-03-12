@@ -34,7 +34,7 @@ export default function SellerProfilePage() {
           setPhone(data.user.phone || "");
         }
       })
-      .catch(console.error)
+      .catch(() => setSaveError("Errore nel caricamento del profilo. Riprova."))
       .finally(() => setLoading(false));
   }, []);
 

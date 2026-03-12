@@ -25,7 +25,7 @@ export default function SellerContractPage() {
         setProperty(prop);
         setContract(prop?.contract);
       })
-      .catch(console.error)
+      .catch(() => setOtpError("Errore nel caricamento del contratto. Riprova."))
       .finally(() => setLoading(false));
   }, []);
 

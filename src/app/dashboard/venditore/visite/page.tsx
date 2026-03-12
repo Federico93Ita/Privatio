@@ -18,11 +18,15 @@ interface Visit {
 export default function SellerVisitsPage() {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [filter, setFilter] = useState("ALL");
 
   useEffect(() => {
     fetch("/api/dashboard/seller")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Errore nel caricamento");
+        return r.json();
+      })
       .then((data) => {
         const propertyTitle = data.property?.title || "Immobile";
         const allVisits = (data.allVisits || []).map((v: any) => ({
@@ -31,7 +35,7 @@ export default function SellerVisitsPage() {
         }));
         setVisits(allVisits);
       })
-      .catch(console.error)
+      .catch(() => setFetchError("Errore nel caricamento delle visite. Riprova."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -53,6 +57,13 @@ export default function SellerVisitsPage() {
     <DashboardLayout role="seller">
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-[#0a1f44]">Visite Programmate</h1>
+
+        {fetchError && !loading && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+            <p className="text-sm font-medium text-red-600">{fetchError}</p>
+            <button onClick={() => window.location.reload()} className="mt-3 text-sm font-semibold text-[#0e8ff1] underline hover:no-underline">Riprova</button>
+          </div>
+        )}
 
         <div className="flex gap-2 flex-wrap">
           {[{ id: "ALL", label: "Tutte" }, { id: "PENDING", label: "In Attesa" }, { id: "CONFIRMED", label: "Confermate" }, { id: "COMPLETED", label: "Completate" }, { id: "CANCELLED", label: "Annullate" }].map((tab) => (

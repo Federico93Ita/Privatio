@@ -8,16 +8,20 @@ export default function AgencyDashboardPage() {
   const [agency, setAgency] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
 
   useEffect(() => {
     fetch("/api/dashboard/agency")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Errore nel caricamento");
+        return r.json();
+      })
       .then((data) => {
         setAgency(data.agency);
         setStats(data.stats);
       })
-      .catch(console.error)
+      .catch(() => setFetchError("Errore nel caricamento dei dati. Riprova."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -46,13 +50,20 @@ export default function AgencyDashboardPage() {
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-[#0a1f44]">Dashboard Agenzia</h1>
 
+        {fetchError && !loading && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+            <p className="text-sm font-medium text-red-600">{fetchError}</p>
+            <button onClick={() => window.location.reload()} className="mt-3 text-sm font-semibold text-[#0e8ff1] underline hover:no-underline">Riprova</button>
+          </div>
+        )}
+
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-24 bg-[#f8fafc] rounded-lg animate-pulse" />
             ))}
           </div>
-        ) : !agency ? (
+        ) : !agency && !fetchError ? (
           <div className="bg-white rounded-xl p-8 border border-[#e2e8f0] text-center">
             <h3 className="text-lg font-semibold text-[#0a1f44] mb-2">Agenzia non trovata</h3>
             <p className="text-[#64748b]">Il tuo profilo agenzia non è ancora configurato.</p>

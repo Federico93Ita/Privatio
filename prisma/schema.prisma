@@ -77,6 +77,16 @@ model Agency {
   description      String?   @db.Text
   rating           Float?    @default(0)
   reviewCount      Int       @default(0)
+  // Fatturazione elettronica
+  ragioneSociale   String?
+  partitaIva       String?
+  codiceFiscale    String?
+  pec              String?
+  codiceSdi        String?   @default("0000000")
+  invoiceAddress   String?
+  invoiceCity      String?
+  invoiceProvince  String?
+  invoiceCap       String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   agents           User[]

@@ -49,7 +49,7 @@ export default function SellerPropertyEditPage() {
           setEnergyClass(p.energyClass);
         }
       })
-      .catch(console.error)
+      .catch(() => setError("Errore nel caricamento dell'immobile. Riprova."))
       .finally(() => setLoading(false));
   }, []);
 
