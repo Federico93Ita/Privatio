@@ -39,14 +39,29 @@ export default function AgencySettingsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function handleSave() {
     setSaving(true);
-    // In production: PUT /api/agency/[id]
-    setTimeout(() => {
-      setSaving(false);
+    setError(null);
+    try {
+      const res = await fetch("/api/dashboard/agency/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Errore nel salvataggio");
+        return;
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    }, 1000);
+    } catch {
+      setError("Errore di connessione. Riprova.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -119,6 +134,7 @@ export default function AgencySettingsPage() {
                   {saving ? "Salvataggio..." : "Salva modifiche"}
                 </button>
                 {saved && <p className="text-sm text-[#10b981] font-medium">Modifiche salvate!</p>}
+                {error && <p className="text-sm text-[#ef4444] font-medium">{error}</p>}
               </div>
             </div>
 
