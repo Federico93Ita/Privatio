@@ -39,11 +39,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       id || props.name || label?.toLowerCase().replace(/\s+/g, "-");
 
     return (
-      <div className={cn("flex flex-col gap-1.5", fullWidth && "w-full")}>
+      <div className={cn("flex flex-col gap-2", fullWidth && "w-full")}>
         {label && (
           <label
             htmlFor={selectId}
-            className="text-sm font-medium text-text select-none"
+            className="text-sm font-medium text-text select-none tracking-[-0.01em]"
           >
             {label}
           </label>
@@ -54,9 +54,9 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             disabled={disabled}
             className={cn(
-              "w-full appearance-none rounded-lg border bg-bg px-4 py-2.5 pr-10 text-base text-text",
-              "transition-colors duration-200",
-              "focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary",
+              "w-full appearance-none rounded-lg border bg-bg px-4 py-3 pr-10 text-base text-text",
+              "transition-colors duration-300",
+              "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
               "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-bg-soft",
               error
                 ? "border-error focus:ring-error/40 focus:border-error"

@@ -35,10 +35,10 @@ interface ToastContextValue {
 /* ------------------------------------------------------------------ */
 
 const typeStyles: Record<ToastType, string> = {
-  success: "bg-success text-white",
-  error: "bg-error text-white",
-  info: "bg-primary text-white",
-  warning: "bg-accent text-white",
+  success: "bg-white text-success border border-success/15 shadow-lg shadow-success/5",
+  error: "bg-white text-error border border-error/15 shadow-lg shadow-error/5",
+  info: "bg-white text-primary border border-primary/15 shadow-lg shadow-primary/5",
+  warning: "bg-white text-accent border border-accent/15 shadow-lg shadow-accent/5",
 };
 
 const typeIcons: Record<ToastType, ReactNode> = {
@@ -184,9 +184,9 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
+      transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
       className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg",
+        "flex items-center gap-3 px-5 py-3.5 rounded-xl",
         "min-w-[300px] max-w-md pointer-events-auto",
         typeStyles[toast.type]
       )}
@@ -198,7 +198,7 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
       <p className="flex-1 text-sm font-medium">{toast.message}</p>
       <button
         onClick={() => onDismiss(toast.id)}
-        className="shrink-0 rounded-md p-1 opacity-70 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+        className="shrink-0 rounded-md p-1 opacity-50 hover:opacity-100 transition-opacity duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
         aria-label="Chiudi notifica"
       >
         <svg

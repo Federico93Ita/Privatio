@@ -80,7 +80,7 @@ function Modal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-primary-dark/50 backdrop-blur-sm"
+            className="fixed inset-0 bg-primary-dark/40 backdrop-blur-md"
             onClick={handleOverlayClick}
             aria-hidden="true"
           />
@@ -94,9 +94,9 @@ function Modal({
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
               className={cn(
-                "relative w-full rounded-xl bg-bg border border-border shadow-xl",
+                "relative w-full rounded-2xl bg-bg border border-border shadow-xl",
                 "max-h-[calc(100vh-2rem)] overflow-y-auto",
                 sizeStyles[size],
                 className
@@ -109,12 +109,12 @@ function Modal({
             >
               {/* Header */}
               {(title || showCloseButton) && (
-                <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-bg px-6 pt-6 pb-2">
+                <div className="sticky top-0 z-10 flex items-start justify-between gap-4 bg-bg px-8 pt-8 pb-2">
                   <div className="flex-1 min-w-0">
                     {title && (
                       <h2
                         id="modal-title"
-                        className="text-lg font-semibold text-text"
+                        className="text-lg font-medium text-text tracking-[-0.02em]"
                       >
                         {title}
                       </h2>
@@ -159,7 +159,7 @@ function Modal({
               )}
 
               {/* Body */}
-              <div className="px-6 pb-6 pt-2">{children}</div>
+              <div className="px-8 pb-8 pt-2">{children}</div>
             </motion.div>
           </div>
         </div>

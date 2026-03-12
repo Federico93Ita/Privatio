@@ -3,10 +3,10 @@ import { cn } from "@/lib/utils";
 
 const variantStyles = {
   default: "bg-bg-soft text-text-muted border-border",
-  success: "bg-success/10 text-success border-success/20",
-  warning: "bg-accent/10 text-accent border-accent/20",
-  error: "bg-error/10 text-error border-error/20",
-  info: "bg-primary/10 text-primary border-primary/20",
+  success: "bg-success/5 text-success border-success/15",
+  warning: "bg-accent/5 text-accent border-accent/15",
+  error: "bg-error/5 text-error border-error/15",
+  info: "bg-primary/5 text-primary border-primary/15",
 } as const;
 
 const sizeStyles = {
@@ -36,7 +36,7 @@ function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 font-medium rounded-full border",
+        "inline-flex items-center gap-1.5 font-medium rounded-full border text-[0.8125rem] leading-none",
         "whitespace-nowrap select-none",
         variantStyles[variant],
         sizeStyles[size],

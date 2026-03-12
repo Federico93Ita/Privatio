@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const paddingStyles = {
   none: "p-0",
-  sm: "p-4",
+  sm: "p-5",
   md: "p-6",
   lg: "p-8",
 } as const;
@@ -28,11 +28,11 @@ function Card({
   return (
     <div
       className={cn(
-        "rounded-xl bg-bg",
-        bordered && "border border-border",
+        "rounded-2xl bg-bg",
+        bordered && "border border-border shadow-[0_1px_3px_rgba(0,0,0,0.04)]",
         paddingStyles[padding],
         hover &&
-          "transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/5 cursor-pointer",
+          "transition-all duration-300 ease-out hover:shadow-md hover:shadow-black/5 hover:-translate-y-0.5 cursor-pointer",
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ function CardTitle({
 }: CardTitleProps) {
   return (
     <Tag
-      className={cn("text-lg font-semibold text-text", className)}
+      className={cn("text-lg font-medium text-text tracking-[-0.02em]", className)}
       {...props}
     >
       {children}

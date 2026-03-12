@@ -6,19 +6,19 @@ import { cn } from "@/lib/utils";
 
 const variantStyles = {
   primary:
-    "bg-primary text-white hover:bg-primary/90 focus-visible:ring-primary",
+    "bg-primary text-white hover:bg-primary/85 shadow-sm shadow-primary/10",
   secondary:
-    "border-2 border-primary text-primary bg-transparent hover:bg-primary/5 focus-visible:ring-primary",
+    "border border-primary/30 text-primary bg-transparent hover:bg-primary/5",
   ghost:
-    "text-text-muted bg-transparent hover:bg-bg-soft focus-visible:ring-text-muted",
+    "text-text-muted bg-transparent hover:bg-bg-soft",
   accent:
-    "bg-accent text-white hover:bg-accent/90 focus-visible:ring-accent",
+    "bg-accent text-white hover:bg-accent/85 shadow-sm shadow-accent/10",
 } as const;
 
 const sizeStyles = {
-  sm: "px-3 py-1.5 text-sm gap-1.5",
+  sm: "px-3.5 py-1.5 text-sm gap-1.5",
   md: "px-5 py-2.5 text-base gap-2",
-  lg: "px-7 py-3.5 text-lg gap-2.5",
+  lg: "px-8 py-3.5 text-lg gap-2.5",
 } as const;
 
 type ButtonVariant = keyof typeof variantStyles;
@@ -95,9 +95,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || loading;
 
     const classes = cn(
-      "inline-flex items-center justify-center font-medium rounded-lg",
-      "transition-all duration-200 ease-in-out",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+      "inline-flex items-center justify-center font-medium rounded-lg tracking-[-0.01em]",
+      "transition-all duration-300 ease-out",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2",
       "cursor-pointer select-none",
       variantStyles[variant],
       sizeStyles[size],

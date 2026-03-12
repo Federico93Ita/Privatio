@@ -59,7 +59,7 @@ function ProgressBar({
       )}
       <div
         className={cn(
-          "w-full rounded-full bg-border/40 overflow-hidden",
+          "w-full rounded-full bg-border overflow-hidden",
           sizeMap[size]
         )}
         role="progressbar"

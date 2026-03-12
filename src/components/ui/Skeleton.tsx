@@ -17,7 +17,7 @@ function Skeleton({
   className,
   lines = 1,
 }: SkeletonProps) {
-  const baseClass = "animate-pulse bg-border/60 rounded";
+  const baseClass = "animate-pulse bg-border rounded";
 
   if (variant === "circle") {
     const size = width || height || 40;
@@ -78,7 +78,7 @@ function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-border p-6 space-y-4",
+        "rounded-2xl border border-border p-6 space-y-4",
         className
       )}
       aria-hidden="true"
