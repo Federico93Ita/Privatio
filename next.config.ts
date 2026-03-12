@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseHostname = supabaseUrl
-  ? new URL(supabaseUrl).hostname
-  : "*.supabase.co";
+let supabaseHostname = "*.supabase.co";
+try {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  if (supabaseUrl && supabaseUrl.startsWith("http")) {
+    supabaseHostname = new URL(supabaseUrl).hostname;
+  }
+} catch {}
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["http://localhost:3000"],
