@@ -1,29 +1,33 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #0e8ff1;
-  --color-primary-dark: #0a1f44;
+  --color-primary: #2563eb;
+  --color-primary-dark: #0f172a;
   --color-accent: #f59e0b;
   --color-bg: #ffffff;
-  --color-bg-soft: #f8fafc;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-success: #10b981;
-  --color-error: #ef4444;
+  --color-bg-soft: #fafafa;
+  --color-text: #0f172a;
+  --color-text-muted: #6b7280;
+  --color-border: #f0f0f0;
+  --color-success: #059669;
+  --color-error: #dc2626;
 
-  --font-heading: "Anton", sans-serif;
-  --font-sans: "Poppins", sans-serif;
+  --font-heading: "Inter", sans-serif;
+  --font-sans: "Inter", sans-serif;
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+  letter-spacing: -0.025em;
 }
 
 /* Smooth scrolling */
@@ -31,30 +35,30 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-soft);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
+  background: #d4d4d4;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: #a3a3a3;
 }
 
-/* Focus styles for accessibility */
+/* Refined focus styles */
 *:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 1.5px solid var(--color-primary);
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Anton font for hero and section titles */
+/* Heading utility — clean, no uppercase */
 .font-heading {
   font-family: var(--font-heading);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.025em;
 }
