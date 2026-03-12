@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendEmail, welcomeEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,10 +37,20 @@ export async function GET(req: NextRequest) {
     });
 
     // Mark user as verified
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: { email },
       data: { emailVerified: new Date() },
     });
+
+    // Send welcome email after successful verification
+    if (user.name && user.email) {
+      try {
+        const emailContent = welcomeEmail(user.name);
+        await sendEmail({ to: user.email, ...emailContent });
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+      }
+    }
 
     return NextResponse.json({ message: "Email verificata con successo!" });
   } catch (error) {

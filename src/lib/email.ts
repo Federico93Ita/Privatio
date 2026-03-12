@@ -213,3 +213,121 @@ export function leadReceivedEmail(name: string) {
     `,
   };
 }
+
+export function welcomeEmail(name: string) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.vercel.app";
+  return {
+    subject: "Benvenuto su Privatio — Ecco come funziona!",
+    html: `
+      <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 32px; letter-spacing: -0.5px;">Privatio</h1>
+          <p style="color: rgba(255,255,255,0.9); margin-top: 8px; font-size: 16px;">Vendi casa. Zero commissioni.</p>
+        </div>
+
+        <!-- Welcome -->
+        <div style="padding: 30px; background: white;">
+          <h2 style="color: #0a1f44; margin-top: 0;">Ciao ${esc(name)}, benvenuto su Privatio! 🎉</h2>
+          <p style="color: #475569; line-height: 1.7; font-size: 15px;">
+            Siamo felici di averti a bordo! Privatio è la <strong>prima piattaforma immobiliare in Italia
+            pensata per chi vende</strong>. Il nostro obiettivo è semplice: aiutarti a vendere il tuo
+            immobile senza pagare commissioni.
+          </p>
+
+          <!-- How it works -->
+          <div style="background: #f0f9ff; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <h3 style="color: #0a1f44; margin-top: 0; font-size: 18px;">📋 Come funziona Privatio</h3>
+
+            <div style="margin-bottom: 16px;">
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">STEP 1 — Inserisci il tuo immobile</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                Dalla tua dashboard, clicca su "Inserisci immobile" e compila i dati: indirizzo,
+                metratura, prezzo, descrizione e foto. Più dettagli inserisci, meglio è!
+              </p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">STEP 2 — Ti assegniamo un'agenzia partner</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                Il nostro team verifica il tuo annuncio e ti assegna un'agenzia immobiliare
+                partner nella tua zona. Riceverai un'email con i contatti dell'agenzia.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">STEP 3 — L'agenzia gestisce tutto</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                L'agenzia si occupa di sopralluogo, foto professionali, pubblicazione dell'annuncio
+                sui principali portali e gestione delle visite con i potenziali acquirenti.
+              </p>
+            </div>
+
+            <div>
+              <p style="color: #0e8ff1; font-weight: bold; margin: 0 0 4px; font-size: 14px;">STEP 4 — Vendi e incassi il 100%</p>
+              <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
+                Quando trovi l'acquirente giusto, concludi la vendita e <strong>incassi l'intero
+                prezzo di vendita</strong>. Nessuna commissione, nessun costo nascosto.
+              </p>
+            </div>
+          </div>
+
+          <!-- Key benefits -->
+          <div style="background: #f8fafc; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <h3 style="color: #0a1f44; margin-top: 0; font-size: 18px;">✨ Perché scegliere Privatio</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #0e8ff1; font-size: 20px; width: 30px;">💰</td>
+                <td style="padding: 8px 0;">
+                  <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 14px;">Zero commissioni</p>
+                  <p style="margin: 2px 0 0; color: #64748b; font-size: 13px;">Non paghi nulla. Il servizio è completamente gratuito per il venditore.</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #0e8ff1; font-size: 20px; width: 30px;">🏠</td>
+                <td style="padding: 8px 0;">
+                  <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 14px;">Agenzie verificate</p>
+                  <p style="margin: 2px 0 0; color: #64748b; font-size: 13px;">Collaboriamo solo con agenzie professionali selezionate nella tua zona.</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #0e8ff1; font-size: 20px; width: 30px;">📊</td>
+                <td style="padding: 8px 0;">
+                  <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 14px;">Dashboard dedicata</p>
+                  <p style="margin: 2px 0 0; color: #64748b; font-size: 13px;">Monitora lo stato del tuo immobile, le visite programmate e i contatti ricevuti.</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #0e8ff1; font-size: 20px; width: 30px;">🔒</td>
+                <td style="padding: 8px 0;">
+                  <p style="margin: 0; color: #1e293b; font-weight: bold; font-size: 14px;">Trasparenza totale</p>
+                  <p style="margin: 2px 0 0; color: #64748b; font-size: 13px;">Sei sempre aggiornato su ogni fase della vendita del tuo immobile.</p>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- CTA -->
+          <div style="text-align: center; margin: 32px 0 16px;">
+            <a href="${appUrl}/dashboard/venditore"
+               style="background: #0e8ff1; color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+              Vai alla tua Dashboard
+            </a>
+          </div>
+          <p style="text-align: center; color: #94a3b8; font-size: 13px; margin-top: 8px;">
+            Oppure visita <a href="${appUrl}" style="color: #0e8ff1;">privatio.it</a> per esplorare la piattaforma.
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 24px 30px; background: #f8fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+          <p style="color: #64748b; font-size: 14px; margin: 0 0 4px;">Hai domande? Rispondi a questa email, siamo qui per aiutarti.</p>
+          <p style="color: #94a3b8; font-size: 13px; margin: 0;">
+            Privatio — Vendi casa. Zero commissioni.<br/>
+            <a href="${appUrl}" style="color: #0e8ff1;">privatio.it</a>
+          </p>
+        </div>
+      </div>
+    `,
+  };
+}
