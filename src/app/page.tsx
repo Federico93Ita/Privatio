@@ -3,6 +3,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SavingsCalc from "@/components/property/SavingsCalc";
 import LeadForm from "@/components/forms/LeadForm";
+import FeaturedProperties from "@/components/home/FeaturedProperties";
 import { formatPrice } from "@/lib/utils";
 
 /* ================================================================== */
@@ -273,39 +274,6 @@ const features = [
   },
 ];
 
-const showcaseProperties = [
-  {
-    id: "1",
-    title: "Trilocale luminoso con balcone",
-    city: "Milano",
-    province: "MI",
-    price: 320000,
-    surface: 95,
-    rooms: 3,
-    gradient: "from-primary/30 to-primary-dark/30",
-  },
-  {
-    id: "2",
-    title: "Appartamento ristrutturato centro storico",
-    city: "Roma",
-    province: "RM",
-    price: 285000,
-    surface: 80,
-    rooms: 2,
-    gradient: "from-accent/30 to-primary/30",
-  },
-  {
-    id: "3",
-    title: "Villa bifamiliare con giardino",
-    city: "Torino",
-    province: "TO",
-    price: 450000,
-    surface: 160,
-    rooms: 5,
-    gradient: "from-success/30 to-primary/30",
-  },
-];
-
 const testimonials = [
   {
     quote:
@@ -554,56 +522,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {showcaseProperties.map((property) => (
-                <div
-                  key={property.id}
-                  className="group overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                >
-                  {/* Photo placeholder */}
-                  <div
-                    className={`relative aspect-[4/3] bg-gradient-to-br ${property.gradient}`}
-                  >
-                    <div className="flex h-full items-center justify-center">
-                      <svg
-                        className="h-16 w-16 text-white/40"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={1}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-                        />
-                      </svg>
-                    </div>
-                    {/* Badge */}
-                    <span className="absolute left-3 top-3 rounded-full bg-success/90 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-                      0% comm. venditore
-                    </span>
-                  </div>
-
-                  {/* Card body */}
-                  <div className="flex flex-col gap-2 p-5">
-                    <h3 className="text-base font-semibold text-text transition-colors group-hover:text-primary">
-                      {property.title}
-                    </h3>
-                    <p className="text-sm text-text-muted">
-                      {property.city}, {property.province}
-                    </p>
-                    <p className="text-xl font-bold text-primary">
-                      {formatPrice(property.price)}
-                    </p>
-                    <div className="flex items-center gap-4 border-t border-border pt-2 text-sm text-text-muted">
-                      <span>{property.surface} mq</span>
-                      <span>{property.rooms} locali</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <FeaturedProperties />
 
             <div className="mt-12 text-center">
               <Link
