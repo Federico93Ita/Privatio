@@ -321,95 +321,38 @@ export default function HomePage() {
         {/* ============================================================ */}
         {/*  1. HERO                                                      */}
         {/* ============================================================ */}
-        <section className="relative flex min-h-screen items-center bg-gradient-to-b from-white to-bg-soft pt-20">
-          {/* Decorative blurred circles */}
-          <div className="pointer-events-none absolute -top-32 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-accent/5 blur-3xl" />
-
-          <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-24">
-            {/* ---- Left column: Copy ---- */}
-            <div className="flex flex-col items-start gap-6 text-left">
-              <h1 className="font-heading text-5xl leading-[1.1] tracking-wide text-text sm:text-6xl lg:text-7xl">
+        <section className="relative flex min-h-[85vh] items-center pt-20">
+          <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:px-8 lg:py-32">
+              <h1 className="text-4xl font-light leading-[1.1] tracking-[-0.03em] text-text sm:text-5xl lg:text-6xl">
                 Vendi casa.
                 <br />
                 <span className="text-primary">Zero commissioni.</span>
               </h1>
 
-              <p className="max-w-lg text-lg leading-relaxed text-text-muted sm:text-xl">
+              <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
                 La prima piattaforma immobiliare italiana dove il venditore non
                 paga nulla. Gestiamo tutto noi, con agenzie locali selezionate.
               </p>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
                   href="/vendi"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-lg font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
                 >
-                  Inserisci il tuo immobile gratis
-                  <ArrowRightIcon className="h-5 w-5" />
+                  Inserisci il tuo immobile
+                  <ArrowRightIcon className="h-4 w-4" />
                 </Link>
                 <a
                   href="#come-funziona"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary bg-transparent px-7 py-3.5 text-lg font-semibold text-primary transition-all hover:bg-primary/5"
+                  className="inline-flex items-center justify-center gap-2 text-base text-text-muted transition-colors duration-200 hover:text-text"
                 >
                   Scopri come funziona
                 </a>
               </div>
 
-              <p className="flex items-center gap-2 text-sm text-text-muted">
-                <svg
-                  className="h-4 w-4 text-success"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Già 150+ venditori iscritti | 45 agenzie partner
+              <p className="mt-8 flex items-center justify-center gap-2 text-sm text-text-muted/70">
+                Già 150+ venditori iscritti &middot; 45 agenzie partner
               </p>
-            </div>
-
-            {/* ---- Right column: House illustration ---- */}
-            <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
-              <div className="relative aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-bg-soft to-accent/10 p-8 shadow-2xl">
-                {/* Simplified house shape */}
-                <div className="flex h-full flex-col items-center justify-center gap-4">
-                  {/* Roof */}
-                  <div className="h-0 w-0 border-b-[60px] border-l-[80px] border-r-[80px] border-b-primary/20 border-l-transparent border-r-transparent sm:border-b-[80px] sm:border-l-[100px] sm:border-r-[100px]" />
-                  {/* Body */}
-                  <div className="relative flex h-28 w-40 items-center justify-center rounded-b-lg bg-primary/15 sm:h-36 sm:w-48">
-                    {/* Door */}
-                    <div className="h-16 w-10 rounded-t-full bg-primary/25 sm:h-20 sm:w-12" />
-                    {/* Windows */}
-                    <div className="absolute left-3 top-3 h-8 w-8 rounded bg-white/60 sm:h-10 sm:w-10" />
-                    <div className="absolute right-3 top-3 h-8 w-8 rounded bg-white/60 sm:h-10 sm:w-10" />
-                  </div>
-                </div>
-
-                {/* Badge overlay */}
-                <div className="absolute bottom-6 right-6 rounded-2xl bg-white px-5 py-3 shadow-xl">
-                  <p className="text-center font-heading text-2xl tracking-wide text-success sm:text-3xl">
-                    0%
-                  </p>
-                  <p className="text-xs font-semibold text-text-muted">
-                    commissioni
-                  </p>
-                </div>
-
-                {/* Decorative dots */}
-                <div className="absolute left-4 top-4 grid grid-cols-3 gap-1.5">
-                  {Array.from({ length: 9 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-1.5 w-1.5 rounded-full bg-primary/20"
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -434,7 +377,7 @@ export default function HomePage() {
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-14 text-center">
-              <h2 className="font-heading text-3xl tracking-wide text-text sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
                 Come Funziona
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
@@ -447,19 +390,14 @@ export default function HomePage() {
               {howItWorksSteps.map((step) => (
                 <div
                   key={step.num}
-                  className="relative rounded-2xl border border-border bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-lg"
+                  className="relative rounded-2xl bg-white p-8 text-center transition-all duration-300"
                 >
-                  {/* Step number badge */}
-                  <div className="absolute -top-4 left-1/2 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-md">
+                  {/* Step number */}
+                  <div className="mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full border border-border text-sm font-medium text-text-muted">
                     {step.num}
                   </div>
 
-                  {/* Icon */}
-                  <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                    <step.icon className="h-7 w-7 text-primary" />
-                  </div>
-
-                  <h3 className="mb-2 text-lg font-semibold text-text">
+                  <h3 className="mb-2 text-base font-medium text-text">
                     {step.title}
                   </h3>
                   <p className="text-sm leading-relaxed text-text-muted">
@@ -477,7 +415,7 @@ export default function HomePage() {
         <section className="bg-white py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-14 text-center">
-              <h2 className="font-heading text-3xl tracking-wide text-text sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
                 Perché scegliere Privatio
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
@@ -490,12 +428,12 @@ export default function HomePage() {
               {features.map((feature) => (
                 <div
                   key={feature.title}
-                  className="group rounded-2xl border border-border bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+                  className="group rounded-2xl p-6 transition-all duration-300"
                 >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                    <feature.icon className="h-6 w-6 text-primary" />
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-bg-soft">
+                    <feature.icon className="h-5 w-5 text-text-muted" />
                   </div>
-                  <h3 className="mb-2 text-base font-semibold text-text">
+                  <h3 className="mb-2 text-base font-medium text-text">
                     {feature.title}
                   </h3>
                   <p className="text-sm leading-relaxed text-text-muted">
@@ -513,7 +451,7 @@ export default function HomePage() {
         <section className="bg-bg-soft py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-14 text-center">
-              <h2 className="font-heading text-3xl tracking-wide text-text sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
                 Immobili in Vetrina
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
@@ -527,7 +465,7 @@ export default function HomePage() {
             <div className="mt-12 text-center">
               <Link
                 href="/cerca"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-primary bg-transparent px-7 py-3 text-base font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/30 bg-transparent px-6 py-3 text-sm font-medium text-primary transition-all duration-300 hover:bg-primary/5"
               >
                 Vedi tutti gli immobili
                 <ArrowRightIcon className="h-4 w-4" />
@@ -542,7 +480,7 @@ export default function HomePage() {
         <section className="bg-white py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-14 text-center">
-              <h2 className="font-heading text-3xl tracking-wide text-text sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
                 Chi ha venduto con Privatio
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
@@ -555,7 +493,7 @@ export default function HomePage() {
               {testimonials.map((testimonial) => (
                 <div
                   key={testimonial.author}
-                  className="flex flex-col justify-between rounded-2xl border border-border bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg md:p-8"
+                  className="flex flex-col justify-between rounded-2xl border border-border bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] md:p-8"
                 >
                   {/* Stars */}
                   <div>
@@ -599,26 +537,22 @@ export default function HomePage() {
         {/* ============================================================ */}
         {/*  7. AGENCIES CTA                                              */}
         {/* ============================================================ */}
-        <section className="bg-primary-dark py-20 md:py-28">
+        <section className="border-t border-border py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-              {/* Copy */}
-              <div>
-                <h2 className="font-heading text-3xl tracking-wide text-white sm:text-4xl md:text-5xl">
+            <div className="mx-auto max-w-2xl text-center">
+                <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
                   Sei un&apos;agenzia?
-                  <br />
-                  Entra nel network Privatio
                 </h2>
-                <p className="mt-4 max-w-lg text-base leading-relaxed text-white/70 sm:text-lg">
+                <p className="mt-4 text-base leading-relaxed text-text-muted sm:text-lg">
                   Unisciti alla rete di agenzie partner e ricevi contatti
                   qualificati nella tua zona.
                 </p>
 
-                <ul className="mt-8 space-y-4">
+                <ul className="mt-8 inline-block space-y-3 text-left">
                   {agencyBenefits.map((benefit) => (
                     <li key={benefit} className="flex items-start gap-3">
                       <svg
-                        className="mt-0.5 h-5 w-5 shrink-0 text-accent"
+                        className="mt-0.5 h-4 w-4 shrink-0 text-success"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -628,7 +562,7 @@ export default function HomePage() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span className="text-sm text-white/90 sm:text-base">
+                      <span className="text-sm text-text-muted">
                         {benefit}
                       </span>
                     </li>
@@ -638,35 +572,12 @@ export default function HomePage() {
                 <div className="mt-10">
                   <Link
                     href="/agenzie"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-7 py-3.5 text-lg font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 hover:shadow-xl"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
                   >
                     Diventa Partner
-                    <ArrowRightIcon className="h-5 w-5" />
+                    <ArrowRightIcon className="h-4 w-4" />
                   </Link>
                 </div>
-              </div>
-
-              {/* Decorative right column */}
-              <div className="hidden lg:flex lg:justify-center">
-                <div className="relative h-80 w-80 rounded-3xl bg-white/5 p-8">
-                  <div className="flex h-full flex-col items-center justify-center gap-6">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-accent/20">
-                      <HandshakeIcon className="h-10 w-10 text-accent" />
-                    </div>
-                    <div className="text-center">
-                      <p className="font-heading text-4xl tracking-wide text-white">
-                        45+
-                      </p>
-                      <p className="mt-1 text-sm text-white/60">
-                        agenzie partner in tutta Italia
-                      </p>
-                    </div>
-                  </div>
-                  {/* Decorative ring */}
-                  <div className="absolute inset-0 rounded-3xl border border-white/10" />
-                  <div className="absolute -inset-3 rounded-[2rem] border border-white/5" />
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -680,8 +591,8 @@ export default function HomePage() {
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
-              <h2 className="font-heading text-3xl tracking-wide text-text sm:text-4xl md:text-5xl">
-                Inizia ora. È gratis.
+              <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
+                Inizia ora
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
                 Compila il form e ti ricontatteremo entro 24 ore per assegnarti
