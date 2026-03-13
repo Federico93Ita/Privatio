@@ -368,8 +368,16 @@ export default async function PropertyDetailPage({ params }: Props) {
           </div>
 
           {/* ── Mortgage Calculator (full width, below grid) ── */}
-          <div className="mt-12 pt-8 border-t border-border">
-            <div className="lg:max-w-2xl">
+          <div className="mt-16 pt-12">
+            <div className="text-center mb-8">
+              <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
+                Simula il tuo mutuo
+              </h2>
+              <p className="text-text-muted text-sm mt-2">
+                Scopri quanto potrebbe costare la rata mensile per questo immobile
+              </p>
+            </div>
+            <div className="lg:max-w-4xl mx-auto">
               <MortgageCalc defaultPrice={property.price} />
             </div>
           </div>
