@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice, getPropertyTypeLabel, cn } from "@/lib/utils";
+import FavoriteButton from "@/components/property/FavoriteButton";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -114,6 +115,13 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-text text-xs font-medium px-2.5 py-1 rounded-full">
           {getPropertyTypeLabel(type)}
         </span>
+
+        {/* Favorite button */}
+        <FavoriteButton
+          propertyId={property.id}
+          variant="icon"
+          className="absolute bottom-3 right-3"
+        />
       </div>
 
       {/* ---- Body ---- */}

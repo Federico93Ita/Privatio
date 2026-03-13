@@ -6,6 +6,7 @@ import PropertyGallery from "@/components/property/PropertyGallery";
 import MortgageCalc from "@/components/property/MortgageCalc";
 import PropertyMap from "@/components/property/PropertyMap";
 import PropertyContactForm from "@/components/forms/PropertyContactForm";
+import FavoriteButton from "@/components/property/FavoriteButton";
 import { formatPrice, getPropertyTypeLabel } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 
@@ -187,13 +188,11 @@ export default async function PropertyDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       <Header />
-      <main className="bg-bg-soft min-h-screen">
-        {/* Gallery */}
-        {property.photos?.length > 0 && (
-          <div className="max-w-7xl mx-auto px-4 pt-6">
-            <PropertyGallery photos={property.photos} />
-          </div>
-        )}
+      <main className="bg-bg-soft min-h-screen pt-28 md:pt-32">
+        {/* Gallery (placeholder shown when no photos) */}
+        <div className="max-w-7xl mx-auto px-4 pt-6">
+          <PropertyGallery photos={property.photos ?? []} />
+        </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* ── Breadcrumb ── */}
@@ -226,11 +225,14 @@ export default async function PropertyDetailPage({ params }: Props) {
             <p className="text-text-muted text-lg mb-4">
               {property.address && `${property.address}, `}{property.city} ({property.province})
             </p>
-            <div className="flex items-baseline gap-3">
-              <p className="text-4xl font-medium text-primary">{formatPrice(property.price)}</p>
-              <p className="text-lg text-text-muted">
-                {pricePerSqm.toLocaleString("it-IT")} &euro;/mq
-              </p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-baseline gap-3">
+                <p className="text-4xl font-medium text-primary">{formatPrice(property.price)}</p>
+                <p className="text-lg text-text-muted">
+                  {pricePerSqm.toLocaleString("it-IT")} &euro;/mq
+                </p>
+              </div>
+              <FavoriteButton propertyId={property.id} variant="button" />
             </div>
           </div>
 
@@ -362,10 +364,13 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </div>
               )}
 
-              {/* Mortgage Calculator */}
-              <div className="bg-white rounded-xl p-6 border border-border">
-                <MortgageCalc defaultPrice={property.price} />
-              </div>
+            </div>
+          </div>
+
+          {/* ── Mortgage Calculator (full width, below grid) ── */}
+          <div className="mt-12 pt-8 border-t border-border">
+            <div className="lg:max-w-2xl">
+              <MortgageCalc defaultPrice={property.price} />
             </div>
           </div>
         </div>

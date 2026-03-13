@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -11,7 +11,18 @@ export async function GET() {
     }
 
     const userId = (session.user as { id: string }).id;
+    const { searchParams } = new URL(request.url);
+    const propertyId = searchParams.get("propertyId");
 
+    // Single property check — lightweight
+    if (propertyId) {
+      const favorite = await prisma.favorite.findUnique({
+        where: { userId_propertyId: { userId, propertyId } },
+      });
+      return NextResponse.json({ isFavorite: !!favorite });
+    }
+
+    // Full list
     const favorites = await prisma.favorite.findMany({
       where: { userId },
       include: {
