@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { stripe, PLANS } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import Stripe from "stripe";
+
+/** Determine plan (BASE | PRO) from subscription price ID */
+function planFromSubscription(subscription: Stripe.Subscription): "BASE" | "PRO" | null {
+  const priceId = subscription.items?.data?.[0]?.price?.id;
+  if (!priceId) return null;
+  if (priceId === PLANS.PRO.priceId) return "PRO";
+  if (priceId === PLANS.BASE.priceId) return "BASE";
+  return null;
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -22,6 +31,25 @@ export async function POST(req: NextRequest) {
   }
 
   switch (event.type) {
+    case "checkout.session.completed": {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const customerId = session.customer as string;
+      const plan = (session.metadata?.plan as "BASE" | "PRO") || null;
+
+      if (customerId && plan) {
+        const agency = await prisma.agency.findFirst({
+          where: { stripeCustomerId: customerId },
+        });
+        if (agency) {
+          await prisma.agency.update({
+            where: { id: agency.id },
+            data: { plan },
+          });
+        }
+      }
+      break;
+    }
+
     case "customer.subscription.created":
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
@@ -32,11 +60,14 @@ export async function POST(req: NextRequest) {
       });
 
       if (agency) {
+        const detectedPlan = planFromSubscription(subscription);
+
         await prisma.agency.update({
           where: { id: agency.id },
           data: {
             isActive: subscription.status === "active",
             stripeSubId: subscription.id,
+            ...(detectedPlan ? { plan: detectedPlan } : {}),
           },
         });
 

@@ -32,6 +32,7 @@ export default function AgencyBillingPage() {
   const [agency, setAgency] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   // Billing form state
   const [billing, setBilling] = useState<BillingData>(emptyBilling);
@@ -90,6 +91,24 @@ export default function AgencyBillingPage() {
     }
   }
 
+  async function handleManageSubscription() {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPortalLoading(false);
+    }
+  }
+
   async function handleSaveBilling() {
     setBillingSaving(true);
     setBillingError(null);
@@ -134,7 +153,7 @@ export default function AgencyBillingPage() {
     `w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
       fieldErrors[field]?.length
         ? "border-error/30 focus:ring-error/20"
-        : "border-border focus:ring-primary/30/30"
+        : "border-border focus:ring-1 focus:ring-primary/30"
     }`;
 
   return (
@@ -186,7 +205,7 @@ export default function AgencyBillingPage() {
                       : "Max 5 immobili — €49/mese"}
                   </p>
                 </div>
-                {!agency?.isActive && (
+                {!agency?.isActive ? (
                   <div className="flex gap-3">
                     <button
                       onClick={() => handleSubscribe("BASE")}
@@ -203,6 +222,14 @@ export default function AgencyBillingPage() {
                       Pro — €99/mese
                     </button>
                   </div>
+                ) : (
+                  <button
+                    onClick={handleManageSubscription}
+                    disabled={portalLoading}
+                    className="px-5 py-2.5 border border-border text-text rounded-lg font-medium hover:bg-bg-soft transition-colors disabled:opacity-50"
+                  >
+                    {portalLoading ? "Caricamento..." : "Gestisci abbonamento"}
+                  </button>
                 )}
               </div>
             </div>

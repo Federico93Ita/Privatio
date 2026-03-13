@@ -1,15 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice, formatDate } from "@/lib/utils";
 
 export default function AgencyDashboardPage() {
+  const searchParams = useSearchParams();
   const [agency, setAgency] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [banner, setBanner] = useState<{ type: "success" | "info" | "warning"; message: string } | null>(null);
+
+  // Post-checkout / welcome feedback
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      setBanner({ type: "success", message: "Abbonamento attivato con successo! Ora puoi iniziare a ricevere immobili." });
+      window.history.replaceState({}, "", "/dashboard/agenzia");
+    } else if (searchParams.get("canceled") === "true") {
+      setBanner({ type: "warning", message: "Pagamento annullato. Puoi riprovare quando vuoi dalla sezione Fatturazione." });
+      window.history.replaceState({}, "", "/dashboard/agenzia");
+    } else if (searchParams.get("welcome") === "true") {
+      setBanner({ type: "info", message: "Benvenuto nel network Privatio! Attiva un piano per iniziare a ricevere immobili." });
+      window.history.replaceState({}, "", "/dashboard/agenzia");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetch("/api/dashboard/agency")
@@ -49,6 +66,27 @@ export default function AgencyDashboardPage() {
     <DashboardLayout role="agency">
       <div className="space-y-6">
         <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Dashboard Agenzia</h1>
+
+        {banner && (
+          <div
+            className={`rounded-xl border p-4 flex items-center justify-between ${
+              banner.type === "success"
+                ? "bg-success/5 border-success/20 text-success"
+                : banner.type === "warning"
+                  ? "bg-accent/5 border-accent/20 text-accent"
+                  : "bg-primary/5 border-primary/20 text-primary"
+            }`}
+          >
+            <p className="text-sm font-medium">{banner.message}</p>
+            <button
+              onClick={() => setBanner(null)}
+              className="text-current opacity-60 hover:opacity-100 ml-4 text-lg leading-none"
+              aria-label="Chiudi"
+            >
+              &times;
+            </button>
+          </div>
+        )}
 
         {fetchError && !loading && (
           <div className="rounded-xl border border-error/20 bg-error/5 p-5 text-center">
