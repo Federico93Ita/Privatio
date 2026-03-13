@@ -86,7 +86,7 @@ export default function SavedSearchesPage() {
     <DashboardLayout role="buyer">
       <div className="mx-auto max-w-4xl space-y-6">
         <div>
-          <h1 className="font-heading text-2xl tracking-wide text-primary-dark sm:text-3xl">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark sm:text-3xl">
             Ricerche Salvate
           </h1>
           <p className="mt-1 text-sm text-text-muted">
@@ -111,7 +111,7 @@ export default function SavedSearchesPage() {
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <h3 className="mb-2 text-lg font-semibold text-primary-dark">
+            <h3 className="mb-2 text-lg font-medium text-primary-dark">
               Nessuna ricerca salvata
             </h3>
             <p className="mb-6 max-w-sm text-sm text-text-muted">
@@ -153,7 +153,7 @@ export default function SavedSearchesPage() {
                     type="button"
                     onClick={() => handleDelete(search.id)}
                     disabled={deletingId === search.id}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-[#ef4444] hover:bg-[#ef4444]/5 transition-colors disabled:opacity-50"
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-error hover:bg-error/5 transition-colors disabled:opacity-50"
                   >
                     {deletingId === search.id ? "..." : "Elimina"}
                   </button>

@@ -141,29 +141,29 @@ export default function AdminDashboard() {
   };
 
   const statusColors: Record<string, string> = {
-    DRAFT: "bg-gray-100 text-gray-700",
-    PENDING_REVIEW: "bg-amber-100 text-amber-700",
-    PUBLISHED: "bg-green-100 text-green-700",
-    UNDER_CONTRACT: "bg-blue-100 text-blue-700",
-    SOLD: "bg-purple-100 text-purple-700",
-    WITHDRAWN: "bg-red-100 text-red-700",
+    DRAFT: "bg-bg-soft text-text-muted",
+    PENDING_REVIEW: "bg-accent/10 text-accent",
+    PUBLISHED: "bg-success/10 text-success",
+    UNDER_CONTRACT: "bg-primary/10 text-primary",
+    SOLD: "bg-primary/10 text-primary",
+    WITHDRAWN: "bg-error/10 text-error",
   };
 
   return (
     <DashboardLayout role="admin">
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-[#0a1f44]">Pannello Admin</h1>
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Pannello Admin</h1>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-[#e2e8f0]">
+        <div className="flex gap-1 border-b border-border">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
                 activeTab === tab.id
-                  ? "bg-white text-[#0e8ff1] border-b-2 border-[#0e8ff1]"
-                  : "text-[#64748b] hover:text-[#1e293b]"
+                  ? "bg-white text-primary border-b-2 border-primary"
+                  : "text-text-muted hover:text-text"
               }`}
             >
               {tab.label}
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-[#f8fafc] rounded-lg animate-pulse" />
+              <div key={i} className="h-24 bg-bg-soft rounded-lg animate-pulse" />
             ))}
           </div>
         ) : (
@@ -184,27 +184,27 @@ export default function AdminDashboard() {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { label: "Immobili Totali", value: properties.length, color: "text-[#0e8ff1]" },
-                    { label: "Pubblicati", value: properties.filter((p) => p.status === "PUBLISHED").length, color: "text-[#10b981]" },
-                    { label: "Agenzie Totali", value: agencies.length, color: "text-[#0a1f44]" },
-                    { label: "Agenzie Attive", value: agencies.filter((a: any) => a.isActive).length, color: "text-[#f59e0b]" },
+                    { label: "Immobili Totali", value: properties.length, color: "text-primary" },
+                    { label: "Pubblicati", value: properties.filter((p) => p.status === "PUBLISHED").length, color: "text-success" },
+                    { label: "Agenzie Totali", value: agencies.length, color: "text-primary-dark" },
+                    { label: "Agenzie Attive", value: agencies.filter((a: any) => a.isActive).length, color: "text-accent" },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                      <p className="text-sm text-[#64748b]">{stat.label}</p>
-                      <p className={`text-3xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+                    <div key={i} className="bg-white rounded-xl p-5 border border-border">
+                      <p className="text-sm text-text-muted">{stat.label}</p>
+                      <p className={`text-3xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
                     </div>
                   ))}
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                    <h3 className="font-semibold text-[#0a1f44] mb-3">Immobili Recenti</h3>
+                  <div className="bg-white rounded-xl p-5 border border-border">
+                    <h3 className="font-medium text-primary-dark mb-3">Immobili Recenti</h3>
                     <div className="space-y-2">
                       {properties.slice(0, 5).map((p: any) => (
-                        <div key={p.id} className="flex justify-between items-center py-2 border-b border-[#f8fafc] last:border-0">
+                        <div key={p.id} className="flex justify-between items-center py-2 border-b border-border last:border-0">
                           <div>
                             <p className="text-sm font-medium">{p.title}</p>
-                            <p className="text-xs text-[#64748b]">{p.city}</p>
+                            <p className="text-xs text-text-muted">{p.city}</p>
                           </div>
                           <span className={`text-xs px-2 py-1 rounded-full ${statusColors[p.status]}`}>
                             {statusLabels[p.status]}
@@ -212,27 +212,27 @@ export default function AdminDashboard() {
                         </div>
                       ))}
                       {properties.length === 0 && (
-                        <p className="text-sm text-[#64748b]">Nessun immobile inserito.</p>
+                        <p className="text-sm text-text-muted">Nessun immobile inserito.</p>
                       )}
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                    <h3 className="font-semibold text-[#0a1f44] mb-3">Agenzie Recenti</h3>
+                  <div className="bg-white rounded-xl p-5 border border-border">
+                    <h3 className="font-medium text-primary-dark mb-3">Agenzie Recenti</h3>
                     <div className="space-y-2">
                       {agencies.slice(0, 5).map((a: any) => (
-                        <div key={a.id} className="flex justify-between items-center py-2 border-b border-[#f8fafc] last:border-0">
+                        <div key={a.id} className="flex justify-between items-center py-2 border-b border-border last:border-0">
                           <div>
                             <p className="text-sm font-medium">{a.name}</p>
-                            <p className="text-xs text-[#64748b]">{a.city} ({a.province})</p>
+                            <p className="text-xs text-text-muted">{a.city} ({a.province})</p>
                           </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${a.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}`}>
+                          <span className={`text-xs px-2 py-1 rounded-full ${a.isActive ? "bg-success/10 text-success" : "bg-bg-soft text-text-muted"}`}>
                             {a.isActive ? "Attiva" : "Inattiva"}
                           </span>
                         </div>
                       ))}
                       {agencies.length === 0 && (
-                        <p className="text-sm text-[#64748b]">Nessuna agenzia registrata.</p>
+                        <p className="text-sm text-text-muted">Nessuna agenzia registrata.</p>
                       )}
                     </div>
                   </div>
@@ -246,21 +246,21 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-[#e2e8f0]">
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Immobile</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Venditore</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Prezzo</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Stato</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Agenzia</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Azioni</th>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Immobile</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Venditore</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Prezzo</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Agenzia</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Azioni</th>
                       </tr>
                     </thead>
                     <tbody>
                       {properties.map((p: any) => (
-                        <tr key={p.id} className="border-b border-[#f8fafc] hover:bg-[#f8fafc]">
+                        <tr key={p.id} className="border-b border-border hover:bg-bg-soft">
                           <td className="py-3 px-4">
                             <p className="text-sm font-medium">{p.title}</p>
-                            <p className="text-xs text-[#64748b]">{p.city} ({p.province})</p>
+                            <p className="text-xs text-text-muted">{p.city} ({p.province})</p>
                           </td>
                           <td className="py-3 px-4 text-sm">{p.seller?.name || "—"}</td>
                           <td className="py-3 px-4 text-sm font-semibold">{formatPrice(p.price)}</td>
@@ -275,7 +275,7 @@ export default function AdminDashboard() {
                               {p.status === "DRAFT" && (
                                 <button
                                   onClick={() => handleStatusChange(p.id, p.slug, "PENDING_REVIEW")}
-                                  className="text-xs px-3 py-1 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200"
+                                  className="text-xs px-3 py-1 bg-accent/10 text-accent rounded-lg hover:bg-accent/20"
                                 >
                                   Revisiona
                                 </button>
@@ -283,7 +283,7 @@ export default function AdminDashboard() {
                               {p.status === "PENDING_REVIEW" && (
                                 <button
                                   onClick={() => handleStatusChange(p.id, p.slug, "PUBLISHED")}
-                                  className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
+                                  className="text-xs px-3 py-1 bg-success/10 text-success rounded-lg hover:bg-success/20"
                                 >
                                   Pubblica
                                 </button>
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
                               {!p.assignment && (
                                 <button
                                   onClick={() => handleAssign(p.id)}
-                                  className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
+                                  className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20"
                                 >
                                   Assegna
                                 </button>
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                     </tbody>
                   </table>
                   {properties.length === 0 && (
-                    <p className="text-center py-8 text-[#64748b]">Nessun immobile.</p>
+                    <p className="text-center py-8 text-text-muted">Nessun immobile.</p>
                   )}
                 </div>
               </div>
@@ -315,30 +315,30 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-[#e2e8f0]">
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Agenzia</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Città</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Piano</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Immobili</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Stato</th>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Agenzia</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Città</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Piano</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Immobili</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
                       </tr>
                     </thead>
                     <tbody>
                       {agencies.map((a: any) => (
-                        <tr key={a.id} className="border-b border-[#f8fafc] hover:bg-[#f8fafc]">
+                        <tr key={a.id} className="border-b border-border hover:bg-bg-soft">
                           <td className="py-3 px-4">
                             <p className="text-sm font-medium">{a.name}</p>
-                            <p className="text-xs text-[#64748b]">{a.email}</p>
+                            <p className="text-xs text-text-muted">{a.email}</p>
                           </td>
                           <td className="py-3 px-4 text-sm">{a.city} ({a.province})</td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${a.plan === "PRO" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
+                            <span className={`text-xs px-2 py-1 rounded-full ${a.plan === "PRO" ? "bg-primary/10 text-primary" : "bg-bg-soft text-text-muted"}`}>
                               {a.plan}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-sm">{a._count?.assignments || 0}</td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${a.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                            <span className={`text-xs px-2 py-1 rounded-full ${a.isActive ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
                               {a.isActive ? "Attiva" : "Inattiva"}
                             </span>
                           </td>
@@ -347,7 +347,7 @@ export default function AdminDashboard() {
                     </tbody>
                   </table>
                   {agencies.length === 0 && (
-                    <p className="text-center py-8 text-[#64748b]">Nessuna agenzia registrata.</p>
+                    <p className="text-center py-8 text-text-muted">Nessuna agenzia registrata.</p>
                   )}
                 </div>
               </div>
@@ -359,49 +359,49 @@ export default function AdminDashboard() {
                 {/* Lead Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { label: "Lead Venditori", value: sellerLeads.length, color: "text-[#0e8ff1]" },
-                    { label: "Lead Agenzie", value: agencyLeads.length, color: "text-[#0a1f44]" },
-                    { label: "Nuovi (Venditori)", value: sellerLeads.filter((l: any) => l.status === "NEW").length, color: "text-[#10b981]" },
-                    { label: "Nuovi (Agenzie)", value: agencyLeads.filter((l: any) => l.status === "NEW").length, color: "text-[#f59e0b]" },
+                    { label: "Lead Venditori", value: sellerLeads.length, color: "text-primary" },
+                    { label: "Lead Agenzie", value: agencyLeads.length, color: "text-primary-dark" },
+                    { label: "Nuovi (Venditori)", value: sellerLeads.filter((l: any) => l.status === "NEW").length, color: "text-success" },
+                    { label: "Nuovi (Agenzie)", value: agencyLeads.filter((l: any) => l.status === "NEW").length, color: "text-accent" },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                      <p className="text-sm text-[#64748b]">{stat.label}</p>
-                      <p className={`text-3xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+                    <div key={i} className="bg-white rounded-xl p-5 border border-border">
+                      <p className="text-sm text-text-muted">{stat.label}</p>
+                      <p className={`text-3xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
                     </div>
                   ))}
                 </div>
 
                 {/* Seller Leads Table */}
-                <div className="bg-white rounded-xl border border-[#e2e8f0]">
-                  <div className="p-5 border-b border-[#e2e8f0]">
-                    <h3 className="font-semibold text-[#0a1f44]">Lead Venditori</h3>
+                <div className="bg-white rounded-xl border border-border">
+                  <div className="p-5 border-b border-border">
+                    <h3 className="font-medium text-primary-dark">Lead Venditori</h3>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-[#e2e8f0]">
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Nome</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Email</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Telefono</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Zona</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Stato</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Data</th>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Nome</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Email</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Telefono</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Zona</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Data</th>
                         </tr>
                       </thead>
                       <tbody>
                         {sellerLeads.map((lead: any) => (
-                          <tr key={lead.id} className="border-b border-[#f8fafc] hover:bg-[#f8fafc]">
+                          <tr key={lead.id} className="border-b border-border hover:bg-bg-soft">
                             <td className="py-3 px-4 text-sm font-medium">{lead.name}</td>
-                            <td className="py-3 px-4 text-sm text-[#64748b]">{lead.email}</td>
+                            <td className="py-3 px-4 text-sm text-text-muted">{lead.email}</td>
                             <td className="py-3 px-4 text-sm">{lead.phone}</td>
                             <td className="py-3 px-4 text-sm">{lead.city} ({lead.province})</td>
                             <td className="py-3 px-4">
                               <span className={`text-xs px-2 py-1 rounded-full ${
-                                lead.status === "NEW" ? "bg-green-100 text-green-700" :
-                                lead.status === "CONTACTED" ? "bg-blue-100 text-blue-700" :
-                                lead.status === "CONVERTED" ? "bg-purple-100 text-purple-700" :
-                                lead.status === "LOST" ? "bg-red-100 text-red-700" :
-                                "bg-gray-100 text-gray-700"
+                                lead.status === "NEW" ? "bg-success/10 text-success" :
+                                lead.status === "CONTACTED" ? "bg-primary/10 text-primary" :
+                                lead.status === "CONVERTED" ? "bg-primary/10 text-primary" :
+                                lead.status === "LOST" ? "bg-error/10 text-error" :
+                                "bg-bg-soft text-text-muted"
                               }`}>
                                 {lead.status === "NEW" ? "Nuovo" :
                                  lead.status === "CONTACTED" ? "Contattato" :
@@ -410,7 +410,7 @@ export default function AdminDashboard() {
                                  lead.status === "LOST" ? "Perso" : lead.status}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-sm text-[#64748b]">
+                            <td className="py-3 px-4 text-sm text-text-muted">
                               {new Date(lead.createdAt).toLocaleDateString("it-IT")}
                             </td>
                           </tr>
@@ -418,44 +418,44 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                     {sellerLeads.length === 0 && (
-                      <p className="text-center py-8 text-[#64748b]">Nessun lead venditore.</p>
+                      <p className="text-center py-8 text-text-muted">Nessun lead venditore.</p>
                     )}
                   </div>
                 </div>
 
                 {/* Agency Leads Table */}
-                <div className="bg-white rounded-xl border border-[#e2e8f0]">
-                  <div className="p-5 border-b border-[#e2e8f0]">
-                    <h3 className="font-semibold text-[#0a1f44]">Lead Agenzie</h3>
+                <div className="bg-white rounded-xl border border-border">
+                  <div className="p-5 border-b border-border">
+                    <h3 className="font-medium text-primary-dark">Lead Agenzie</h3>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-[#e2e8f0]">
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Agenzia</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Contatto</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Email</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Zona</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Stato</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Data</th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-[#64748b]">Azioni</th>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Agenzia</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Contatto</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Email</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Zona</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Data</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Azioni</th>
                         </tr>
                       </thead>
                       <tbody>
                         {agencyLeads.map((lead: any) => (
-                          <tr key={lead.id} className="border-b border-[#f8fafc] hover:bg-[#f8fafc]">
+                          <tr key={lead.id} className="border-b border-border hover:bg-bg-soft">
                             <td className="py-3 px-4 text-sm font-medium">{lead.agencyName}</td>
                             <td className="py-3 px-4 text-sm">{lead.contactName}</td>
-                            <td className="py-3 px-4 text-sm text-[#64748b]">{lead.email}</td>
+                            <td className="py-3 px-4 text-sm text-text-muted">{lead.email}</td>
                             <td className="py-3 px-4 text-sm">{lead.city} ({lead.province})</td>
                             <td className="py-3 px-4">
                               <span className={`text-xs px-2 py-1 rounded-full ${
-                                lead.status === "NEW" ? "bg-green-100 text-green-700" :
-                                lead.status === "CONTACTED" ? "bg-blue-100 text-blue-700" :
+                                lead.status === "NEW" ? "bg-success/10 text-success" :
+                                lead.status === "CONTACTED" ? "bg-primary/10 text-primary" :
                                 lead.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" :
-                                lead.status === "CONVERTED" ? "bg-purple-100 text-purple-700" :
-                                lead.status === "LOST" ? "bg-red-100 text-red-700" :
-                                "bg-gray-100 text-gray-700"
+                                lead.status === "CONVERTED" ? "bg-primary/10 text-primary" :
+                                lead.status === "LOST" ? "bg-error/10 text-error" :
+                                "bg-bg-soft text-text-muted"
                               }`}>
                                 {lead.status === "NEW" ? "Nuovo" :
                                  lead.status === "CONTACTED" ? "Contattato" :
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
                                  lead.status === "LOST" ? "Rifiutato" : lead.status}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-sm text-[#64748b]">
+                            <td className="py-3 px-4 text-sm text-text-muted">
                               {new Date(lead.createdAt).toLocaleDateString("it-IT")}
                             </td>
                             <td className="py-3 px-4">
@@ -473,13 +473,13 @@ export default function AdminDashboard() {
                                 <div className="flex gap-2">
                                   <button
                                     onClick={() => handleLeadAction(lead.id, "approve")}
-                                    className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-medium"
+                                    className="text-xs px-3 py-1 bg-success/10 text-success rounded-lg hover:bg-success/20 font-medium"
                                   >
                                     Approva
                                   </button>
                                   <button
                                     onClick={() => handleLeadAction(lead.id, "reject")}
-                                    className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium"
+                                    className="text-xs px-3 py-1 bg-error/10 text-error rounded-lg hover:bg-error/20 font-medium"
                                   >
                                     Rifiuta
                                   </button>
@@ -491,7 +491,7 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                     {agencyLeads.length === 0 && (
-                      <p className="text-center py-8 text-[#64748b]">Nessun lead agenzia.</p>
+                      <p className="text-center py-8 text-text-muted">Nessun lead agenzia.</p>
                     )}
                   </div>
                 </div>
@@ -501,28 +501,28 @@ export default function AdminDashboard() {
             {/* Assignments */}
             {activeTab === "assignments" && (
               <div className="space-y-4">
-                <p className="text-sm text-[#64748b]">
+                <p className="text-sm text-text-muted">
                   Immobili senza agenzia assegnata. Clicca &quot;Auto-Assegna&quot; per avviare il matchmaking automatico.
                 </p>
                 <div className="space-y-3">
                   {properties
                     .filter((p: any) => !p.assignment)
                     .map((p: any) => (
-                      <div key={p.id} className="flex items-center justify-between bg-white p-4 rounded-xl border border-[#e2e8f0]">
+                      <div key={p.id} className="flex items-center justify-between bg-white p-4 rounded-xl border border-border">
                         <div>
                           <p className="font-medium">{p.title}</p>
-                          <p className="text-sm text-[#64748b]">{p.city} — {formatPrice(p.price)}</p>
+                          <p className="text-sm text-text-muted">{p.city} — {formatPrice(p.price)}</p>
                         </div>
                         <button
                           onClick={() => handleAssign(p.id)}
-                          className="px-4 py-2 bg-[#0e8ff1] text-white rounded-lg text-sm font-medium hover:bg-[#0a1f44] transition-colors"
+                          className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
                         >
                           Auto-Assegna
                         </button>
                       </div>
                     ))}
                   {properties.filter((p: any) => !p.assignment).length === 0 && (
-                    <p className="text-center py-8 text-[#64748b]">Tutti gli immobili sono assegnati.</p>
+                    <p className="text-center py-8 text-text-muted">Tutti gli immobili sono assegnati.</p>
                   )}
                 </div>
               </div>

@@ -90,38 +90,38 @@ export default function SellerMessagesPage() {
   return (
     <DashboardLayout role="seller">
       <div className="flex flex-col h-[calc(100vh-8rem)]">
-        <h1 className="text-2xl font-bold text-[#0a1f44] mb-4">Messaggi</h1>
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text mb-4">Messaggi</h1>
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="w-8 h-8 border-3 border-[#0e8ff1] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : !agencyName || !propertyId ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <svg className="w-16 h-16 text-[#e2e8f0] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 text-border mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
-              <h3 className="text-lg font-semibold text-[#0a1f44] mb-2">Messaggi non disponibili</h3>
-              <p className="text-[#64748b]">I messaggi saranno disponibili dopo l&apos;assegnazione dell&apos;agenzia.</p>
+              <h3 className="text-lg font-medium text-primary-dark mb-2">Messaggi non disponibili</h3>
+              <p className="text-text-muted">I messaggi saranno disponibili dopo l&apos;assegnazione dell&apos;agenzia.</p>
             </div>
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-t-xl border border-[#e2e8f0] px-5 py-3 flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#0e8ff1]/10 rounded-full flex items-center justify-center">
-                <span className="text-[#0e8ff1] font-bold text-sm">{agencyName.charAt(0)}</span>
+            <div className="bg-white rounded-t-xl border border-border px-5 py-3 flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-primary font-bold text-sm">{agencyName.charAt(0)}</span>
               </div>
               <div>
-                <p className="font-medium text-[#0a1f44]">{agencyName}</p>
-                <p className="text-xs text-[#64748b]">Agenzia partner</p>
+                <p className="font-medium text-primary-dark">{agencyName}</p>
+                <p className="text-xs text-text-muted">Agenzia partner</p>
               </div>
             </div>
 
-            <div className="flex-1 bg-[#f8fafc] border-x border-[#e2e8f0] p-4 overflow-y-auto">
+            <div className="flex-1 bg-bg-soft border-x border-border p-4 overflow-y-auto">
               {messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-[#64748b] text-sm">Nessun messaggio. Inizia la conversazione con la tua agenzia.</p>
+                  <p className="text-text-muted text-sm">Nessun messaggio. Inizia la conversazione con la tua agenzia.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -131,11 +131,11 @@ export default function SellerMessagesPage() {
                       <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                         <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl ${
                           isMine
-                            ? "bg-[#0e8ff1] text-white rounded-br-sm"
-                            : "bg-white text-[#1e293b] border border-[#e2e8f0] rounded-bl-sm"
+                            ? "bg-primary text-white rounded-br-sm"
+                            : "bg-white text-text border border-border rounded-bl-sm"
                         }`}>
                           <p className="text-sm">{msg.content}</p>
-                          <p className={`text-xs mt-1 ${isMine ? "text-white/70" : "text-[#64748b]"}`}>
+                          <p className={`text-xs mt-1 ${isMine ? "text-white/70" : "text-text-muted"}`}>
                             {new Date(msg.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
                           </p>
                         </div>
@@ -147,19 +147,19 @@ export default function SellerMessagesPage() {
               )}
             </div>
 
-            <div className="bg-white rounded-b-xl border border-[#e2e8f0] p-3 flex gap-3">
+            <div className="bg-white rounded-b-xl border border-border p-3 flex gap-3">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !sending && handleSend()}
                 placeholder="Scrivi un messaggio..."
-                className="flex-1 px-4 py-2.5 border border-[#e2e8f0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                className="flex-1 px-4 py-2.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
               <button
                 onClick={handleSend}
                 disabled={!newMessage.trim() || sending}
-                className="px-5 py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#0a1f44] transition-colors"
+                className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary-dark transition-colors"
               >
                 {sending ? "..." : "Invia"}
               </button>

@@ -144,7 +144,7 @@ export default function BuyerDashboardPage() {
       <div className="mx-auto max-w-6xl space-y-6">
         {/* Page Title */}
         <div>
-          <h1 className="font-heading text-2xl tracking-wide text-primary-dark sm:text-3xl">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark sm:text-3xl">
             La tua Dashboard
           </h1>
           <p className="mt-1 text-sm text-text-muted">
@@ -159,7 +159,7 @@ export default function BuyerDashboardPage() {
             <p className="text-sm font-medium text-error">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-3 text-sm font-semibold text-primary underline hover:no-underline"
+              className="mt-3 text-sm font-medium text-primary underline hover:no-underline"
             >
               Riprova
             </button>
@@ -172,12 +172,12 @@ export default function BuyerDashboardPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
               <div className="rounded-xl border border-border bg-white p-4 shadow-sm sm:p-5">
                 <div className="mb-2 text-text-muted"><HeartIcon /></div>
-                <p className="text-2xl font-bold text-primary-dark">{favorites.length}</p>
+                <p className="text-2xl font-medium text-text">{favorites.length}</p>
                 <p className="mt-1 text-xs text-text-muted sm:text-sm">Immobili Salvati</p>
               </div>
               <div className="rounded-xl border border-border bg-white p-4 shadow-sm sm:p-5">
                 <div className="mb-2 text-text-muted"><SearchIcon /></div>
-                <p className="text-2xl font-bold text-primary-dark">{savedSearches.length}</p>
+                <p className="text-2xl font-medium text-text">{savedSearches.length}</p>
                 <p className="mt-1 text-xs text-text-muted sm:text-sm">Ricerche Salvate</p>
               </div>
               <Link
@@ -186,7 +186,7 @@ export default function BuyerDashboardPage() {
               >
                 <div className="text-primary"><SearchIcon /></div>
                 <div>
-                  <p className="text-sm font-semibold text-primary-dark">Cerca Immobili</p>
+                  <p className="text-sm font-medium text-primary-dark">Cerca Immobili</p>
                   <p className="text-xs text-text-muted">Esplora tutti gli annunci</p>
                 </div>
               </Link>
@@ -195,7 +195,7 @@ export default function BuyerDashboardPage() {
             {/* Recent Favorites */}
             <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-primary-dark">Preferiti Recenti</h2>
+                <h2 className="text-lg font-medium text-primary-dark">Preferiti Recenti</h2>
                 {favorites.length > 0 && (
                   <Link
                     href="/dashboard/acquirente/preferiti"
@@ -271,7 +271,7 @@ export default function BuyerDashboardPage() {
             {/* Saved Searches */}
             <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-primary-dark">Ricerche Salvate</h2>
+                <h2 className="text-lg font-medium text-primary-dark">Ricerche Salvate</h2>
                 {savedSearches.length > 0 && (
                   <Link
                     href="/dashboard/acquirente/ricerche"

@@ -155,7 +155,7 @@ export default function BuyerProfilePage() {
     <DashboardLayout role="buyer">
       <div className="mx-auto max-w-2xl space-y-8">
         <div>
-          <h1 className="font-heading text-2xl tracking-wide text-primary-dark sm:text-3xl">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark sm:text-3xl">
             Il Tuo Profilo
           </h1>
           <p className="mt-1 text-sm text-text-muted">
@@ -165,7 +165,7 @@ export default function BuyerProfilePage() {
 
         {/* Profile Form */}
         <form onSubmit={handleSave} className="rounded-xl border border-border bg-white p-6 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-primary-dark">Dati Personali</h2>
+          <h2 className="text-lg font-medium text-primary-dark">Dati Personali</h2>
 
           {success && (
             <div className="p-3 rounded-lg bg-success/10 border border-success/20 text-sm text-success">
@@ -220,7 +220,7 @@ export default function BuyerProfilePage() {
 
         {/* Password Change */}
         <form onSubmit={handlePasswordChange} className="rounded-xl border border-border bg-white p-6 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-primary-dark">Cambia Password</h2>
+          <h2 className="text-lg font-medium text-primary-dark">Cambia Password</h2>
 
           {pwSuccess && (
             <div className="p-3 rounded-lg bg-success/10 border border-success/20 text-sm text-success">
@@ -276,7 +276,7 @@ export default function BuyerProfilePage() {
 
         {/* Privacy & Data (GDPR) */}
         <div className="rounded-xl border border-border bg-white p-6 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-primary-dark">Privacy e Dati</h2>
+          <h2 className="text-lg font-medium text-primary-dark">Privacy e Dati</h2>
           <p className="text-sm text-text-muted">
             Ai sensi del GDPR, puoi esportare o eliminare tutti i tuoi dati personali.
           </p>
@@ -293,19 +293,19 @@ export default function BuyerProfilePage() {
             <button
               type="button"
               onClick={() => setShowDeleteSection(!showDeleteSection)}
-              className="rounded-lg border border-[#ef4444]/30 px-4 py-2 text-sm font-medium text-[#ef4444] hover:bg-[#ef4444]/5 transition-colors"
+              className="rounded-lg border border-error/30 px-4 py-2 text-sm font-medium text-error hover:bg-error/5 transition-colors"
             >
               Elimina account
             </button>
           </div>
 
           {showDeleteSection && (
-            <form onSubmit={handleDelete} className="mt-4 rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/5 p-4 space-y-3">
-              <p className="text-sm font-medium text-[#ef4444]">
+            <form onSubmit={handleDelete} className="mt-4 rounded-lg border border-error/30 bg-error/5 p-4 space-y-3">
+              <p className="text-sm font-medium text-error">
                 Questa azione è irreversibile. Tutti i tuoi dati verranno eliminati permanentemente.
               </p>
               {deleteError && (
-                <div className="p-2 rounded bg-[#ef4444]/10 text-xs text-[#ef4444]">{deleteError}</div>
+                <div className="p-2 rounded bg-error/10 text-xs text-error">{deleteError}</div>
               )}
               <div>
                 <label className="block text-xs font-medium text-text mb-1">Password</label>
@@ -314,7 +314,7 @@ export default function BuyerProfilePage() {
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#ef4444] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-error/30 focus:border-transparent"
                 />
               </div>
               <div>
@@ -326,13 +326,13 @@ export default function BuyerProfilePage() {
                   value={deleteConfirm}
                   onChange={(e) => setDeleteConfirm(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#ef4444] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-error/30 focus:border-transparent"
                 />
               </div>
               <button
                 type="submit"
                 disabled={deleting || deleteConfirm !== "ELIMINA IL MIO ACCOUNT"}
-                className="rounded-lg bg-[#ef4444] px-4 py-2 text-sm font-semibold text-white hover:bg-[#dc2626] transition-colors disabled:opacity-50"
+                className="rounded-lg bg-error px-4 py-2 text-sm font-semibold text-white hover:bg-error/85 transition-colors disabled:opacity-50"
               >
                 {deleting ? "Eliminazione..." : "Elimina Account Definitivamente"}
               </button>

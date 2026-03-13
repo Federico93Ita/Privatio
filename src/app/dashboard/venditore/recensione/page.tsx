@@ -141,7 +141,7 @@ export default function ReviewPage() {
     <DashboardLayout role="seller">
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
-          <h1 className="font-heading text-2xl tracking-wide text-primary-dark sm:text-3xl">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark sm:text-3xl">
             Recensione Agenzia
           </h1>
           <p className="mt-1 text-sm text-text-muted">
@@ -231,7 +231,7 @@ export default function ReviewPage() {
         {/* Show existing reviews for this agency */}
         {assignment?.agencyId && (
           <div className="mt-8">
-            <h2 className="text-lg font-semibold text-primary-dark mb-4">
+            <h2 className="text-lg font-medium text-primary-dark mb-4">
               Recensioni per {assignment.agencyName}
             </h2>
             <AgencyReviews agencyId={assignment.agencyId} agencyName={assignment.agencyName} />

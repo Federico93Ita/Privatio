@@ -203,7 +203,7 @@ function ProgressBar({ currentStage }: { currentStage: string }) {
               </div>
               <span
                 className={`mt-1.5 text-center text-[10px] leading-tight sm:text-xs ${
-                  isCurrent ? "font-semibold text-primary" : "text-text-muted"
+                  isCurrent ? "font-medium text-primary" : "text-text-muted"
                 }`}
               >
                 {stage.label}
@@ -241,7 +241,7 @@ function StatsGrid({ stats }: { stats: DashboardData["stats"] }) {
           <div className="mb-2 flex items-center justify-between">
             <span className="text-text-muted">{card.icon}</span>
           </div>
-          <p className="text-2xl font-bold text-primary-dark sm:text-3xl">{card.value}</p>
+          <p className="text-2xl font-medium text-text sm:text-3xl">{card.value}</p>
           <p className="mt-1 text-xs text-text-muted sm:text-sm">{card.label}</p>
         </div>
       ))}
@@ -253,7 +253,7 @@ function AgencyCard({ agency }: { agency: Agency | null }) {
   if (!agency) {
     return (
       <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-        <h3 className="mb-4 text-lg font-semibold text-primary-dark">Agenzia Assegnata</h3>
+        <h3 className="mb-4 text-lg font-medium text-primary-dark">Agenzia Assegnata</h3>
         <div className="flex items-center gap-3 text-text-muted">
           <SpinnerIcon />
           <p className="text-sm">Stiamo cercando un&apos;agenzia nella tua zona...</p>
@@ -264,7 +264,7 @@ function AgencyCard({ agency }: { agency: Agency | null }) {
 
   return (
     <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-      <h3 className="mb-4 text-lg font-semibold text-primary-dark">Agenzia Assegnata</h3>
+      <h3 className="mb-4 text-lg font-medium text-primary-dark">Agenzia Assegnata</h3>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
@@ -304,7 +304,7 @@ function RecentLeads({ leads }: { leads: Lead[] }) {
   if (leads.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-        <h3 className="mb-4 text-lg font-semibold text-primary-dark">Attivit&agrave; Recente</h3>
+        <h3 className="mb-4 text-lg font-medium text-primary-dark">Attivit&agrave; Recente</h3>
         <p className="text-sm text-text-muted">Nessuna richiesta ricevuta.</p>
       </div>
     );
@@ -312,7 +312,7 @@ function RecentLeads({ leads }: { leads: Lead[] }) {
 
   return (
     <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-      <h3 className="mb-4 text-lg font-semibold text-primary-dark">Attivit&agrave; Recente</h3>
+      <h3 className="mb-4 text-lg font-medium text-primary-dark">Attivit&agrave; Recente</h3>
       <ul className="divide-y divide-border">
         {leads.map((lead) => (
           <li key={lead.id} className="py-3 first:pt-0 last:pb-0">
@@ -334,7 +334,7 @@ function UpcomingVisits({ visits }: { visits: Visit[] }) {
   if (visits.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-        <h3 className="mb-4 text-lg font-semibold text-primary-dark">Prossime Visite</h3>
+        <h3 className="mb-4 text-lg font-medium text-primary-dark">Prossime Visite</h3>
         <p className="text-sm text-text-muted">Nessuna visita in programma.</p>
       </div>
     );
@@ -347,7 +347,7 @@ function UpcomingVisits({ visits }: { visits: Visit[] }) {
 
   return (
     <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-      <h3 className="mb-4 text-lg font-semibold text-primary-dark">Prossime Visite</h3>
+      <h3 className="mb-4 text-lg font-medium text-primary-dark">Prossime Visite</h3>
       <ul className="space-y-3">
         {visits.map((visit) => {
           const badge = statusConfig[visit.status] ?? statusConfig.pending;
@@ -378,7 +378,7 @@ function EmptyState() {
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
         <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
-      <h3 className="mb-2 text-lg font-semibold text-primary-dark">
+      <h3 className="mb-2 text-lg font-medium text-primary-dark">
         Non hai ancora inserito un immobile.
       </h3>
       <p className="mb-6 max-w-sm text-sm text-text-muted">
@@ -440,7 +440,7 @@ export default function SellerDashboardPage() {
       <div className="mx-auto max-w-6xl space-y-6">
         {/* Page Title */}
         <div>
-          <h1 className="font-heading text-2xl tracking-wide text-primary-dark sm:text-3xl">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark sm:text-3xl">
             La tua Dashboard
           </h1>
           <p className="mt-1 text-sm text-text-muted">
@@ -457,7 +457,7 @@ export default function SellerDashboardPage() {
             <p className="text-sm font-medium text-error">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="mt-3 text-sm font-semibold text-primary underline hover:no-underline"
+              className="mt-3 text-sm font-medium text-primary underline hover:no-underline"
             >
               Riprova
             </button>
@@ -476,7 +476,7 @@ export default function SellerDashboardPage() {
                 {/* Status Card */}
                 <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
                   <div className="mb-4">
-                    <h2 className="text-lg font-semibold text-primary-dark">
+                    <h2 className="text-lg font-medium text-primary-dark">
                       {data.property.title}
                     </h2>
                     <p className="text-sm text-text-muted">{data.property.address}</p>

@@ -47,21 +47,21 @@ export default function SellerVisitsPage() {
     CANCELLED: "Annullata",
   };
   const statusColors: Record<string, string> = {
-    PENDING: "bg-amber-100 text-amber-700",
-    CONFIRMED: "bg-green-100 text-green-700",
-    COMPLETED: "bg-blue-100 text-blue-700",
-    CANCELLED: "bg-red-100 text-red-700",
+    PENDING: "bg-accent/10 text-accent",
+    CONFIRMED: "bg-success/10 text-success",
+    COMPLETED: "bg-primary/10 text-primary",
+    CANCELLED: "bg-error/10 text-error",
   };
 
   return (
     <DashboardLayout role="seller">
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-[#0a1f44]">Visite Programmate</h1>
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Visite Programmate</h1>
 
         {fetchError && !loading && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
-            <p className="text-sm font-medium text-red-600">{fetchError}</p>
-            <button onClick={() => window.location.reload()} className="mt-3 text-sm font-semibold text-[#0e8ff1] underline hover:no-underline">Riprova</button>
+          <div className="rounded-xl border border-error/20 bg-error/5 p-5 text-center">
+            <p className="text-sm font-medium text-error">{fetchError}</p>
+            <button onClick={() => window.location.reload()} className="mt-3 text-sm font-medium text-primary underline hover:no-underline">Riprova</button>
           </div>
         )}
 
@@ -71,7 +71,7 @@ export default function SellerVisitsPage() {
               key={tab.id}
               onClick={() => setFilter(tab.id)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === tab.id ? "bg-[#0e8ff1] text-white" : "bg-white text-[#64748b] border border-[#e2e8f0] hover:bg-[#f8fafc]"
+                filter === tab.id ? "bg-primary text-white" : "bg-white text-text-muted border border-border hover:bg-bg-soft"
               }`}
             >
               {tab.label}
@@ -82,32 +82,32 @@ export default function SellerVisitsPage() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-[#f8fafc] rounded-lg animate-pulse" />
+              <div key={i} className="h-24 bg-bg-soft rounded-lg animate-pulse" />
             ))}
           </div>
         ) : filteredVisits.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-[#e2e8f0]">
-            <p className="text-[#64748b]">Nessuna visita programmata.</p>
+          <div className="text-center py-12 bg-white rounded-xl border border-border">
+            <p className="text-text-muted">Nessuna visita programmata.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {filteredVisits.map((visit) => (
-              <div key={visit.id} className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
+              <div key={visit.id} className="bg-white rounded-xl p-5 border border-border">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-[#0a1f44]">{visit.property.title}</p>
-                    <p className="text-sm text-[#64748b] mt-1">
-                      <span className="font-medium text-[#0e8ff1]">{formatDateTime(visit.scheduledAt)}</span>
+                    <p className="font-medium text-primary-dark">{visit.property.title}</p>
+                    <p className="text-sm text-text-muted mt-1">
+                      <span className="font-medium text-primary">{formatDateTime(visit.scheduledAt)}</span>
                     </p>
-                    <p className="text-sm text-[#64748b] mt-1">
+                    <p className="text-sm text-text-muted mt-1">
                       Acquirente: {visit.buyerName} — {visit.buyerPhone}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium self-start ${statusColors[visit.status] || "bg-gray-100 text-gray-700"}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium self-start ${statusColors[visit.status] || "bg-bg-soft text-text-muted"}`}>
                     {statusLabels[visit.status] || visit.status}
                   </span>
                 </div>
-                {visit.notes && <p className="text-sm text-[#64748b] mt-2 italic">{visit.notes}</p>}
+                {visit.notes && <p className="text-sm text-text-muted mt-2 italic">{visit.notes}</p>}
               </div>
             ))}
           </div>

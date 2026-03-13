@@ -116,7 +116,7 @@ export default function AgencyPropertyPage({
       <DashboardLayout role="agency">
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-[#f8fafc] rounded-lg animate-pulse" />
+            <div key={i} className="h-32 bg-bg-soft rounded-lg animate-pulse" />
           ))}
         </div>
       </DashboardLayout>
@@ -126,11 +126,11 @@ export default function AgencyPropertyPage({
   if (error || !property) {
     return (
       <DashboardLayout role="agency">
-        <div className="bg-white rounded-xl p-8 border border-[#e2e8f0] text-center">
-          <h2 className="text-lg font-semibold text-[#0a1f44] mb-2">
+        <div className="bg-white rounded-xl p-8 border border-border text-center">
+          <h2 className="text-lg font-medium text-primary-dark mb-2">
             {error || "Immobile non trovato"}
           </h2>
-          <Link href="/dashboard/agenzia" className="text-[#0e8ff1] hover:underline text-sm">
+          <Link href="/dashboard/agenzia" className="text-primary hover:underline text-sm">
             Torna alla Dashboard
           </Link>
         </div>
@@ -149,23 +149,23 @@ export default function AgencyPropertyPage({
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <Link href="/dashboard/agenzia" className="text-sm text-[#0e8ff1] hover:underline mb-2 inline-block">
+            <Link href="/dashboard/agenzia" className="text-sm text-primary hover:underline mb-2 inline-block">
               &larr; Torna alla Dashboard
             </Link>
-            <h1 className="text-2xl font-bold text-[#0a1f44]">{property.title}</h1>
-            <p className="text-[#64748b]">{property.address}, {property.city} ({property.province})</p>
+            <h1 className="text-2xl font-light tracking-[-0.03em] text-text">{property.title}</h1>
+            <p className="text-text-muted">{property.address}, {property.city} ({property.province})</p>
           </div>
           <div className="flex items-center gap-3">
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(property.status)}`}>
               {getStatusLabel(property.status)}
             </span>
-            <span className="text-2xl font-bold text-[#0e8ff1]">{formatPrice(property.price)}</span>
+            <span className="text-2xl font-medium text-primary">{formatPrice(property.price)}</span>
           </div>
         </div>
 
         {/* Status pipeline */}
-        <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-          <h3 className="text-sm font-semibold text-[#0a1f44] mb-3">Pipeline Stato</h3>
+        <div className="bg-white rounded-xl p-5 border border-border">
+          <h3 className="text-sm font-medium text-primary-dark mb-3">Pipeline Stato</h3>
           <div className="flex items-center gap-1 mb-4 overflow-x-auto">
             {STATUS_FLOW.map((s, i) => {
               const isActive = property.status === s;
@@ -173,15 +173,15 @@ export default function AgencyPropertyPage({
               return (
                 <div key={s} className="flex items-center">
                   {i > 0 && (
-                    <div className={`w-8 h-0.5 ${isPast ? "bg-[#0e8ff1]" : "bg-[#e2e8f0]"}`} />
+                    <div className={`w-8 h-0.5 ${isPast ? "bg-primary" : "bg-border"}`} />
                   )}
                   <div
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
                       isActive
-                        ? "bg-[#0e8ff1] text-white"
+                        ? "bg-primary text-white"
                         : isPast
-                        ? "bg-[#0e8ff1]/10 text-[#0e8ff1]"
-                        : "bg-[#f8fafc] text-[#94a3b8]"
+                        ? "bg-primary/10 text-primary"
+                        : "bg-bg-soft text-text-muted"
                     }`}
                   >
                     {getStatusLabel(s)}
@@ -199,10 +199,10 @@ export default function AgencyPropertyPage({
                   disabled={statusUpdating}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                     s === "SOLD" || s === "PUBLISHED"
-                      ? "bg-[#0e8ff1] text-white hover:bg-[#0a1f44]"
+                      ? "bg-primary text-white hover:bg-primary-dark"
                       : s === "WITHDRAWN"
-                      ? "bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20"
-                      : "bg-[#f8fafc] text-[#1e293b] border border-[#e2e8f0] hover:bg-[#e2e8f0]"
+                      ? "bg-error/10 text-error hover:bg-error/20"
+                      : "bg-bg-soft text-text border border-border hover:bg-border"
                   }`}
                 >
                   {statusUpdating ? "..." : statusActionLabels[s] || getStatusLabel(s)}
@@ -213,7 +213,7 @@ export default function AgencyPropertyPage({
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-[#e2e8f0]">
+        <div className="flex gap-1 border-b border-border">
           {[
             { id: "info" as const, label: "Dettagli" },
             { id: "visite" as const, label: `Visite (${property._count?.visits || 0})` },
@@ -225,8 +225,8 @@ export default function AgencyPropertyPage({
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
                 activeTab === tab.id
-                  ? "border-[#0e8ff1] text-[#0e8ff1]"
-                  : "border-transparent text-[#64748b] hover:text-[#0a1f44]"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-text-muted hover:text-primary-dark"
               }`}
             >
               {tab.label}
@@ -238,108 +238,108 @@ export default function AgencyPropertyPage({
         {activeTab === "info" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Property details */}
-            <div className="bg-white rounded-xl p-5 border border-[#e2e8f0] space-y-4">
-              <h3 className="font-semibold text-[#0a1f44]">Informazioni Immobile</h3>
+            <div className="bg-white rounded-xl p-5 border border-border space-y-4">
+              <h3 className="font-medium text-primary-dark">Informazioni Immobile</h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="text-[#64748b]">Tipologia</span>
-                  <p className="font-medium text-[#0a1f44]">{getPropertyTypeLabel(property.type)}</p>
+                  <span className="text-text-muted">Tipologia</span>
+                  <p className="font-medium text-primary-dark">{getPropertyTypeLabel(property.type)}</p>
                 </div>
                 <div>
-                  <span className="text-[#64748b]">Superficie</span>
-                  <p className="font-medium text-[#0a1f44]">{property.surface} m&sup2;</p>
+                  <span className="text-text-muted">Superficie</span>
+                  <p className="font-medium text-primary-dark">{property.surface} m&sup2;</p>
                 </div>
                 <div>
-                  <span className="text-[#64748b]">Locali</span>
-                  <p className="font-medium text-[#0a1f44]">{property.rooms}</p>
+                  <span className="text-text-muted">Locali</span>
+                  <p className="font-medium text-primary-dark">{property.rooms}</p>
                 </div>
                 <div>
-                  <span className="text-[#64748b]">Bagni</span>
-                  <p className="font-medium text-[#0a1f44]">{property.bathrooms}</p>
+                  <span className="text-text-muted">Bagni</span>
+                  <p className="font-medium text-primary-dark">{property.bathrooms}</p>
                 </div>
                 {property.floor !== null && (
                   <div>
-                    <span className="text-[#64748b]">Piano</span>
-                    <p className="font-medium text-[#0a1f44]">{property.floor}{property.totalFloors ? ` / ${property.totalFloors}` : ""}</p>
+                    <span className="text-text-muted">Piano</span>
+                    <p className="font-medium text-primary-dark">{property.floor}{property.totalFloors ? ` / ${property.totalFloors}` : ""}</p>
                   </div>
                 )}
                 {property.energyClass && (
                   <div>
-                    <span className="text-[#64748b]">Classe Energetica</span>
-                    <p className="font-medium text-[#0a1f44]">{property.energyClass}</p>
+                    <span className="text-text-muted">Classe Energetica</span>
+                    <p className="font-medium text-primary-dark">{property.energyClass}</p>
                   </div>
                 )}
                 {property.yearBuilt && (
                   <div>
-                    <span className="text-[#64748b]">Anno Costruzione</span>
-                    <p className="font-medium text-[#0a1f44]">{property.yearBuilt}</p>
+                    <span className="text-text-muted">Anno Costruzione</span>
+                    <p className="font-medium text-primary-dark">{property.yearBuilt}</p>
                   </div>
                 )}
                 <div>
-                  <span className="text-[#64748b]">CAP</span>
-                  <p className="font-medium text-[#0a1f44]">{property.cap}</p>
+                  <span className="text-text-muted">CAP</span>
+                  <p className="font-medium text-primary-dark">{property.cap}</p>
                 </div>
               </div>
               {/* Features */}
               <div className="flex flex-wrap gap-2 pt-2">
-                {property.hasGarage && <span className="px-2.5 py-1 bg-[#f0f9ff] text-[#0e8ff1] text-xs rounded-full">Garage</span>}
-                {property.hasGarden && <span className="px-2.5 py-1 bg-[#f0f9ff] text-[#0e8ff1] text-xs rounded-full">Giardino</span>}
-                {property.hasBalcony && <span className="px-2.5 py-1 bg-[#f0f9ff] text-[#0e8ff1] text-xs rounded-full">Balcone</span>}
-                {property.hasElevator && <span className="px-2.5 py-1 bg-[#f0f9ff] text-[#0e8ff1] text-xs rounded-full">Ascensore</span>}
+                {property.hasGarage && <span className="px-2.5 py-1 bg-primary/5 text-primary text-xs rounded-full">Garage</span>}
+                {property.hasGarden && <span className="px-2.5 py-1 bg-primary/5 text-primary text-xs rounded-full">Giardino</span>}
+                {property.hasBalcony && <span className="px-2.5 py-1 bg-primary/5 text-primary text-xs rounded-full">Balcone</span>}
+                {property.hasElevator && <span className="px-2.5 py-1 bg-primary/5 text-primary text-xs rounded-full">Ascensore</span>}
               </div>
               {property.description && (
                 <div className="pt-2">
-                  <span className="text-[#64748b] text-sm">Descrizione</span>
-                  <p className="text-sm text-[#1e293b] mt-1 whitespace-pre-line">{property.description}</p>
+                  <span className="text-text-muted text-sm">Descrizione</span>
+                  <p className="text-sm text-text mt-1 whitespace-pre-line">{property.description}</p>
                 </div>
               )}
             </div>
 
             {/* Seller info + assignment info */}
             <div className="space-y-6">
-              <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                <h3 className="font-semibold text-[#0a1f44] mb-3">Venditore</h3>
+              <div className="bg-white rounded-xl p-5 border border-border">
+                <h3 className="font-medium text-primary-dark mb-3">Venditore</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Nome</span>
-                    <span className="text-[#0a1f44] font-medium">{property.seller?.name || "—"}</span>
+                    <span className="text-text-muted">Nome</span>
+                    <span className="text-primary-dark font-medium">{property.seller?.name || "—"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Email</span>
-                    <a href={`mailto:${property.seller?.email}`} className="text-[#0e8ff1] hover:underline">
+                    <span className="text-text-muted">Email</span>
+                    <a href={`mailto:${property.seller?.email}`} className="text-primary hover:underline">
                       {property.seller?.email}
                     </a>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Telefono</span>
-                    <a href={`tel:${property.seller?.phone}`} className="text-[#0e8ff1] hover:underline">
+                    <span className="text-text-muted">Telefono</span>
+                    <a href={`tel:${property.seller?.phone}`} className="text-primary hover:underline">
                       {property.seller?.phone || "—"}
                     </a>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                <h3 className="font-semibold text-[#0a1f44] mb-3">Assegnazione</h3>
+              <div className="bg-white rounded-xl p-5 border border-border">
+                <h3 className="font-medium text-primary-dark mb-3">Assegnazione</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Data assegnazione</span>
-                    <span className="text-[#0a1f44]">{assignment ? formatDate(assignment.assignedAt) : "—"}</span>
+                    <span className="text-text-muted">Data assegnazione</span>
+                    <span className="text-primary-dark">{assignment ? formatDate(assignment.assignedAt) : "—"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Giorni dall&apos;assegnazione</span>
-                    <span className="text-[#0a1f44] font-medium">
+                    <span className="text-text-muted">Giorni dall&apos;assegnazione</span>
+                    <span className="text-primary-dark font-medium">
                       {assignment ? Math.floor((Date.now() - new Date(assignment.assignedAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Visualizzazioni</span>
-                    <span className="text-[#0a1f44] font-medium">{property.viewCount}</span>
+                    <span className="text-text-muted">Visualizzazioni</span>
+                    <span className="text-primary-dark font-medium">{property.viewCount}</span>
                   </div>
                   {property.publishedAt && (
                     <div className="flex justify-between">
-                      <span className="text-[#64748b]">Pubblicato il</span>
-                      <span className="text-[#0a1f44]">{formatDate(property.publishedAt)}</span>
+                      <span className="text-text-muted">Pubblicato il</span>
+                      <span className="text-primary-dark">{formatDate(property.publishedAt)}</span>
                     </div>
                   )}
                 </div>
@@ -347,11 +347,11 @@ export default function AgencyPropertyPage({
 
               {/* Photos */}
               {property.photos?.length > 0 && (
-                <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                  <h3 className="font-semibold text-[#0a1f44] mb-3">Foto ({property.photos.length})</h3>
+                <div className="bg-white rounded-xl p-5 border border-border">
+                  <h3 className="font-medium text-primary-dark mb-3">Foto ({property.photos.length})</h3>
                   <div className="grid grid-cols-3 gap-2">
                     {property.photos.map((photo: any, i: number) => (
-                      <div key={photo.id || i} className="aspect-square rounded-lg overflow-hidden bg-[#f8fafc]">
+                      <div key={photo.id || i} className="aspect-square rounded-lg overflow-hidden bg-bg-soft">
                         <img
                           src={photo.url}
                           alt={`Foto ${i + 1}`}
@@ -371,31 +371,31 @@ export default function AgencyPropertyPage({
             {/* Pending visits */}
             {pendingVisits.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-[#f59e0b] mb-2">In Attesa ({pendingVisits.length})</h3>
+                <h3 className="text-sm font-semibold text-accent mb-2">In Attesa ({pendingVisits.length})</h3>
                 <div className="space-y-2">
                   {pendingVisits.map((visit: any) => (
-                    <div key={visit.id} className="bg-white rounded-xl p-4 border border-[#f59e0b]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div key={visit.id} className="bg-white rounded-xl p-4 border border-accent/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <p className="font-medium text-[#0a1f44]">{visit.buyerName}</p>
-                        <p className="text-sm text-[#64748b]">{formatDateTime(visit.scheduledAt)}</p>
-                        <div className="flex gap-3 text-xs text-[#64748b] mt-1">
-                          <a href={`mailto:${visit.buyerEmail}`} className="text-[#0e8ff1] hover:underline">{visit.buyerEmail}</a>
-                          {visit.buyerPhone && <a href={`tel:${visit.buyerPhone}`} className="text-[#0e8ff1] hover:underline">{visit.buyerPhone}</a>}
+                        <p className="font-medium text-primary-dark">{visit.buyerName}</p>
+                        <p className="text-sm text-text-muted">{formatDateTime(visit.scheduledAt)}</p>
+                        <div className="flex gap-3 text-xs text-text-muted mt-1">
+                          <a href={`mailto:${visit.buyerEmail}`} className="text-primary hover:underline">{visit.buyerEmail}</a>
+                          {visit.buyerPhone && <a href={`tel:${visit.buyerPhone}`} className="text-primary hover:underline">{visit.buyerPhone}</a>}
                         </div>
-                        {visit.notes && <p className="text-xs text-[#64748b] mt-1">{visit.notes}</p>}
+                        {visit.notes && <p className="text-xs text-text-muted mt-1">{visit.notes}</p>}
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleVisitConfirm(visit.id, "CONFIRMED")}
                           disabled={visitAction === visit.id}
-                          className="px-3 py-1.5 bg-[#10b981] text-white rounded-lg text-sm font-medium hover:bg-[#059669] transition-colors disabled:opacity-50"
+                          className="px-3 py-1.5 bg-success text-white rounded-lg text-sm font-medium hover:bg-success/85 transition-colors disabled:opacity-50"
                         >
                           Conferma
                         </button>
                         <button
                           onClick={() => handleVisitConfirm(visit.id, "CANCELLED")}
                           disabled={visitAction === visit.id}
-                          className="px-3 py-1.5 bg-[#ef4444]/10 text-[#ef4444] rounded-lg text-sm font-medium hover:bg-[#ef4444]/20 transition-colors disabled:opacity-50"
+                          className="px-3 py-1.5 bg-error/10 text-error rounded-lg text-sm font-medium hover:bg-error/20 transition-colors disabled:opacity-50"
                         >
                           Annulla
                         </button>
@@ -409,16 +409,16 @@ export default function AgencyPropertyPage({
             {/* Confirmed visits */}
             {confirmedVisits.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-[#10b981] mb-2">Confermate ({confirmedVisits.length})</h3>
+                <h3 className="text-sm font-semibold text-success mb-2">Confermate ({confirmedVisits.length})</h3>
                 <div className="space-y-2">
                   {confirmedVisits.map((visit: any) => (
-                    <div key={visit.id} className="bg-white rounded-xl p-4 border border-[#e2e8f0]">
+                    <div key={visit.id} className="bg-white rounded-xl p-4 border border-border">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-[#0a1f44]">{visit.buyerName}</p>
-                          <p className="text-sm text-[#64748b]">{formatDateTime(visit.scheduledAt)}</p>
+                          <p className="font-medium text-primary-dark">{visit.buyerName}</p>
+                          <p className="text-sm text-text-muted">{formatDateTime(visit.scheduledAt)}</p>
                         </div>
-                        <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">Confermata</span>
+                        <span className="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full">Confermata</span>
                       </div>
                     </div>
                   ))}
@@ -429,17 +429,17 @@ export default function AgencyPropertyPage({
             {/* Past visits */}
             {completedVisits.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-[#64748b] mb-2">Passate ({completedVisits.length})</h3>
+                <h3 className="text-sm font-semibold text-text-muted mb-2">Passate ({completedVisits.length})</h3>
                 <div className="space-y-2">
                   {completedVisits.map((visit: any) => (
-                    <div key={visit.id} className="bg-white rounded-xl p-4 border border-[#e2e8f0] opacity-70">
+                    <div key={visit.id} className="bg-white rounded-xl p-4 border border-border opacity-70">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-[#0a1f44]">{visit.buyerName}</p>
-                          <p className="text-sm text-[#64748b]">{formatDateTime(visit.scheduledAt)}</p>
+                          <p className="font-medium text-primary-dark">{visit.buyerName}</p>
+                          <p className="text-sm text-text-muted">{formatDateTime(visit.scheduledAt)}</p>
                         </div>
                         <span className={`px-2 py-0.5 text-xs rounded-full ${
-                          visit.status === "COMPLETED" ? "bg-purple-100 text-purple-700" : "bg-red-100 text-red-700"
+                          visit.status === "COMPLETED" ? "bg-primary/10 text-primary" : "bg-error/10 text-error"
                         }`}>
                           {visit.status === "COMPLETED" ? "Completata" : "Annullata"}
                         </span>
@@ -451,8 +451,8 @@ export default function AgencyPropertyPage({
             )}
 
             {property.visits?.length === 0 && (
-              <div className="bg-white rounded-xl p-8 border border-[#e2e8f0] text-center">
-                <p className="text-[#64748b]">Nessuna visita programmata per questo immobile.</p>
+              <div className="bg-white rounded-xl p-8 border border-border text-center">
+                <p className="text-text-muted">Nessuna visita programmata per questo immobile.</p>
               </div>
             )}
           </div>
@@ -462,74 +462,74 @@ export default function AgencyPropertyPage({
           <div className="space-y-3">
             {property.leads?.length > 0 ? (
               property.leads.map((lead: any) => (
-                <div key={lead.id} className="bg-white rounded-xl p-4 border border-[#e2e8f0]">
+                <div key={lead.id} className="bg-white rounded-xl p-4 border border-border">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-[#0a1f44]">{lead.name}</p>
-                      <div className="flex gap-3 text-sm text-[#64748b] mt-1">
-                        <a href={`mailto:${lead.email}`} className="text-[#0e8ff1] hover:underline">{lead.email}</a>
-                        {lead.phone && <a href={`tel:${lead.phone}`} className="text-[#0e8ff1] hover:underline">{lead.phone}</a>}
+                      <p className="font-medium text-primary-dark">{lead.name}</p>
+                      <div className="flex gap-3 text-sm text-text-muted mt-1">
+                        <a href={`mailto:${lead.email}`} className="text-primary hover:underline">{lead.email}</a>
+                        {lead.phone && <a href={`tel:${lead.phone}`} className="text-primary hover:underline">{lead.phone}</a>}
                       </div>
                       {lead.message && (
-                        <p className="text-sm text-[#64748b] mt-2 bg-[#f8fafc] rounded-lg p-3">{lead.message}</p>
+                        <p className="text-sm text-text-muted mt-2 bg-bg-soft rounded-lg p-3">{lead.message}</p>
                       )}
                     </div>
-                    <span className="text-xs text-[#94a3b8]">{formatDate(lead.createdAt)}</span>
+                    <span className="text-xs text-text-muted">{formatDate(lead.createdAt)}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="bg-white rounded-xl p-8 border border-[#e2e8f0] text-center">
-                <p className="text-[#64748b]">Nessuna richiesta ricevuta per questo immobile.</p>
+              <div className="bg-white rounded-xl p-8 border border-border text-center">
+                <p className="text-text-muted">Nessuna richiesta ricevuta per questo immobile.</p>
               </div>
             )}
           </div>
         )}
 
         {activeTab === "contratto" && (
-          <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
+          <div className="bg-white rounded-xl p-5 border border-border">
             {property.contract ? (
               <div className="space-y-4">
-                <h3 className="font-semibold text-[#0a1f44]">Contratto</h3>
+                <h3 className="font-medium text-primary-dark">Contratto</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-[#64748b]">Tipo</span>
-                    <p className="font-medium text-[#0a1f44]">{property.contract.type.replace(/_/g, " ")}</p>
+                    <span className="text-text-muted">Tipo</span>
+                    <p className="font-medium text-primary-dark">{property.contract.type.replace(/_/g, " ")}</p>
                   </div>
                   <div>
-                    <span className="text-[#64748b]">Durata</span>
-                    <p className="font-medium text-[#0a1f44]">{property.contract.duration} giorni</p>
+                    <span className="text-text-muted">Durata</span>
+                    <p className="font-medium text-primary-dark">{property.contract.duration} giorni</p>
                   </div>
                   <div>
-                    <span className="text-[#64748b]">Firma Venditore</span>
-                    <p className={`font-medium ${property.contract.sellerSigned ? "text-[#10b981]" : "text-[#f59e0b]"}`}>
+                    <span className="text-text-muted">Firma Venditore</span>
+                    <p className={`font-medium ${property.contract.sellerSigned ? "text-success" : "text-accent"}`}>
                       {property.contract.sellerSigned ? "Firmato" : "In attesa"}
                     </p>
                   </div>
                   <div>
-                    <span className="text-[#64748b]">Firma Agenzia</span>
-                    <p className={`font-medium ${property.contract.agencySigned ? "text-[#10b981]" : "text-[#f59e0b]"}`}>
+                    <span className="text-text-muted">Firma Agenzia</span>
+                    <p className={`font-medium ${property.contract.agencySigned ? "text-success" : "text-accent"}`}>
                       {property.contract.agencySigned ? "Firmato" : "In attesa"}
                     </p>
                   </div>
                   {property.contract.signedAt && (
                     <div>
-                      <span className="text-[#64748b]">Data firma</span>
-                      <p className="font-medium text-[#0a1f44]">{formatDate(property.contract.signedAt)}</p>
+                      <span className="text-text-muted">Data firma</span>
+                      <p className="font-medium text-primary-dark">{formatDate(property.contract.signedAt)}</p>
                     </div>
                   )}
                   {property.contract.expiresAt && (
                     <div>
-                      <span className="text-[#64748b]">Scadenza</span>
-                      <p className="font-medium text-[#0a1f44]">{formatDate(property.contract.expiresAt)}</p>
+                      <span className="text-text-muted">Scadenza</span>
+                      <p className="font-medium text-primary-dark">{formatDate(property.contract.expiresAt)}</p>
                     </div>
                   )}
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-[#64748b] mb-4">Nessun contratto ancora creato per questo immobile.</p>
-                <p className="text-sm text-[#94a3b8]">Il contratto viene generato quando l&apos;immobile passa allo stato &quot;In trattativa&quot;.</p>
+                <p className="text-text-muted mb-4">Nessun contratto ancora creato per questo immobile.</p>
+                <p className="text-sm text-text-muted">Il contratto viene generato quando l&apos;immobile passa allo stato &quot;In trattativa&quot;.</p>
               </div>
             )}
           </div>

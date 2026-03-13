@@ -133,29 +133,29 @@ export default function AgencyBillingPage() {
   const inputClass = (field: string) =>
     `w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
       fieldErrors[field]?.length
-        ? "border-red-300 focus:ring-red-200"
-        : "border-[#e2e8f0] focus:ring-[#0e8ff1]/30"
+        ? "border-error/30 focus:ring-error/20"
+        : "border-border focus:ring-primary/30/30"
     }`;
 
   return (
     <DashboardLayout role="agency">
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-2xl font-bold text-[#0a1f44]">Fatturazione</h1>
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Fatturazione</h1>
 
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-32 bg-[#f8fafc] rounded-lg animate-pulse"
+                className="h-32 bg-bg-soft rounded-lg animate-pulse"
               />
             ))}
           </div>
         ) : (
           <>
             {/* Current plan */}
-            <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-              <h2 className="font-semibold text-[#0a1f44] mb-4">
+            <div className="bg-white rounded-xl p-6 border border-border">
+              <h2 className="font-medium text-primary-dark mb-4">
                 Piano Attuale
               </h2>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -164,8 +164,8 @@ export default function AgencyBillingPage() {
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-semibold ${
                         agency?.plan === "PRO"
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-gray-100 text-gray-700"
+                          ? "bg-primary/10 text-primary"
+                          : "bg-bg-soft text-text-muted"
                       }`}
                     >
                       Piano {agency?.plan || "—"}
@@ -173,14 +173,14 @@ export default function AgencyBillingPage() {
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         agency?.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                          ? "bg-success/10 text-success"
+                          : "bg-error/10 text-error"
                       }`}
                     >
                       {agency?.isActive ? "Attivo" : "Non attivo"}
                     </span>
                   </div>
-                  <p className="text-[#64748b] mt-2">
+                  <p className="text-text-muted mt-2">
                     {agency?.plan === "PRO"
                       ? "Immobili illimitati — €99/mese"
                       : "Max 5 immobili — €49/mese"}
@@ -191,14 +191,14 @@ export default function AgencyBillingPage() {
                     <button
                       onClick={() => handleSubscribe("BASE")}
                       disabled={checkoutLoading}
-                      className="px-5 py-2.5 border border-[#0e8ff1] text-[#0e8ff1] rounded-lg font-medium hover:bg-[#0e8ff1]/5 transition-colors disabled:opacity-50"
+                      className="px-5 py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:opacity-50"
                     >
                       Base — €49/mese
                     </button>
                     <button
                       onClick={() => handleSubscribe("PRO")}
                       disabled={checkoutLoading}
-                      className="px-5 py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium hover:bg-[#0a1f44] transition-colors disabled:opacity-50"
+                      className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
                     >
                       Pro — €99/mese
                     </button>
@@ -208,16 +208,16 @@ export default function AgencyBillingPage() {
             </div>
 
             {/* Fatturazione Elettronica */}
-            <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
+            <div className="bg-white rounded-xl p-6 border border-border">
               <div className="flex items-center gap-3 mb-1">
-                <h2 className="font-semibold text-[#0a1f44]">
+                <h2 className="font-medium text-primary-dark">
                   Dati Fatturazione Elettronica
                 </h2>
-                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#0e8ff1]/10 text-[#0e8ff1] rounded">
+                <span className="px-2 py-0.5 text-[10px] font-medium bg-primary/10 text-primary rounded">
                   SDI
                 </span>
               </div>
-              <p className="text-sm text-[#64748b] mb-5">
+              <p className="text-sm text-text-muted mb-5">
                 Inserisci i dati per la ricezione delle fatture elettroniche
                 tramite il Sistema di Interscambio (SDI).
               </p>
@@ -227,7 +227,7 @@ export default function AgencyBillingPage() {
                   {[1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      className="h-10 bg-[#f8fafc] rounded-lg animate-pulse"
+                      className="h-10 bg-bg-soft rounded-lg animate-pulse"
                     />
                   ))}
                 </div>
@@ -235,8 +235,8 @@ export default function AgencyBillingPage() {
                 <div className="space-y-4">
                   {/* Ragione Sociale */}
                   <div>
-                    <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                      Ragione Sociale <span className="text-red-500">*</span>
+                    <label className="block text-sm font-medium text-text mb-1">
+                      Ragione Sociale <span className="text-error">*</span>
                     </label>
                     <input
                       type="text"
@@ -248,7 +248,7 @@ export default function AgencyBillingPage() {
                       className={inputClass("ragioneSociale")}
                     />
                     {fieldErrors.ragioneSociale && (
-                      <p className="text-xs text-red-500 mt-1">
+                      <p className="text-xs text-error mt-1">
                         {fieldErrors.ragioneSociale[0]}
                       </p>
                     )}
@@ -257,8 +257,8 @@ export default function AgencyBillingPage() {
                   {/* P.IVA + Codice Fiscale */}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                        Partita IVA <span className="text-red-500">*</span>
+                      <label className="block text-sm font-medium text-text mb-1">
+                        Partita IVA <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -274,14 +274,14 @@ export default function AgencyBillingPage() {
                         className={inputClass("partitaIva")}
                       />
                       {fieldErrors.partitaIva && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.partitaIva[0]}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                        Codice Fiscale <span className="text-red-500">*</span>
+                      <label className="block text-sm font-medium text-text mb-1">
+                        Codice Fiscale <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -297,7 +297,7 @@ export default function AgencyBillingPage() {
                         className={inputClass("codiceFiscale")}
                       />
                       {fieldErrors.codiceFiscale && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.codiceFiscale[0]}
                         </p>
                       )}
@@ -307,9 +307,9 @@ export default function AgencyBillingPage() {
                   {/* PEC + Codice SDI */}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
+                      <label className="block text-sm font-medium text-text mb-1">
                         PEC
-                        <span className="text-[#64748b] font-normal ml-1">
+                        <span className="text-text-muted font-normal ml-1">
                           (o Codice SDI)
                         </span>
                       </label>
@@ -321,15 +321,15 @@ export default function AgencyBillingPage() {
                         className={inputClass("pec")}
                       />
                       {fieldErrors.pec && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.pec[0]}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
+                      <label className="block text-sm font-medium text-text mb-1">
                         Codice SDI
-                        <span className="text-[#64748b] font-normal ml-1">
+                        <span className="text-text-muted font-normal ml-1">
                           (o PEC)
                         </span>
                       </label>
@@ -347,11 +347,11 @@ export default function AgencyBillingPage() {
                         className={inputClass("codiceSdi")}
                       />
                       {fieldErrors.codiceSdi && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.codiceSdi[0]}
                         </p>
                       )}
-                      <p className="text-[10px] text-[#94a3b8] mt-1">
+                      <p className="text-[10px] text-text-muted mt-1">
                         Inserisci almeno uno tra PEC e Codice SDI
                       </p>
                     </div>
@@ -359,9 +359,9 @@ export default function AgencyBillingPage() {
 
                   {/* Indirizzo Sede Legale */}
                   <div>
-                    <label className="block text-sm font-medium text-[#1e293b] mb-1">
+                    <label className="block text-sm font-medium text-text mb-1">
                       Indirizzo Sede Legale{" "}
-                      <span className="text-red-500">*</span>
+                      <span className="text-error">*</span>
                     </label>
                     <input
                       type="text"
@@ -373,7 +373,7 @@ export default function AgencyBillingPage() {
                       className={inputClass("invoiceAddress")}
                     />
                     {fieldErrors.invoiceAddress && (
-                      <p className="text-xs text-red-500 mt-1">
+                      <p className="text-xs text-error mt-1">
                         {fieldErrors.invoiceAddress[0]}
                       </p>
                     )}
@@ -382,8 +382,8 @@ export default function AgencyBillingPage() {
                   {/* Città + Provincia + CAP */}
                   <div className="grid sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                        Città <span className="text-red-500">*</span>
+                      <label className="block text-sm font-medium text-text mb-1">
+                        Città <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -395,14 +395,14 @@ export default function AgencyBillingPage() {
                         className={inputClass("invoiceCity")}
                       />
                       {fieldErrors.invoiceCity && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.invoiceCity[0]}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                        Provincia <span className="text-red-500">*</span>
+                      <label className="block text-sm font-medium text-text mb-1">
+                        Provincia <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -418,14 +418,14 @@ export default function AgencyBillingPage() {
                         className={inputClass("invoiceProvince")}
                       />
                       {fieldErrors.invoiceProvince && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.invoiceProvince[0]}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#1e293b] mb-1">
-                        CAP <span className="text-red-500">*</span>
+                      <label className="block text-sm font-medium text-text mb-1">
+                        CAP <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -441,7 +441,7 @@ export default function AgencyBillingPage() {
                         className={inputClass("invoiceCap")}
                       />
                       {fieldErrors.invoiceCap && (
-                        <p className="text-xs text-red-500 mt-1">
+                        <p className="text-xs text-error mt-1">
                           {fieldErrors.invoiceCap[0]}
                         </p>
                       )}
@@ -453,19 +453,19 @@ export default function AgencyBillingPage() {
                     <button
                       onClick={handleSaveBilling}
                       disabled={billingSaving}
-                      className="px-6 py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#0a1f44] transition-colors"
+                      className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary-dark transition-colors"
                     >
                       {billingSaving
                         ? "Salvataggio..."
                         : "Salva dati fatturazione"}
                     </button>
                     {billingSaved && (
-                      <p className="text-sm text-[#10b981] font-medium">
+                      <p className="text-sm text-success font-medium">
                         Dati salvati correttamente!
                       </p>
                     )}
                     {billingError && (
-                      <p className="text-sm text-[#ef4444] font-medium">
+                      <p className="text-sm text-error font-medium">
                         {billingError}
                       </p>
                     )}
@@ -475,49 +475,49 @@ export default function AgencyBillingPage() {
             </div>
 
             {/* Commissions */}
-            <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-              <h2 className="font-semibold text-[#0a1f44] mb-4">
+            <div className="bg-white rounded-xl p-6 border border-border">
+              <h2 className="font-medium text-primary-dark mb-4">
                 Provvigioni Maturate
               </h2>
               {completedSales.length === 0 ? (
-                <p className="text-[#64748b] text-center py-4">
+                <p className="text-text-muted text-center py-4">
                   Nessuna vendita completata ancora.
                 </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-[#e2e8f0]">
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-[#64748b]">
+                      <tr className="border-b border-border">
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
                           Immobile
                         </th>
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-[#64748b]">
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
                           Prezzo Vendita
                         </th>
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-[#64748b]">
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
                           Provvigione (1.5%)
                         </th>
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-[#64748b]">
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
                           Stato
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {completedSales.map((sale: any) => (
-                        <tr key={sale.id} className="border-b border-[#f8fafc]">
+                        <tr key={sale.id} className="border-b border-border">
                           <td className="py-3 px-3 text-sm">
                             {sale.property.title}
                           </td>
                           <td className="py-3 px-3 text-sm font-semibold">
                             {formatPrice(sale.property.price)}
                           </td>
-                          <td className="py-3 px-3 text-sm font-semibold text-[#10b981]">
+                          <td className="py-3 px-3 text-sm font-semibold text-success">
                             {formatPrice(
                               Math.round(sale.property.price * 0.015)
                             )}
                           </td>
                           <td className="py-3 px-3">
-                            <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">
+                            <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
                               In attesa
                             </span>
                           </td>

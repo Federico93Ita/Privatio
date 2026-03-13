@@ -120,43 +120,43 @@ export default function AgencyMessagesPage() {
   return (
     <DashboardLayout role="agency">
       <div className="flex flex-col h-[calc(100vh-8rem)]">
-        <h1 className="text-2xl font-bold text-[#0a1f44] mb-4">Messaggi</h1>
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text mb-4">Messaggi</h1>
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="w-8 h-8 border-3 border-[#0e8ff1] border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="flex-1 flex rounded-xl border border-[#e2e8f0] overflow-hidden bg-white">
+          <div className="flex-1 flex rounded-xl border border-border overflow-hidden bg-white">
             {/* Conversation list */}
-            <div className="w-80 border-r border-[#e2e8f0] overflow-y-auto flex-shrink-0">
+            <div className="w-80 border-r border-border overflow-y-auto flex-shrink-0">
               {conversations.length === 0 ? (
                 <div className="p-6 text-center">
-                  <p className="text-sm text-[#64748b]">Nessuna conversazione.</p>
+                  <p className="text-sm text-text-muted">Nessuna conversazione.</p>
                 </div>
               ) : (
                 conversations.map((conv) => (
                   <button
                     key={conv.propertyId}
                     onClick={() => selectConversation(conv.propertyId)}
-                    className={`w-full text-left px-4 py-3 border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-colors ${
-                      selectedPropertyId === conv.propertyId ? "bg-[#f0f9ff]" : ""
+                    className={`w-full text-left px-4 py-3 border-b border-border hover:bg-bg-soft transition-colors ${
+                      selectedPropertyId === conv.propertyId ? "bg-primary/5" : ""
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#0a1f44] truncate">
+                        <p className="text-sm font-medium text-primary-dark truncate">
                           {conv.property?.title || "Immobile"}
                         </p>
-                        <p className="text-xs text-[#64748b] truncate">
+                        <p className="text-xs text-text-muted truncate">
                           {sellerMap[conv.propertyId]?.name || "Venditore"}
                         </p>
-                        <p className="text-xs text-[#94a3b8] truncate mt-0.5">
+                        <p className="text-xs text-text-muted truncate mt-0.5">
                           {conv.lastMessage.content}
                         </p>
                       </div>
                       {conv.unreadCount > 0 && (
-                        <span className="flex-shrink-0 w-5 h-5 bg-[#0e8ff1] text-white text-xs rounded-full flex items-center justify-center">
+                        <span className="flex-shrink-0 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
                           {conv.unreadCount}
                         </span>
                       )}
@@ -170,24 +170,24 @@ export default function AgencyMessagesPage() {
             <div className="flex-1 flex flex-col">
               {!selectedPropertyId ? (
                 <div className="flex-1 flex items-center justify-center">
-                  <p className="text-[#64748b] text-sm">Seleziona una conversazione</p>
+                  <p className="text-text-muted text-sm">Seleziona una conversazione</p>
                 </div>
               ) : (
                 <>
-                  <div className="px-5 py-3 border-b border-[#e2e8f0] flex items-center gap-3">
-                    <div className="w-9 h-9 bg-[#0e8ff1]/10 rounded-full flex items-center justify-center">
-                      <span className="text-[#0e8ff1] font-bold text-sm">{selectedSellerName.charAt(0)}</span>
+                  <div className="px-5 py-3 border-b border-border flex items-center gap-3">
+                    <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="text-primary font-bold text-sm">{selectedSellerName.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className="font-medium text-[#0a1f44] text-sm">{selectedSellerName}</p>
-                      <p className="text-xs text-[#64748b]">Venditore</p>
+                      <p className="font-medium text-primary-dark text-sm">{selectedSellerName}</p>
+                      <p className="text-xs text-text-muted">Venditore</p>
                     </div>
                   </div>
 
-                  <div className="flex-1 bg-[#f8fafc] p-4 overflow-y-auto">
+                  <div className="flex-1 bg-bg-soft p-4 overflow-y-auto">
                     {messages.length === 0 ? (
                       <div className="flex items-center justify-center h-full">
-                        <p className="text-[#64748b] text-sm">Nessun messaggio. Inizia la conversazione.</p>
+                        <p className="text-text-muted text-sm">Nessun messaggio. Inizia la conversazione.</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -197,11 +197,11 @@ export default function AgencyMessagesPage() {
                             <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                               <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl ${
                                 isMine
-                                  ? "bg-[#0e8ff1] text-white rounded-br-sm"
-                                  : "bg-white text-[#1e293b] border border-[#e2e8f0] rounded-bl-sm"
+                                  ? "bg-primary text-white rounded-br-sm"
+                                  : "bg-white text-text border border-border rounded-bl-sm"
                               }`}>
                                 <p className="text-sm">{msg.content}</p>
-                                <p className={`text-xs mt-1 ${isMine ? "text-white/70" : "text-[#64748b]"}`}>
+                                <p className={`text-xs mt-1 ${isMine ? "text-white/70" : "text-text-muted"}`}>
                                   {new Date(msg.createdAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
                                 </p>
                               </div>
@@ -213,19 +213,19 @@ export default function AgencyMessagesPage() {
                     )}
                   </div>
 
-                  <div className="p-3 border-t border-[#e2e8f0] flex gap-3">
+                  <div className="p-3 border-t border-border flex gap-3">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && !sending && handleSend()}
                       placeholder="Scrivi un messaggio..."
-                      className="flex-1 px-4 py-2.5 border border-[#e2e8f0] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                      className="flex-1 px-4 py-2.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
                     />
                     <button
                       onClick={handleSend}
                       disabled={!newMessage.trim() || sending}
-                      className="px-5 py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#0a1f44] transition-colors"
+                      className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary-dark transition-colors"
                     >
                       {sending ? "..." : "Invia"}
                     </button>

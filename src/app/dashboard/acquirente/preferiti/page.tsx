@@ -86,7 +86,7 @@ export default function BuyerFavoritesPage() {
     <DashboardLayout role="buyer">
       <div className="mx-auto max-w-6xl space-y-6">
         <div>
-          <h1 className="font-heading text-2xl tracking-wide text-primary-dark sm:text-3xl">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark sm:text-3xl">
             I Tuoi Preferiti
           </h1>
           <p className="mt-1 text-sm text-text-muted">
@@ -116,7 +116,7 @@ export default function BuyerFavoritesPage() {
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-4 text-text-muted" aria-hidden="true">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
-            <h3 className="mb-2 text-lg font-semibold text-primary-dark">
+            <h3 className="mb-2 text-lg font-medium text-primary-dark">
               Nessun preferito ancora
             </h3>
             <p className="mb-6 max-w-sm text-sm text-text-muted">
@@ -143,7 +143,7 @@ export default function BuyerFavoritesPage() {
                   type="button"
                   onClick={() => handleRemove(fav.property.id)}
                   disabled={removingId === fav.property.id}
-                  className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#ef4444] shadow-sm transition-colors hover:bg-[#ef4444] hover:text-white disabled:opacity-50"
+                  className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-error shadow-sm transition-colors hover:bg-error hover:text-white disabled:opacity-50"
                   aria-label="Rimuovi dai preferiti"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -170,7 +170,7 @@ export default function BuyerFavoritesPage() {
                     )}
                     {/* Status badge */}
                     {fav.property.status === "VENDUTO" && (
-                      <div className="absolute top-3 left-3 rounded-full bg-[#ef4444] px-2.5 py-0.5 text-xs font-medium text-white">
+                      <div className="absolute top-3 left-3 rounded-full bg-error px-2.5 py-0.5 text-xs font-medium text-white">
                         Venduto
                       </div>
                     )}
@@ -183,7 +183,7 @@ export default function BuyerFavoritesPage() {
                       {fav.property.city} ({fav.property.province})
                     </p>
                     <div className="mt-3 flex items-center justify-between">
-                      <span className="text-base font-bold text-primary">
+                      <span className="text-base font-medium text-primary">
                         {formatPrice(fav.property.price)}
                       </span>
                       <span className="text-xs text-text-muted">
