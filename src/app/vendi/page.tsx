@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, FormEvent, ChangeEvent, DragEvent } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -309,10 +310,21 @@ export default function VendiPage() {
 
       if (!registerRes.ok) {
         const data = await registerRes.json().catch(() => ({}));
-        throw new Error(data.message || "Errore durante la registrazione.");
+        throw new Error(data.error || data.message || "Errore durante la registrazione.");
       }
 
-      // 2. Create property
+      // 2. Auto-login to establish session (required for property creation)
+      const loginResult = await signIn("credentials", {
+        email: form.email,
+        password: form.password,
+        redirect: false,
+      });
+
+      if (loginResult?.error) {
+        throw new Error("Registrazione riuscita ma accesso fallito. Accedi manualmente e riprova.");
+      }
+
+      // 3. Create property
       const propertyPayload = new FormData();
       propertyPayload.append("tipoImmobile", form.tipoImmobile);
       propertyPayload.append("indirizzo", form.indirizzo);
