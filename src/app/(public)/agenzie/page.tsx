@@ -183,20 +183,18 @@ export default function AgenziePage() {
       <Header />
 
       {/* ---- Hero ---- */}
-      <section className="relative overflow-hidden bg-primary-dark pt-28 pb-20 md:pt-36 md:pb-28">
-        {/* Decorative gradient blob */}
-        <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h1 className="font-heading text-4xl uppercase leading-tight tracking-wide text-white md:text-5xl lg:text-6xl">
+      <section className="pt-28 pb-16 md:pt-36 md:pb-20">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-light tracking-[-0.03em] text-text md:text-5xl">
             Porta la tua agenzia nel futuro
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-muted md:text-xl">
             Entra nel network Privatio e ricevi clienti venditori senza doverli
             cercare.
           </p>
           <a
             href="#registrazione"
-            className="mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl"
+            className="mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3.5 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
           >
             Diventa Partner
           </a>
@@ -206,7 +204,7 @@ export default function AgenziePage() {
       {/* ---- Benefits ---- */}
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-center text-3xl uppercase tracking-wide text-primary-dark md:text-4xl">
+          <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
             Perche scegliere Privatio
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
@@ -223,7 +221,7 @@ export default function AgenziePage() {
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
                   {b.icon}
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-primary-dark" style={{ fontFamily: "var(--font-sans)" }}>
+                <h3 className="mt-5 text-lg font-medium text-primary-dark" style={{ fontFamily: "var(--font-sans)" }}>
                   {b.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-text-muted">
@@ -238,7 +236,7 @@ export default function AgenziePage() {
       {/* ---- Pricing ---- */}
       <section className="bg-bg-soft py-16 md:py-24" id="piani">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-center text-3xl uppercase tracking-wide text-primary-dark md:text-4xl">
+          <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
             Scegli il tuo piano
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
@@ -256,15 +254,15 @@ export default function AgenziePage() {
                 }`}
               >
                 {plan.highlighted && (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white">
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-medium text-white">
                     Consigliato
                   </span>
                 )}
-                <h3 className="text-xl font-bold text-primary-dark" style={{ fontFamily: "var(--font-sans)" }}>
+                <h3 className="text-xl font-medium text-text" style={{ fontFamily: "var(--font-sans)" }}>
                   {plan.name}
                 </h3>
                 <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-primary-dark">
+                  <span className="text-4xl font-medium text-primary-dark">
                     &euro;{plan.price}
                   </span>
                   <span className="text-text-muted">/mese</span>
@@ -296,7 +294,7 @@ export default function AgenziePage() {
       {/* ---- Registration Form ---- */}
       <section className="py-16 md:py-24" id="registrazione">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-center text-3xl uppercase tracking-wide text-primary-dark md:text-4xl">
+          <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
             Diventa partner
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
@@ -311,7 +309,7 @@ export default function AgenziePage() {
       {/* ---- FAQ ---- */}
       <section className="bg-bg-soft py-16 md:py-24" id="faq">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading text-center text-3xl uppercase tracking-wide text-primary-dark md:text-4xl">
+          <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
             Domande frequenti
           </h2>
           <div className="mt-10">

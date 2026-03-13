@@ -25,7 +25,7 @@ export default function GlobalError({
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-heading text-primary-dark mb-3">
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text mb-3">
           Qualcosa e andato storto
         </h1>
         <p className="text-text-muted mb-8">
@@ -34,7 +34,7 @@ export default function GlobalError({
         <div className="flex gap-3 justify-center">
           <button
             onClick={reset}
-            className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
+            className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors"
           >
             Riprova
           </button>

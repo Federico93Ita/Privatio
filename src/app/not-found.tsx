@@ -19,8 +19,8 @@ export default function NotFound() {
             />
           </svg>
         </div>
-        <h1 className="text-6xl font-heading text-primary-dark mb-2">404</h1>
-        <h2 className="text-xl font-semibold text-text mb-3">
+        <h1 className="text-6xl font-light tracking-[-0.03em] text-text mb-2">404</h1>
+        <h2 className="text-xl font-medium text-text mb-3">
           Pagina non trovata
         </h2>
         <p className="text-text-muted mb-8">
@@ -29,7 +29,7 @@ export default function NotFound() {
         <div className="flex gap-3 justify-center">
           <Link
             href="/"
-            className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors"
+            className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors"
           >
             Torna alla Home
           </Link>

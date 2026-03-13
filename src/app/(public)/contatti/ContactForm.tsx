@@ -38,17 +38,17 @@ export default function ContactForm() {
 
   if (result === "success") {
     return (
-      <div className="bg-white rounded-xl p-6 border border-[#e2e8f0] flex flex-col items-center justify-center text-center min-h-[400px]">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-white rounded-xl p-6 border border-border flex flex-col items-center justify-center text-center min-h-[400px]">
+        <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
+          <svg className="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="font-semibold text-[#0a1f44] text-lg mb-2">Messaggio inviato!</h3>
-        <p className="text-[#64748b] text-sm">Ti risponderemo il prima possibile, generalmente entro 24 ore.</p>
+        <h3 className="font-medium text-primary-dark text-lg mb-2">Messaggio inviato!</h3>
+        <p className="text-text-muted text-sm">Ti risponderemo il prima possibile, generalmente entro 24 ore.</p>
         <button
           onClick={() => setResult(null)}
-          className="mt-6 text-[#0e8ff1] font-medium text-sm hover:underline"
+          className="mt-6 text-primary font-medium text-sm hover:underline"
         >
           Invia un altro messaggio
         </button>
@@ -57,40 +57,40 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-      <h3 className="font-semibold text-[#0a1f44] mb-4">Scrivici un messaggio</h3>
+    <div className="bg-white rounded-xl p-6 border border-border">
+      <h3 className="font-medium text-primary-dark mb-4">Scrivici un messaggio</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[#1e293b] mb-1">Nome</label>
+          <label className="block text-sm font-medium text-text mb-1">Nome</label>
           <input
             type="text"
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="Il tuo nome"
-            className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]"
+            className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
           />
-          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name[0]}</p>}
+          {errors.name && <p className="text-error text-xs mt-1">{errors.name[0]}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#1e293b] mb-1">Email</label>
+          <label className="block text-sm font-medium text-text mb-1">Email</label>
           <input
             type="email"
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             placeholder="email@esempio.it"
-            className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]"
+            className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email[0]}</p>}
+          {errors.email && <p className="text-error text-xs mt-1">{errors.email[0]}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#1e293b] mb-1">Oggetto</label>
+          <label className="block text-sm font-medium text-text mb-1">Oggetto</label>
           <select
             required
             value={form.subject}
             onChange={(e) => setForm({ ...form, subject: e.target.value })}
-            className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]"
+            className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
           >
             <option value="">Seleziona</option>
             <option value="vendita">Voglio vendere casa</option>
@@ -98,29 +98,29 @@ export default function ContactForm() {
             <option value="agenzia">Partnership agenzia</option>
             <option value="altro">Altro</option>
           </select>
-          {errors.subject && <p className="text-red-500 text-xs mt-1">{errors.subject[0]}</p>}
+          {errors.subject && <p className="text-error text-xs mt-1">{errors.subject[0]}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#1e293b] mb-1">Messaggio</label>
+          <label className="block text-sm font-medium text-text mb-1">Messaggio</label>
           <textarea
             required
             rows={5}
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}
             placeholder="Scrivi il tuo messaggio..."
-            className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] resize-none"
+            className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
           />
-          {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message[0]}</p>}
+          {errors.message && <p className="text-error text-xs mt-1">{errors.message[0]}</p>}
         </div>
 
         {result === "error" && (
-          <p className="text-red-500 text-sm">Errore nell&apos;invio. Riprova o scrivi a info@privatio.it</p>
+          <p className="text-error text-sm">Errore nell&apos;invio. Riprova o scrivi a info@privatio.it</p>
         )}
 
         <button
           type="submit"
           disabled={sending}
-          className="w-full py-3 bg-[#0e8ff1] text-white rounded-lg font-semibold hover:bg-[#0a1f44] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {sending ? "Invio in corso..." : "Invia messaggio"}
         </button>

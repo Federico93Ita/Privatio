@@ -40,10 +40,10 @@ export default function ComeFunzionaPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-gradient-to-b from-[#0a1f44] to-[#0e8ff1] text-white py-20 md:py-28">
+        <section className="pt-32 pb-16 md:pt-40 md:pb-20">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h1 className="font-heading text-4xl md:text-6xl mb-6">COME FUNZIONA</h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            <h1 className="text-4xl font-light tracking-[-0.03em] text-text md:text-5xl mb-6">Come funziona</h1>
+            <p className="text-xl text-text-muted max-w-2xl mx-auto">
               Vendere casa senza commissioni è semplice. Ecco come Privatio rivoluziona la vendita immobiliare in Italia.
             </p>
           </div>
@@ -55,17 +55,17 @@ export default function ComeFunzionaPage() {
             {steps.map((step, i) => (
               <div key={step.num} className={`flex flex-col md:flex-row gap-8 items-start ${i % 2 === 1 ? "md:flex-row-reverse" : ""}`}>
                 <div className="flex-shrink-0">
-                  <div className="w-20 h-20 rounded-2xl bg-[#0e8ff1]/10 flex items-center justify-center">
-                    <span className="text-3xl font-bold text-[#0e8ff1]">{step.num}</span>
+                  <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <span className="text-3xl font-medium text-primary">{step.num}</span>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-[#0a1f44] mb-3">{step.title}</h2>
-                  <p className="text-[#64748b] text-lg mb-4">{step.desc}</p>
+                  <h2 className="text-2xl font-medium text-text mb-3">{step.title}</h2>
+                  <p className="text-text-muted text-lg mb-4">{step.desc}</p>
                   <ul className="space-y-2">
                     {step.details.map((detail) => (
-                      <li key={detail} className="flex items-center gap-2 text-[#1e293b]">
-                        <svg className="w-5 h-5 text-[#10b981] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <li key={detail} className="flex items-center gap-2 text-text">
+                        <svg className="w-5 h-5 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                         {detail}
@@ -79,19 +79,19 @@ export default function ComeFunzionaPage() {
         </section>
 
         {/* Commission explanation */}
-        <section className="bg-[#f8fafc] py-16">
+        <section className="bg-bg-soft py-16">
           <div className="max-w-4xl mx-auto px-4">
-            <h2 className="font-heading text-3xl text-[#0a1f44] text-center mb-8">CHI PAGA COSA?</h2>
+            <h2 className="text-2xl font-light tracking-[-0.03em] text-text text-center mb-8">Chi paga cosa?</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl p-6 border-2 border-[#10b981]">
-                <h3 className="text-xl font-bold text-[#10b981] mb-2">Venditore</h3>
-                <p className="text-5xl font-bold text-[#10b981] mb-2">0%</p>
-                <p className="text-[#64748b]">Nessuna commissione, nessun costo nascosto. Incassi il 100% del prezzo di vendita.</p>
+              <div className="bg-white rounded-xl p-6 border-2 border-success">
+                <h3 className="text-xl font-medium text-success mb-2">Venditore</h3>
+                <p className="text-5xl font-semibold text-success mb-2">0%</p>
+                <p className="text-text-muted">Nessuna commissione, nessun costo nascosto. Incassi il 100% del prezzo di vendita.</p>
               </div>
-              <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-                <h3 className="text-xl font-bold text-[#0a1f44] mb-2">Acquirente</h3>
-                <p className="text-5xl font-bold text-[#0e8ff1] mb-2">2 - 2.5%</p>
-                <p className="text-[#64748b]">L&apos;acquirente paga una commissione ridotta sul prezzo di vendita. Trasparenza totale.</p>
+              <div className="bg-white rounded-xl p-6 border border-border">
+                <h3 className="text-xl font-medium text-text mb-2">Acquirente</h3>
+                <p className="text-5xl font-semibold text-primary mb-2">2 - 2.5%</p>
+                <p className="text-text-muted">L&apos;acquirente paga una commissione ridotta sul prezzo di vendita. Trasparenza totale.</p>
               </div>
             </div>
           </div>
@@ -100,13 +100,13 @@ export default function ComeFunzionaPage() {
         {/* CTA */}
         <section className="py-16 text-center">
           <div className="max-w-2xl mx-auto px-4">
-            <h2 className="font-heading text-3xl text-[#0a1f44] mb-4">PRONTO A VENDERE?</h2>
-            <p className="text-[#64748b] text-lg mb-8">
+            <h2 className="text-2xl font-light tracking-[-0.03em] text-text mb-4">Pronto a vendere?</h2>
+            <p className="text-text-muted text-lg mb-8">
               Inserisci il tuo immobile gratuitamente e inizia il percorso verso la vendita senza commissioni.
             </p>
             <Link
               href="/vendi"
-              className="inline-block px-8 py-4 bg-[#0e8ff1] text-white rounded-xl text-lg font-semibold hover:bg-[#0a1f44] transition-colors"
+              className="inline-block px-8 py-4 bg-primary text-white rounded-xl text-lg font-semibold hover:bg-primary/85 transition-colors"
             >
               Inserisci il tuo immobile gratis
             </Link>

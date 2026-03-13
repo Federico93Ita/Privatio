@@ -399,7 +399,7 @@ export default function VendiPage() {
   }
 
   const inputBase =
-    "w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none";
+    "w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 transition-colors focus:border-primary focus:ring-1 focus:ring-primary/30 outline-none";
 
   function inputClass(field: keyof FormData) {
     return `${inputBase} ${errors[field] ? "border-error" : "border-border"}`;
@@ -707,12 +707,12 @@ export default function VendiPage() {
               <div>
                 <p className="text-sm leading-relaxed text-text">
                   Con un&apos;agenzia tradizionale pagheresti circa{" "}
-                  <span className="font-bold text-error">
+                  <span className="font-semibold text-error">
                     &euro;{commissioneAgenzia.toLocaleString("it-IT")}
                   </span>{" "}
                   di commissione (3%).
                 </p>
-                <p className="mt-1 text-sm font-semibold text-primary">
+                <p className="mt-1 text-sm font-medium text-primary">
                   Con Privatio risparmi il 100%.
                 </p>
               </div>
@@ -818,7 +818,7 @@ export default function VendiPage() {
 
                 {/* Cover badge */}
                 {photo.isCover && (
-                  <span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow">
+                  <span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-0.5 text-[10px] font-semibold text-white shadow">
                     Copertina
                   </span>
                 )}
@@ -1085,7 +1085,7 @@ export default function VendiPage() {
         <div className="mx-auto max-w-[700px] px-4 sm:px-6">
           {/* ---- Title ---- */}
           <div className="mb-8 text-center">
-            <h1 className="font-heading text-3xl uppercase tracking-wide text-primary-dark md:text-4xl">
+            <h1 className="text-2xl font-light tracking-[-0.03em] text-text md:text-4xl">
               Vendi il tuo immobile
             </h1>
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-text-muted">
@@ -1175,10 +1175,10 @@ export default function VendiPage() {
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="rounded-2xl border border-border bg-white p-6 shadow-lg sm:p-8"
+            className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8"
           >
             {/* Step title */}
-            <h2 className="mb-6 text-lg font-semibold text-primary-dark">
+            <h2 className="mb-6 text-lg font-medium text-primary-dark">
               {step === 1 && "L'immobile"}
               {step === 2 && "Il prezzo"}
               {step === 3 && "Le foto"}
@@ -1230,7 +1230,7 @@ export default function VendiPage() {
                   type="button"
                   onClick={next}
                   disabled={step === 3 && photos.length < 3}
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-primary/85 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Avanti
                   <svg
@@ -1251,7 +1251,7 @@ export default function VendiPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-primary/85 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? (
                     <>

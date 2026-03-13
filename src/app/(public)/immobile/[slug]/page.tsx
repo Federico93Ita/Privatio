@@ -124,9 +124,9 @@ export default async function PropertyDetailPage({ params }: Props) {
         <Header />
         <main className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-[#0a1f44] mb-4">Immobile non trovato</h1>
-            <p className="text-[#64748b] mb-6">L&apos;immobile che stai cercando non esiste o non è più disponibile.</p>
-            <Link href="/cerca" className="px-6 py-3 bg-[#0e8ff1] text-white rounded-lg font-semibold hover:bg-[#0a1f44] transition-colors">
+            <h1 className="text-2xl font-medium text-text mb-4">Immobile non trovato</h1>
+            <p className="text-text-muted mb-6">L&apos;immobile che stai cercando non esiste o non è più disponibile.</p>
+            <Link href="/cerca" className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors">
               Cerca altri immobili
             </Link>
           </div>
@@ -152,7 +152,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       <Header />
-      <main className="bg-[#f8fafc] min-h-screen">
+      <main className="bg-bg-soft min-h-screen">
         {/* Gallery */}
         {property.photos?.length > 0 && (
           <div className="max-w-7xl mx-auto px-4 pt-6">
@@ -167,60 +167,60 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Title & badges */}
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="px-3 py-1 bg-[#0e8ff1]/10 text-[#0e8ff1] rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                     {getPropertyTypeLabel(property.type)}
                   </span>
                   {property.energyClass && (
-                    <span className="px-3 py-1 bg-[#10b981]/10 text-[#10b981] rounded-full text-sm font-medium">
+                    <span className="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
                       Classe {property.energyClass}
                     </span>
                   )}
-                  <span className="px-3 py-1 bg-[#10b981]/10 text-[#10b981] rounded-full text-sm font-semibold">
+                  <span className="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
                     0% comm. venditore
                   </span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-[#0a1f44] mb-2">{property.title}</h1>
-                <p className="text-[#64748b] text-lg">
+                <h1 className="text-3xl md:text-4xl font-medium text-text mb-2">{property.title}</h1>
+                <p className="text-text-muted text-lg">
                   {property.address && `${property.address}, `}{property.city} ({property.province})
                 </p>
-                <p className="text-4xl font-bold text-[#0e8ff1] mt-4">{formatPrice(property.price)}</p>
+                <p className="text-4xl font-medium text-primary mt-4">{formatPrice(property.price)}</p>
               </div>
 
               {/* Stats grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { label: "Superficie", value: `${property.surface} mq`, icon: "📐" },
-                  { label: "Locali", value: property.rooms, icon: "🏠" },
-                  { label: "Bagni", value: property.bathrooms, icon: "🚿" },
-                  { label: "Piano", value: property.floor != null ? `${property.floor}/${property.totalFloors || "—"}` : "—", icon: "🏢" },
+                  { label: "Superficie", value: `${property.surface} mq`, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg> },
+                  { label: "Locali", value: property.rooms, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg> },
+                  { label: "Bagni", value: property.bathrooms, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg> },
+                  { label: "Piano", value: property.floor != null ? `${property.floor}/${property.totalFloors || "—"}` : "—", svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg> },
                 ].map((stat, i) => (
-                  <div key={i} className="bg-white rounded-xl p-4 border border-[#e2e8f0] text-center">
-                    <span className="text-2xl">{stat.icon}</span>
-                    <p className="text-xl font-bold text-[#0a1f44] mt-1">{stat.value}</p>
-                    <p className="text-sm text-[#64748b]">{stat.label}</p>
+                  <div key={i} className="bg-white rounded-xl p-4 border border-border text-center">
+                    <div className="flex justify-center text-text-muted mb-1">{stat.svg}</div>
+                    <p className="text-xl font-medium text-text">{stat.value}</p>
+                    <p className="text-sm text-text-muted">{stat.label}</p>
                   </div>
                 ))}
               </div>
 
               {/* Features */}
               {features.length > 0 && (
-                <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-                  <h2 className="font-heading text-xl text-[#0a1f44] mb-4">CARATTERISTICHE</h2>
+                <div className="bg-white rounded-xl p-6 border border-border">
+                  <h2 className="font-medium text-xl text-text mb-4">Caratteristiche</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {features.map((f) => (
                       <div key={f.key} className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="text-[#1e293b]">{f.label}</span>
+                        <span className="text-text">{f.label}</span>
                       </div>
                     ))}
                     {property.yearBuilt && (
                       <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span className="text-[#1e293b]">Anno: {property.yearBuilt}</span>
+                        <span className="text-text">Anno: {property.yearBuilt}</span>
                       </div>
                     )}
                   </div>
@@ -229,15 +229,15 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Description */}
               {property.description && (
-                <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-                  <h2 className="font-heading text-xl text-[#0a1f44] mb-4">DESCRIZIONE</h2>
-                  <p className="text-[#64748b] leading-relaxed whitespace-pre-line">{property.description}</p>
+                <div className="bg-white rounded-xl p-6 border border-border">
+                  <h2 className="font-medium text-xl text-text mb-4">Descrizione</h2>
+                  <p className="text-text-muted leading-relaxed whitespace-pre-line">{property.description}</p>
                 </div>
               )}
 
               {/* Map */}
-              <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-                <h2 className="font-heading text-xl text-[#0a1f44] mb-4">POSIZIONE</h2>
+              <div className="bg-white rounded-xl p-6 border border-border">
+                <h2 className="font-medium text-xl text-text mb-4">Posizione</h2>
                 <PropertyMap lat={property.lat} lng={property.lng} city={property.city} />
               </div>
             </div>
@@ -245,50 +245,50 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Commission info */}
-              <div className="bg-[#0e8ff1]/5 border border-[#0e8ff1]/20 rounded-xl p-5">
-                <h3 className="font-semibold text-[#0a1f44] mb-2">Commissioni trasparenti</h3>
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
+                <h3 className="font-medium text-primary-dark mb-2">Commissioni trasparenti</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Commissione venditore</span>
-                    <span className="font-bold text-[#10b981]">0%</span>
+                    <span className="text-text-muted">Commissione venditore</span>
+                    <span className="font-medium text-success">0%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#64748b]">Commissione acquirente</span>
-                    <span className="font-semibold text-[#0a1f44]">2% - 2.5%</span>
+                    <span className="text-text-muted">Commissione acquirente</span>
+                    <span className="font-medium text-primary-dark">2% - 2.5%</span>
                   </div>
                 </div>
-                <p className="text-xs text-[#64748b] mt-3">
+                <p className="text-xs text-text-muted mt-3">
                   La commissione acquirente viene concordata in fase di trattativa.
                   Nessun costo nascosto, massima trasparenza.
                 </p>
               </div>
 
               {/* Contact Form */}
-              <div className="bg-white rounded-xl p-6 border border-[#e2e8f0] sticky top-24">
+              <div className="bg-white rounded-xl p-6 border border-border sticky top-24">
                 <PropertyContactForm slug={property.slug} />
               </div>
 
               {/* Agency info */}
               {property.assignment?.agency && (
-                <div className="bg-white rounded-xl p-5 border border-[#e2e8f0]">
-                  <h3 className="font-semibold text-[#0a1f44] mb-3">Agenzia Partner</h3>
-                  <p className="font-medium text-[#1e293b]">{property.assignment.agency.name}</p>
+                <div className="bg-white rounded-xl p-5 border border-border">
+                  <h3 className="font-medium text-primary-dark mb-3">Agenzia Partner</h3>
+                  <p className="font-medium text-text">{property.assignment.agency.name}</p>
                   {property.assignment.agency.rating && (
                     <div className="flex items-center gap-1 mt-1">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className={`w-4 h-4 ${star <= Math.round(property.assignment!.agency.rating!) ? "text-[#f59e0b]" : "text-[#e2e8f0]"}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={star} className={`w-4 h-4 ${star <= Math.round(property.assignment!.agency.rating!) ? "text-accent" : "text-border"}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       ))}
-                      <span className="text-sm text-[#64748b] ml-1">{property.assignment.agency.rating}</span>
+                      <span className="text-sm text-text-muted ml-1">{property.assignment.agency.rating}</span>
                     </div>
                   )}
-                  <p className="text-sm text-[#64748b] mt-1">{property.assignment.agency.phone}</p>
+                  <p className="text-sm text-text-muted mt-1">{property.assignment.agency.phone}</p>
                 </div>
               )}
 
               {/* Mortgage Calculator */}
-              <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
+              <div className="bg-white rounded-xl p-6 border border-border">
                 <MortgageCalc defaultPrice={property.price} />
               </div>
             </div>

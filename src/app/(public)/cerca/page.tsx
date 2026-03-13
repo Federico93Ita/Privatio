@@ -212,13 +212,13 @@ function CercaPageInner() {
   /* ---- Render helpers ---- */
   const inputClass = cn(
     "w-full rounded-lg border border-border px-3 py-2.5 text-sm",
-    "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary",
+    "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
     "transition-colors bg-white"
   );
 
   const selectClass = cn(
     "w-full rounded-lg border border-border px-3 py-2.5 text-sm appearance-none",
-    "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary",
+    "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
     "transition-colors bg-white"
   );
 
@@ -354,8 +354,8 @@ function CercaPageInner() {
           type="button"
           onClick={handleSearch}
           className={cn(
-            "w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white",
-            "hover:bg-primary-dark transition-colors shadow-sm"
+            "w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white",
+            "hover:bg-primary/85 transition-colors shadow-sm"
           )}
         >
           Cerca
@@ -473,7 +473,7 @@ function CercaPageInner() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {/* ---- Page title ---- */}
           <div className="mb-8">
-            <h1 className="font-heading text-3xl md:text-4xl text-primary-dark uppercase tracking-wide">
+            <h1 className="text-3xl font-light tracking-[-0.03em] sm:text-4xl text-primary-dark">
               Cerca il tuo immobile
             </h1>
             <p className="mt-2 text-text-muted text-base">
@@ -509,7 +509,7 @@ function CercaPageInner() {
             {/* ---- Desktop sidebar ---- */}
             <aside className="hidden lg:block w-72 shrink-0">
               <div className="sticky top-28 rounded-2xl border border-border bg-white p-5 shadow-sm">
-                <h2 className="font-heading text-lg text-text uppercase tracking-wide mb-4">
+                <h2 className="text-lg font-medium text-text mb-4">
                   Filtri
                 </h2>
                 {filtersContent}
@@ -543,7 +543,7 @@ function CercaPageInner() {
                     onChange={(e) => handleSortChange(e.target.value)}
                     className={cn(
                       "rounded-lg border border-border px-3 py-2 text-sm bg-white",
-                      "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary",
+                      "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
                       "transition-colors appearance-none"
                     )}
                   >
@@ -582,7 +582,7 @@ function CercaPageInner() {
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="mt-4 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+                    className="mt-4 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/85 transition-colors"
                   >
                     Reset filtri
                   </button>
