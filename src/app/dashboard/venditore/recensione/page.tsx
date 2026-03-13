@@ -198,7 +198,7 @@ export default function ReviewPage() {
                 rows={4}
                 maxLength={2000}
                 placeholder="Racconta la tua esperienza..."
-                className="w-full px-4 py-2.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                className="w-full px-4 py-2.5 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent resize-none"
               />
               <p className="text-xs text-text-muted mt-1 text-right">
                 {comment.length}/2000

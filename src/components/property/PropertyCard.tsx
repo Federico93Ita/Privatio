@@ -96,16 +96,16 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-slate-50 to-slate-100 text-slate-300">
+          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-bg-soft to-border text-text-muted/40">
             <svg className="w-12 h-12 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
-            <span className="text-xs text-slate-400">Foto in arrivo</span>
+            <span className="text-xs text-text-muted">Foto in arrivo</span>
           </div>
         )}
 
         {/* Commission badge */}
-        <span className="absolute top-3 left-3 bg-success/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+        <span className="absolute top-3 left-3 bg-success/90 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
           0% comm. venditore
         </span>
 
@@ -118,7 +118,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       {/* ---- Body ---- */}
       <div className="p-4 flex flex-col gap-2">
         {/* Title */}
-        <h3 className="font-semibold text-text text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-medium text-text text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
 
@@ -128,7 +128,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </p>
 
         {/* Price */}
-        <p className="text-primary font-bold text-xl">
+        <p className="text-primary font-semibold text-xl">
           {formatPrice(price)}
         </p>
 

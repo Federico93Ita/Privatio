@@ -209,7 +209,7 @@ export default function LeadForm() {
             />
           </svg>
         </div>
-        <h3 className="font-heading text-2xl uppercase tracking-wide text-text md:text-3xl">
+        <h3 className="font-light text-2xl tracking-[-0.03em] text-text md:text-3xl">
           Richiesta inviata!
         </h3>
         <p className="mt-3 text-text-muted">
@@ -224,7 +224,7 @@ export default function LeadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-white p-6 shadow-lg md:p-10"
+      className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-white p-6 shadow-sm md:p-10"
     >
       {/* Error banner */}
       {status === "error" && errorMessage && (

@@ -23,7 +23,7 @@ export default function PropertyMap({ lat, lng, city }: PropertyMapProps) {
 
   return (
     <div className="space-y-3">
-      <h3 className="font-heading text-lg text-text uppercase tracking-wide">
+      <h3 className="font-medium text-lg text-text">
         Posizione indicativa
       </h3>
       <p className="text-text-muted text-sm">
@@ -31,7 +31,7 @@ export default function PropertyMap({ lat, lng, city }: PropertyMapProps) {
       </p>
       <div
         className={cn(
-          "relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-md",
+          "relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-sm",
           "border border-border"
         )}
       >

@@ -156,7 +156,7 @@ export default function AgencyDashboardPage() {
                         </div>
                         <a
                           href={`/dashboard/agenzia/immobile/${p.id}`}
-                          className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors self-start"
+                          className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/85 transition-colors self-start"
                         >
                           Gestisci
                         </a>

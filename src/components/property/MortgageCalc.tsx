@@ -35,7 +35,7 @@ export default function MortgageCalc({ defaultPrice }: MortgageCalcProps) {
   return (
     <div className="rounded-2xl border border-border bg-white p-6 shadow-sm space-y-6">
       {/* Title */}
-      <h3 className="font-heading text-xl text-text uppercase tracking-wide">
+      <h3 className="font-medium text-lg text-text">
         Calcola la tua rata
       </h3>
 
@@ -54,7 +54,7 @@ export default function MortgageCalc({ defaultPrice }: MortgageCalcProps) {
             onChange={(e) => setPrice(Number(e.target.value))}
             className={cn(
               "w-full rounded-lg border border-border px-4 py-2.5 text-sm",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary",
+              "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
               "transition-colors"
             )}
           />
@@ -67,7 +67,7 @@ export default function MortgageCalc({ defaultPrice }: MortgageCalcProps) {
       {/* ---- Anticipo % ---- */}
       <div className="space-y-1.5">
         <label htmlFor="mortgage-down" className="block text-sm font-medium text-text">
-          Anticipo: <span className="text-primary font-bold">{downPaymentPct}%</span>
+          Anticipo: <span className="text-primary font-medium">{downPaymentPct}%</span>
           <span className="text-text-muted font-normal ml-2">
             ({formatPrice(Math.round(price * downPaymentPct / 100))})
           </span>
@@ -125,7 +125,7 @@ export default function MortgageCalc({ defaultPrice }: MortgageCalcProps) {
           onChange={(e) => setRate(Number(e.target.value))}
           className={cn(
             "w-full rounded-lg border border-border px-4 py-2.5 text-sm",
-            "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary",
+            "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
             "transition-colors"
           )}
         />
@@ -134,7 +134,7 @@ export default function MortgageCalc({ defaultPrice }: MortgageCalcProps) {
       {/* ---- Output ---- */}
       <div className="rounded-xl bg-bg-soft p-5 text-center space-y-1">
         <p className="text-text-muted text-sm">Rata mensile stimata</p>
-        <p className="text-3xl font-bold text-primary">
+        <p className="text-3xl font-semibold text-primary">
           {formatPrice(Math.round(monthlyPayment))}
         </p>
         <p className="text-text-muted text-xs">/ mese</p>

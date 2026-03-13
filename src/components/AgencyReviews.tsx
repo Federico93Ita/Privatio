@@ -110,7 +110,7 @@ export default function AgencyReviews({ agencyId, agencyName }: AgencyReviewsPro
       {/* Summary */}
       <div className="flex items-center gap-4 rounded-xl border border-border bg-white p-5">
         <div className="text-center">
-          <p className="text-3xl font-bold text-[#0a1f44]">{avgRating.toFixed(1)}</p>
+          <p className="text-3xl font-semibold text-text">{avgRating.toFixed(1)}</p>
           <StarRating rating={Math.round(avgRating)} />
           <p className="text-xs text-text-muted mt-1">
             {reviews.length} recension{reviews.length === 1 ? "e" : "i"}
@@ -124,9 +124,9 @@ export default function AgencyReviews({ agencyId, agencyName }: AgencyReviewsPro
             return (
               <div key={star} className="flex items-center gap-2 text-xs">
                 <span className="w-3 text-right text-text-muted">{star}</span>
-                <div className="flex-1 h-2 rounded-full bg-[#f1f5f9]">
+                <div className="flex-1 h-2 rounded-full bg-bg-soft">
                   <div
-                    className="h-2 rounded-full bg-[#f59e0b]"
+                    className="h-2 rounded-full bg-accent"
                     style={{ width: `${pct}%` }}
                   />
                 </div>

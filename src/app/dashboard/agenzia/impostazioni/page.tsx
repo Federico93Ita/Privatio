@@ -130,7 +130,7 @@ export default function AgencySettingsPage() {
                   </div>
                 </div>
                 <button onClick={handleSave} disabled={saving}
-                  className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary-dark transition-colors">
+                  className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors">
                   {saving ? "Salvataggio..." : "Salva modifiche"}
                 </button>
                 {saved && <p className="text-sm text-success font-medium">Modifiche salvate!</p>}

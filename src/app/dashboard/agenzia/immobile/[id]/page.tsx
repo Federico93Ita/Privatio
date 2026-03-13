@@ -199,7 +199,7 @@ export default function AgencyPropertyPage({
                   disabled={statusUpdating}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                     s === "SOLD" || s === "PUBLISHED"
-                      ? "bg-primary text-white hover:bg-primary-dark"
+                      ? "bg-primary text-white hover:bg-primary/85"
                       : s === "WITHDRAWN"
                       ? "bg-error/10 text-error hover:bg-error/20"
                       : "bg-bg-soft text-text border border-border hover:bg-border"

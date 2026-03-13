@@ -45,7 +45,7 @@ export default function SavingsCalc() {
     <div className="w-full max-w-3xl mx-auto space-y-8">
       {/* Title */}
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-3xl md:text-4xl text-text uppercase tracking-wide">
+        <h2 className="font-light text-3xl md:text-4xl text-text tracking-[-0.03em]">
           Quanto risparmi con Privatio?
         </h2>
         <p className="text-text-muted text-base">
@@ -59,7 +59,7 @@ export default function SavingsCalc() {
           <label htmlFor="savings-slider" className="text-sm font-medium text-text">
             Prezzo della casa
           </label>
-          <span className="text-lg font-bold text-primary">
+          <span className="text-lg font-semibold text-primary">
             <AnimatedPrice value={price} />
           </span>
         </div>
@@ -83,13 +83,13 @@ export default function SavingsCalc() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Traditional agency */}
         <div className="rounded-2xl border border-border bg-white p-6 space-y-3 text-center">
-          <p className="text-sm font-medium text-text-muted uppercase tracking-wide">
+          <p className="text-sm font-medium text-text-muted">
             Agenzia tradizionale
           </p>
           <p className="text-text text-sm">
             Commissione venditore 3%
           </p>
-          <div className="text-2xl md:text-3xl font-bold text-error">
+          <div className="text-2xl md:text-3xl font-semibold text-error">
             <AnimatedPrice value={traditionalCommission} className="text-error" />
           </div>
         </div>
@@ -101,13 +101,13 @@ export default function SavingsCalc() {
             "relative overflow-hidden"
           )}
         >
-          <p className="text-sm font-medium text-text-muted uppercase tracking-wide">
+          <p className="text-sm font-medium text-text-muted">
             Con Privatio
           </p>
           <p className="text-text text-sm">
             Commissione venditore
           </p>
-          <p className="text-2xl md:text-3xl font-bold text-success">
+          <p className="text-2xl md:text-3xl font-semibold text-success">
             &euro; 0
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function SavingsCalc() {
               d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="text-lg font-bold text-accent">
+          <span className="text-lg font-semibold text-accent">
             Risparmi{" "}
             <AnimatedPrice value={savings} className="text-accent" />
           </span>

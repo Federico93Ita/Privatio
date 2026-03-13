@@ -138,7 +138,7 @@ export default function SellerDocumentsPage() {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/85 transition-colors disabled:opacity-50"
                 >
                   {uploading ? "Caricamento..." : "Seleziona file"}
                 </button>
