@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { geocodeAddress } from "@/lib/geocode";
 import { z } from "zod";
 
 const agencyRegisterSchema = z.object({
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(data.password, 12);
 
+    // Geocode agency address for matchmaking
+    const coords = await geocodeAddress(data.address, data.city, data.province);
+
     // Create agency and admin user in a transaction
     const result = await prisma.$transaction(async (tx) => {
       const agency = await tx.agency.create({
@@ -75,6 +79,8 @@ export async function POST(req: NextRequest) {
           province: data.province,
           description: data.description,
           coverageRadius: data.coverageRadius,
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
           plan: "BASE",
           isActive: false, // activated after payment
         },

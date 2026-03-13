@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { geocodeAddress } from "@/lib/geocode";
 import { z } from "zod";
 
 const agencySettingsSchema = z.object({
@@ -42,6 +43,29 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Check if address changed — re-geocode if so
+    const currentAgency = await prisma.agency.findUnique({
+      where: { id: user.agencyId },
+      select: { address: true, city: true, province: true },
+    });
+
+    const addressChanged =
+      currentAgency?.address !== parsed.data.address ||
+      currentAgency?.city !== parsed.data.city ||
+      currentAgency?.province?.toUpperCase() !== parsed.data.province.toUpperCase();
+
+    let geoData: { lat?: number | null; lng?: number | null } = {};
+    if (addressChanged) {
+      const coords = await geocodeAddress(
+        parsed.data.address,
+        parsed.data.city,
+        parsed.data.province
+      );
+      geoData = coords
+        ? { lat: coords.lat, lng: coords.lng }
+        : { lat: null, lng: null };
+    }
+
     const updated = await prisma.agency.update({
       where: { id: user.agencyId },
       data: {
@@ -52,6 +76,7 @@ export async function PUT(req: NextRequest) {
         province: parsed.data.province.toUpperCase(),
         description: parsed.data.description || null,
         coverageRadius: parsed.data.coverageRadius,
+        ...geoData,
       },
     });
 

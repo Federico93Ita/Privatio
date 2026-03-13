@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { propertySchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { geocodeAddress } from "@/lib/geocode";
 
 // GET /api/properties — Public listing with filters
 export async function GET(req: NextRequest) {
@@ -94,28 +95,6 @@ export async function GET(req: NextRequest) {
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_PHOTOS = 20;
-
-// Geocode an address using Google Maps Geocoding API
-async function geocodeAddress(
-  address: string,
-  city: string,
-  province: string
-): Promise<{ lat: number; lng: number } | null> {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-  if (!apiKey) return null;
-
-  const query = encodeURIComponent(`${address}, ${city}, ${province}, Italia`);
-  const res = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${apiKey}`
-  );
-  const data = await res.json();
-
-  if (data.status === "OK" && data.results?.[0]?.geometry?.location) {
-    const { lat, lng } = data.results[0].geometry.location;
-    return { lat, lng };
-  }
-  return null;
-}
 
 // POST /api/properties — Create property (authenticated seller)
 export async function POST(req: NextRequest) {

@@ -36,10 +36,18 @@ export async function assignAgencyToProperty(propertyId: string) {
     return true;
   });
 
-  // Sort by workload (ascending), then rating (descending)
+  // Sort by: PRO first, then workload (ascending), then rating (descending)
   availableAgencies.sort((a, b) => {
+    // PRO agencies get priority over BASE
+    const aPro = a.plan === "PRO" ? 0 : 1;
+    const bPro = b.plan === "PRO" ? 0 : 1;
+    if (aPro !== bPro) return aPro - bPro;
+
+    // Then by workload (fewer active assignments first)
     const loadDiff = a.assignments.length - b.assignments.length;
     if (loadDiff !== 0) return loadDiff;
+
+    // Then by rating (higher first)
     return (b.rating || 0) - (a.rating || 0);
   });
 
