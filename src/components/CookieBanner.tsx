@@ -49,15 +49,15 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl border border-[#e2e8f0] p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="fixed bottom-4 left-4 right-4 z-50 sm:bottom-6 sm:left-6 sm:right-6">
+      <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg shadow-black/5 border border-border p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex-1">
-          <p className="text-sm text-[#1e293b] leading-relaxed">
+          <p className="text-sm text-text leading-relaxed">
             Utilizziamo cookie tecnici necessari al funzionamento del sito e, previo tuo consenso,
             cookie analitici per migliorare la tua esperienza.{" "}
             <a
               href="/cookie-policy"
-              className="text-[#0e8ff1] hover:underline font-medium"
+              className="text-primary hover:underline font-medium"
             >
               Maggiori informazioni
             </a>
@@ -66,13 +66,13 @@ export default function CookieBanner() {
         <div className="flex gap-3 flex-shrink-0">
           <button
             onClick={handleDecline}
-            className="px-4 py-2 text-sm font-medium text-[#64748b] hover:text-[#0a1f44] border border-[#e2e8f0] rounded-lg hover:bg-[#f8fafc] transition-colors"
+            className="px-4 py-2 text-sm font-medium text-text-muted hover:text-text border border-border rounded-lg hover:bg-bg-soft transition-colors duration-200"
           >
             Rifiuta
           </button>
           <button
             onClick={handleAccept}
-            className="px-4 py-2 text-sm font-medium text-white bg-[#0e8ff1] rounded-lg hover:bg-[#0a1f44] transition-colors"
+            className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/85 transition-colors duration-300 shadow-sm shadow-primary/10"
           >
             Accetta
           </button>

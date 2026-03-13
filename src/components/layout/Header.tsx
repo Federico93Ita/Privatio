@@ -56,46 +56,8 @@ export default function Header() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between md:h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <svg
-                width="36"
-                height="36"
-                viewBox="0 0 36 36"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient
-                    id="logo-gradient"
-                    x1="0"
-                    y1="0"
-                    x2="36"
-                    y2="36"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#0e8ff1" />
-                    <stop offset="1" stopColor="#0a1f44" />
-                  </linearGradient>
-                </defs>
-                <rect rx="8" width="36" height="36" fill="url(#logo-gradient)" />
-                <text
-                  x="50%"
-                  y="53%"
-                  dominantBaseline="middle"
-                  textAnchor="middle"
-                  fill="white"
-                  fontFamily="Poppins, sans-serif"
-                  fontWeight="700"
-                  fontSize="22"
-                >
-                  P
-                </text>
-              </svg>
-              <span
-                className="text-xl font-bold tracking-tight"
-                style={{ fontFamily: "Poppins, sans-serif", color: "#0a1f44" }}
-              >
+            <Link href="/" className="flex items-center">
+              <span className="text-xl font-semibold tracking-[-0.03em] text-primary-dark">
                 Privatio
               </span>
             </Link>
@@ -108,17 +70,11 @@ export default function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`relative text-sm font-medium transition-colors hover:text-primary ${
-                      isActive ? "text-primary" : "text-text-muted"
+                    className={`text-sm transition-colors duration-200 hover:text-text ${
+                      isActive ? "text-text font-medium" : "text-text-muted"
                     }`}
                   >
                     {link.label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-underline"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-primary"
-                      />
-                    )}
                   </Link>
                 );
               })}
@@ -129,7 +85,7 @@ export default function Header() {
               {isLoggedIn ? (
                 <Link
                   href={dashboardPath}
-                  className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
                 >
                   Dashboard
                 </Link>
@@ -137,13 +93,13 @@ export default function Header() {
                 <>
                   <Link
                     href="/accedi"
-                    className="text-sm font-medium text-text-muted transition-colors hover:text-primary"
+                    className="text-sm text-text-muted transition-colors duration-200 hover:text-text"
                   >
                     Accedi
                   </Link>
                   <Link
                     href="/vendi"
-                    className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md"
+                    className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
                   >
                     Vendi Casa
                   </Link>
@@ -228,7 +184,7 @@ export default function Header() {
                 {isLoggedIn ? (
                   <Link
                     href={dashboardPath}
-                    className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md"
+                    className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
                   >
                     Dashboard
                   </Link>
@@ -242,7 +198,7 @@ export default function Header() {
                     </Link>
                     <Link
                       href="/vendi"
-                      className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm transition-all hover:bg-primary-dark hover:shadow-md"
+                      className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-3 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
                     >
                       Vendi Casa
                     </Link>

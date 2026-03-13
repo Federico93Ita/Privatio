@@ -96,54 +96,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="sm:col-span-2 lg:col-span-2">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 36 36"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient
-                    id="footer-logo-gradient"
-                    x1="0"
-                    y1="0"
-                    x2="36"
-                    y2="36"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#0e8ff1" />
-                    <stop offset="1" stopColor="#0a1f44" />
-                  </linearGradient>
-                </defs>
-                <rect
-                  rx="8"
-                  width="36"
-                  height="36"
-                  fill="url(#footer-logo-gradient)"
-                />
-                <text
-                  x="50%"
-                  y="53%"
-                  dominantBaseline="middle"
-                  textAnchor="middle"
-                  fill="white"
-                  fontFamily="Poppins, sans-serif"
-                  fontWeight="700"
-                  fontSize="22"
-                >
-                  P
-                </text>
-              </svg>
-              <span
-                className="text-lg font-bold tracking-tight"
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  color: "#0a1f44",
-                }}
-              >
+            <Link href="/" className="inline-flex items-center">
+              <span className="text-lg font-semibold tracking-[-0.03em] text-primary-dark">
                 Privatio
               </span>
             </Link>
@@ -155,7 +109,7 @@ export default function Footer() {
           {/* Link Columns */}
           {footerColumns.map((column) => (
             <div key={column.title}>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-primary-dark">
+              <h3 className="text-xs font-medium tracking-wide text-text-muted">
                 {column.title}
               </h3>
               <ul className="mt-4 space-y-3">
@@ -178,7 +132,7 @@ export default function Footer() {
         <div className="mt-10 border-t border-border pt-8">
           <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-primary-dark">
+              <h3 className="text-xs font-medium tracking-wide text-text-muted">
                 Contatti
               </h3>
               <a
@@ -214,15 +168,15 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border bg-primary-dark">
+      <div className="border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-4">
-            <p className="text-xs text-white/70">
+            <p className="text-xs text-text-muted">
               &copy; {new Date().getFullYear()} Privatio S.r.l. &mdash; P.IVA 12345678901
             </p>
             <button
               onClick={resetConsent}
-              className="text-xs text-white/50 hover:text-white/80 transition-colors underline"
+              className="text-xs text-text-muted/60 hover:text-text-muted transition-colors duration-200"
             >
               Gestisci cookie
             </button>

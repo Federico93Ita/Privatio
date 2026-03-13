@@ -288,46 +288,8 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
       >
         {/* Sidebar Header */}
         <div className="flex h-16 items-center justify-between border-b border-border px-5">
-          <Link href="/" className="flex items-center gap-2">
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 36 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <defs>
-                <linearGradient
-                  id="dash-logo-gradient"
-                  x1="0"
-                  y1="0"
-                  x2="36"
-                  y2="36"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stopColor="#0e8ff1" />
-                  <stop offset="1" stopColor="#0a1f44" />
-                </linearGradient>
-              </defs>
-              <rect rx="8" width="36" height="36" fill="url(#dash-logo-gradient)" />
-              <text
-                x="50%"
-                y="53%"
-                dominantBaseline="middle"
-                textAnchor="middle"
-                fill="white"
-                fontFamily="Poppins, sans-serif"
-                fontWeight="700"
-                fontSize="22"
-              >
-                P
-              </text>
-            </svg>
-            <span
-              className="text-lg font-bold tracking-tight"
-              style={{ fontFamily: "Poppins, sans-serif", color: "#0a1f44" }}
-            >
+          <Link href="/" className="flex items-center">
+            <span className="text-lg font-semibold tracking-[-0.03em] text-primary-dark">
               Privatio
             </span>
           </Link>
@@ -345,7 +307,7 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
 
         {/* Role badge */}
         <div className="px-5 pt-4 pb-2">
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+          <span className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-xs font-medium text-primary border border-primary/10">
             {roleLabels[role]}
           </span>
         </div>
@@ -363,9 +325,9 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors duration-200 ${
                   isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary/5 text-primary font-medium border-l-2 border-primary"
                     : "text-text-muted hover:bg-bg-soft hover:text-text"
                 }`}
               >
@@ -431,7 +393,7 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
             >
               <BellIcon />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#ef4444] px-1 text-[10px] font-bold text-white">
+                <span className="absolute top-1 right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-error px-1 text-[10px] font-bold text-white">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
