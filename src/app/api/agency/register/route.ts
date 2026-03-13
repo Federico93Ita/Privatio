@@ -113,18 +113,18 @@ export async function POST(req: NextRequest) {
       to: data.email,
       subject: "Benvenuto nel network Privatio!",
       html: `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0;">Privatio Partner</h1>
+        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio Partner</h1>
           </div>
-          <div style="padding: 30px;">
-            <h2 style="color: #0a1f44;">Benvenuto ${data.name}!</h2>
-            <p style="color: #64748b; line-height: 1.6;">
+          <div style="padding: 30px; background: white;">
+            <h2 style="color: #0f172a;">Benvenuto ${data.name}!</h2>
+            <p style="color: #6b7280; line-height: 1.6;">
               La registrazione di <strong>${data.agencyName}</strong> è stata completata.
               Per attivare il tuo profilo e iniziare a ricevere immobili, sottoscrivi un piano.
             </p>
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia"
-               style="display: inline-block; background: #0e8ff1; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 16px;">
+               style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500; margin-top: 16px;">
               Attiva il tuo piano
             </a>
           </div>

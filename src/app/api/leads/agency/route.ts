@@ -24,13 +24,13 @@ export async function POST(req: NextRequest) {
       to: parsed.data.email,
       subject: "Richiesta ricevuta — Privatio Partner",
       html: `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
             <p style="color: rgba(255,255,255,0.9); margin-top: 8px;">Network Agenzie Partner</p>
           </div>
           <div style="padding: 30px; background: white;">
-            <h2 style="color: #0a1f44;">Ciao ${parsed.data.contactName}!</h2>
+            <h2 style="color: #0f172a;">Ciao ${parsed.data.contactName}!</h2>
             <p style="color: #64748b; line-height: 1.6;">
               Grazie per l'interesse nel diventare agenzia partner Privatio.
               Abbiamo ricevuto la richiesta di <strong>${parsed.data.agencyName}</strong>

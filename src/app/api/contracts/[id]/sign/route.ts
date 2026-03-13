@@ -94,8 +94,8 @@ export async function POST(
     if (willBeFullySigned) {
       const property = contract.property;
       const emailHtml = `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
             <h1 style="color: white; margin: 0;">Privatio</h1>
           </div>
           <div style="padding: 30px;">

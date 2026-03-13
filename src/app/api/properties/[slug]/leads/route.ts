@@ -66,17 +66,17 @@ export async function POST(
       to: parsed.data.email,
       subject: "Richiesta inviata — Privatio",
       html: `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
           </div>
           <div style="padding: 30px; background: white;">
-            <h2 style="color: #0a1f44;">Ciao ${parsed.data.name}!</h2>
+            <h2 style="color: #0f172a;">Ciao ${parsed.data.name}!</h2>
             <p style="color: #64748b; line-height: 1.6;">
               La tua richiesta per <strong>${property.title}</strong> è stata inviata con successo.
               L'agenzia partner ti contatterà al più presto.
             </p>
-            <div style="background: #f0f9ff; border-left: 4px solid #0e8ff1; padding: 16px; margin: 20px 0;">
+            <div style="background: #f0f9ff; border-left: 4px solid #2563eb; padding: 16px; margin: 20px 0;">
               <p style="margin: 0; color: #64748b; font-size: 14px;">
                 <strong>Commissione acquirente:</strong> 2% - 2.5% sul prezzo di vendita.
                 Nessuna sorpresa, massima trasparenza.

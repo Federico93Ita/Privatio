@@ -59,13 +59,18 @@ export async function POST(
         to: property.assignment.agency.email,
         subject: `Visita prenotata per ${property.title} — ${dateFormatted}`,
         html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2>Nuova visita prenotata</h2>
-            <p><strong>Immobile:</strong> ${property.title}</p>
-            <p><strong>Data:</strong> ${dateFormatted}</p>
-            <p><strong>Acquirente:</strong> ${parsed.data.buyerName}</p>
-            <p><strong>Email:</strong> ${parsed.data.buyerEmail}</p>
-            <p><strong>Telefono:</strong> ${parsed.data.buyerPhone}</p>
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
+            </div>
+            <div style="padding: 30px; background: white;">
+              <h2 style="color: #0f172a;">Nuova visita prenotata</h2>
+              <p style="color: #6b7280; line-height: 1.6;"><strong>Immobile:</strong> ${property.title}</p>
+              <p style="color: #6b7280;"><strong>Data:</strong> ${dateFormatted}</p>
+              <p style="color: #6b7280;"><strong>Acquirente:</strong> ${parsed.data.buyerName}</p>
+              <p style="color: #6b7280;"><strong>Email:</strong> ${parsed.data.buyerEmail}</p>
+              <p style="color: #6b7280;"><strong>Telefono:</strong> ${parsed.data.buyerPhone}</p>
+            </div>
           </div>
         `,
       });
@@ -76,18 +81,18 @@ export async function POST(
       to: parsed.data.buyerEmail,
       subject: `Visita confermata per ${dateFormatted} — Privatio`,
       html: `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
+        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
           </div>
           <div style="padding: 30px; background: white;">
-            <h2 style="color: #0a1f44;">Ciao ${parsed.data.buyerName}!</h2>
-            <p style="color: #64748b;">La tua visita è stata prenotata con successo.</p>
-            <div style="background: #f0f9ff; border-left: 4px solid #0e8ff1; padding: 16px; margin: 20px 0;">
-              <p style="margin: 0;"><strong>${property.title}</strong></p>
-              <p style="margin: 4px 0 0; color: #0e8ff1; font-size: 18px; font-weight: bold;">${dateFormatted}</p>
+            <h2 style="color: #0f172a;">Ciao ${parsed.data.buyerName}!</h2>
+            <p style="color: #6b7280; line-height: 1.6;">La tua visita è stata prenotata con successo.</p>
+            <div style="background: #fafafa; border-left: 4px solid #2563eb; padding: 16px; margin: 20px 0;">
+              <p style="margin: 0; color: #0f172a;"><strong>${property.title}</strong></p>
+              <p style="margin: 4px 0 0; color: #2563eb; font-size: 18px; font-weight: 600;">${dateFormatted}</p>
             </div>
-            <p style="color: #64748b;">L'agenzia ti contatterà per confermare i dettagli.</p>
+            <p style="color: #6b7280; line-height: 1.6;">L'agenzia ti contatterà per confermare i dettagli.</p>
           </div>
         </div>
       `,

@@ -51,16 +51,16 @@ export async function POST(req: NextRequest) {
         to: email,
         subject: "Reimposta la tua password — Privatio",
         html: `
-          <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
+          <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
               <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
             </div>
             <div style="padding: 30px; background: #ffffff;">
-              <h2 style="color: #0a1f44; margin-top: 0;">Reimposta la tua password</h2>
+              <h2 style="color: #0f172a; margin-top: 0;">Reimposta la tua password</h2>
               <p style="color: #64748b;">Ciao ${esc(user.name || "")},</p>
               <p style="color: #64748b;">Hai richiesto di reimpostare la password del tuo account Privatio.</p>
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${resetUrl}" style="background: #0e8ff1; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+                <a href="${resetUrl}" style="background: #2563eb; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
                   Reimposta Password
                 </a>
               </div>

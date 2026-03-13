@@ -76,15 +76,15 @@ export async function POST(req: NextRequest) {
             to: agency.email,
             subject: "Abbonamento attivato — Privatio",
             html: `
-              <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: linear-gradient(135deg, #0e8ff1, #0a1f44); padding: 40px 30px; text-align: center;">
-                  <h1 style="color: white; margin: 0;">Privatio</h1>
+              <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
+                  <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
                 </div>
-                <div style="padding: 30px;">
-                  <h2 style="color: #10b981;">Abbonamento attivato!</h2>
-                  <p>Il tuo abbonamento è ora attivo. Puoi iniziare a ricevere immobili nella tua zona.</p>
+                <div style="padding: 30px; background: white;">
+                  <h2 style="color: #059669;">Abbonamento attivato!</h2>
+                  <p style="color: #6b7280; line-height: 1.6;">Il tuo abbonamento è ora attivo. Puoi iniziare a ricevere immobili nella tua zona.</p>
                   <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia"
-                     style="display: inline-block; background: #0e8ff1; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 16px;">
+                     style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500; margin-top: 16px;">
                     Vai alla Dashboard
                   </a>
                 </div>
@@ -114,10 +114,15 @@ export async function POST(req: NextRequest) {
           to: agency.email,
           subject: "Abbonamento disattivato — Privatio",
           html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-              <h2>Abbonamento disattivato</h2>
-              <p>Il tuo abbonamento Privatio è stato disattivato. Non riceverai nuovi immobili.</p>
-              <p>Puoi riattivare il tuo piano in qualsiasi momento dalla dashboard.</p>
+            <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
+              </div>
+              <div style="padding: 30px; background: white;">
+                <h2 style="color: #0f172a;">Abbonamento disattivato</h2>
+                <p style="color: #6b7280; line-height: 1.6;">Il tuo abbonamento Privatio è stato disattivato. Non riceverai nuovi immobili.</p>
+                <p style="color: #6b7280; line-height: 1.6;">Puoi riattivare il tuo piano in qualsiasi momento dalla dashboard.</p>
+              </div>
             </div>
           `,
         });
@@ -138,13 +143,19 @@ export async function POST(req: NextRequest) {
           to: agency.email,
           subject: "Pagamento fallito — Privatio",
           html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-              <h2>Pagamento non riuscito</h2>
-              <p>Il pagamento del tuo abbonamento Privatio non è andato a buon fine.</p>
-              <p>Aggiorna il tuo metodo di pagamento per continuare a utilizzare la piattaforma.</p>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/fatturazione">
-                Aggiorna pagamento
-              </a>
+            <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
+              </div>
+              <div style="padding: 30px; background: white;">
+                <h2 style="color: #dc2626;">Pagamento non riuscito</h2>
+                <p style="color: #6b7280; line-height: 1.6;">Il pagamento del tuo abbonamento Privatio non è andato a buon fine.</p>
+                <p style="color: #6b7280; line-height: 1.6;">Aggiorna il tuo metodo di pagamento per continuare a utilizzare la piattaforma.</p>
+                <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/fatturazione"
+                   style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500; margin-top: 16px;">
+                  Aggiorna pagamento
+                </a>
+              </div>
             </div>
           `,
         });

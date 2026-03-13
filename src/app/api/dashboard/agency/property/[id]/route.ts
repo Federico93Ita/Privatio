@@ -61,10 +61,19 @@ export async function GET(
   }
 }
 
-// Update property status (agency)
+// Update property status (agency) with transition validation
 const statusUpdateSchema = z.object({
   status: z.enum(["DRAFT", "PENDING_REVIEW", "PUBLISHED", "UNDER_CONTRACT", "SOLD", "WITHDRAWN"]),
 });
+
+/** Allowed status transitions — key is "from", value is array of allowed "to" states */
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  DRAFT: ["PENDING_REVIEW", "WITHDRAWN"],
+  PENDING_REVIEW: ["PUBLISHED", "WITHDRAWN"],
+  PUBLISHED: ["UNDER_CONTRACT", "WITHDRAWN"],
+  UNDER_CONTRACT: ["SOLD", "PUBLISHED", "WITHDRAWN"],
+  // SOLD and WITHDRAWN are terminal states
+};
 
 export async function PUT(
   req: NextRequest,
@@ -102,14 +111,31 @@ export async function PUT(
       return NextResponse.json({ error: "Dati non validi" }, { status: 400 });
     }
 
+    // Validate status transition
+    const currentProperty = await prisma.property.findUnique({
+      where: { id },
+      select: { status: true, publishedAt: true },
+    });
+
+    if (!currentProperty) {
+      return NextResponse.json({ error: "Immobile non trovato" }, { status: 404 });
+    }
+
+    const allowedNext = VALID_TRANSITIONS[currentProperty.status];
+    if (!allowedNext || !allowedNext.includes(parsed.data.status)) {
+      return NextResponse.json(
+        {
+          error: `Transizione non valida: ${currentProperty.status} → ${parsed.data.status}`,
+        },
+        { status: 400 }
+      );
+    }
+
     const updateData: Record<string, unknown> = { status: parsed.data.status };
 
     // Set publishedAt when publishing for the first time
-    if (parsed.data.status === "PUBLISHED") {
-      const property = await prisma.property.findUnique({ where: { id }, select: { publishedAt: true } });
-      if (!property?.publishedAt) {
-        updateData.publishedAt = new Date();
-      }
+    if (parsed.data.status === "PUBLISHED" && !currentProperty.publishedAt) {
+      updateData.publishedAt = new Date();
     }
 
     const updated = await prisma.property.update({
