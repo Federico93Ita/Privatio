@@ -167,16 +167,30 @@ export async function POST(req: NextRequest) {
       totalFloors: formData.get("totalePiani")
         ? parseInt(formData.get("totalePiani") as string, 10)
         : undefined,
-      hasGarage: caratteristiche.includes("Garage / Posto auto"),
+      hasGarage: caratteristiche.includes("Garage"),
       hasGarden: caratteristiche.includes("Giardino"),
-      hasBalcony: caratteristiche.includes("Balcone / Terrazzo"),
+      hasBalcony: caratteristiche.includes("Balcone"),
       hasElevator: caratteristiche.includes("Ascensore"),
+      hasParkingSpace: caratteristiche.includes("Posto auto"),
+      hasCellar: caratteristiche.includes("Cantina"),
+      hasTerrace: caratteristiche.includes("Terrazza"),
+      hasPool: caratteristiche.includes("Piscina"),
+      hasAirConditioning: caratteristiche.includes("Aria condizionata"),
+      isFurnished: caratteristiche.includes("Arredato"),
+      hasConcierge: caratteristiche.includes("Portineria"),
+      hasAlarm: caratteristiche.includes("Allarme"),
       energyClass: (formData.get("classeEnergetica") as string) || undefined,
       yearBuilt: formData.get("annoCostruzione")
         ? parseInt(formData.get("annoCostruzione") as string, 10)
         : undefined,
       price: parseInt(formData.get("prezzo") as string, 10),
       description: (formData.get("descrizione") as string) || undefined,
+      condominiumFees: formData.get("speseCondominiali")
+        ? parseInt(formData.get("speseCondominiali") as string, 10)
+        : undefined,
+      extraCosts: (formData.get("costiExtra") as string) || undefined,
+      condition: (formData.get("statoImmobile") as string) || undefined,
+      heatingType: (formData.get("riscaldamento") as string) || undefined,
       lat: coords.lat,
       lng: coords.lng,
       title: "", // Will be generated below

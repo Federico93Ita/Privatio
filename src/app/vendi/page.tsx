@@ -26,9 +26,13 @@ interface FormData {
   caratteristiche: string[];
   classeEnergetica: string;
   annoCostruzione: string;
-  // Step 2 - Prezzo
+  // Step 2 - Prezzo e dettagli
   prezzo: string;
   descrizione: string;
+  speseCondominiali: string;
+  costiExtra: string;
+  statoImmobile: string;
+  riscaldamento: string;
   // Step 4 - Dati personali
   nomeCompleto: string;
   email: string;
@@ -62,6 +66,10 @@ const INITIAL_FORM: FormData = {
   annoCostruzione: "",
   prezzo: "",
   descrizione: "",
+  speseCondominiali: "",
+  costiExtra: "",
+  statoImmobile: "",
+  riscaldamento: "",
   nomeCompleto: "",
   email: "",
   telefono: "",
@@ -84,7 +92,29 @@ const TIPI_IMMOBILE = [
   "Ufficio",
 ];
 
-const CARATTERISTICHE_OPTIONS = ["Garage", "Giardino", "Balcone", "Ascensore"];
+const CARATTERISTICHE_OPTIONS = [
+  "Garage",
+  "Posto auto",
+  "Giardino",
+  "Balcone",
+  "Terrazza",
+  "Ascensore",
+  "Cantina",
+  "Piscina",
+  "Aria condizionata",
+  "Arredato",
+  "Portineria",
+  "Allarme",
+];
+
+const STATO_IMMOBILE_OPTIONS = ["Nuovo", "Ottimo", "Buono", "Da ristrutturare"];
+
+const RISCALDAMENTO_OPTIONS = [
+  "Autonomo",
+  "Centralizzato",
+  "Pavimento radiante",
+  "Assente",
+];
 
 const CLASSI_ENERGETICHE = [
   "A4",
@@ -346,6 +376,14 @@ export default function VendiPage() {
       propertyPayload.append("prezzo", String(rawPrice(form.prezzo)));
       if (form.descrizione)
         propertyPayload.append("descrizione", form.descrizione);
+      if (form.speseCondominiali)
+        propertyPayload.append("speseCondominiali", form.speseCondominiali);
+      if (form.costiExtra)
+        propertyPayload.append("costiExtra", form.costiExtra);
+      if (form.statoImmobile)
+        propertyPayload.append("statoImmobile", form.statoImmobile);
+      if (form.riscaldamento)
+        propertyPayload.append("riscaldamento", form.riscaldamento);
 
       photos.forEach((p, i) => {
         propertyPayload.append("foto", p.file);
@@ -732,6 +770,60 @@ export default function VendiPage() {
           </div>
         )}
 
+        {/* Stato immobile / Riscaldamento */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="statoImmobile">Stato immobile</Label>
+            <select
+              id="statoImmobile"
+              value={form.statoImmobile}
+              onChange={(e) => updateField("statoImmobile", e.target.value)}
+              className={inputClass("statoImmobile")}
+            >
+              <option value="">Seleziona...</option>
+              {STATO_IMMOBILE_OPTIONS.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="riscaldamento">Riscaldamento</Label>
+            <select
+              id="riscaldamento"
+              value={form.riscaldamento}
+              onChange={(e) => updateField("riscaldamento", e.target.value)}
+              className={inputClass("riscaldamento")}
+            >
+              <option value="">Seleziona...</option>
+              {RISCALDAMENTO_OPTIONS.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Spese condominiali */}
+        <div>
+          <Label htmlFor="speseCondominiali">Spese condominiali</Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-text-muted">
+              &euro;
+            </span>
+            <input
+              id="speseCondominiali"
+              type="number"
+              min={0}
+              placeholder="es. 150"
+              value={form.speseCondominiali}
+              onChange={(e) => updateField("speseCondominiali", e.target.value)}
+              className={`${inputClass("speseCondominiali")} pl-10`}
+            />
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-muted">
+              /mese
+            </span>
+          </div>
+        </div>
+
         {/* Descrizione */}
         <div>
           <Label htmlFor="descrizione">Descrizione immobile</Label>
@@ -750,6 +842,20 @@ export default function VendiPage() {
               {form.descrizione.length}/2000
             </span>
           </div>
+        </div>
+
+        {/* Costi extra */}
+        <div>
+          <Label htmlFor="costiExtra">Costi aggiuntivi</Label>
+          <textarea
+            id="costiExtra"
+            rows={3}
+            maxLength={500}
+            placeholder="Eventuali spese extra (es. lavori straordinari previsti, costi di ristrutturazione...)"
+            value={form.costiExtra}
+            onChange={(e) => updateField("costiExtra", e.target.value)}
+            className={inputClass("costiExtra")}
+          />
         </div>
       </div>
     );

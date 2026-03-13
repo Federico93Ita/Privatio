@@ -6,6 +6,8 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice, getPropertyTypeLabel, getStatusLabel } from "@/lib/utils";
 
 const ENERGY_CLASSES = ["A4", "A3", "A2", "A1", "B", "C", "D", "E", "F", "G"];
+const STATO_OPTIONS = ["Nuovo", "Ottimo", "Buono", "Da ristrutturare"];
+const RISCALDAMENTO_OPTIONS = ["Autonomo", "Centralizzato", "Pavimento radiante", "Assente"];
 
 export default function SellerPropertyEditPage() {
   const [property, setProperty] = useState<any>(null);
@@ -26,7 +28,19 @@ export default function SellerPropertyEditPage() {
   const [hasGarden, setHasGarden] = useState(false);
   const [hasBalcony, setHasBalcony] = useState(false);
   const [hasElevator, setHasElevator] = useState(false);
+  const [hasParkingSpace, setHasParkingSpace] = useState(false);
+  const [hasCellar, setHasCellar] = useState(false);
+  const [hasTerrace, setHasTerrace] = useState(false);
+  const [hasPool, setHasPool] = useState(false);
+  const [hasAirConditioning, setHasAirConditioning] = useState(false);
+  const [isFurnished, setIsFurnished] = useState(false);
+  const [hasConcierge, setHasConcierge] = useState(false);
+  const [hasAlarm, setHasAlarm] = useState(false);
   const [energyClass, setEnergyClass] = useState<string | null>(null);
+  const [condominiumFees, setCondominiumFees] = useState<number | null>(null);
+  const [extraCosts, setExtraCosts] = useState("");
+  const [condition, setCondition] = useState<string | null>(null);
+  const [heatingType, setHeatingType] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/dashboard/seller/property")
@@ -46,7 +60,19 @@ export default function SellerPropertyEditPage() {
           setHasGarden(p.hasGarden);
           setHasBalcony(p.hasBalcony);
           setHasElevator(p.hasElevator);
+          setHasParkingSpace(p.hasParkingSpace ?? false);
+          setHasCellar(p.hasCellar ?? false);
+          setHasTerrace(p.hasTerrace ?? false);
+          setHasPool(p.hasPool ?? false);
+          setHasAirConditioning(p.hasAirConditioning ?? false);
+          setIsFurnished(p.isFurnished ?? false);
+          setHasConcierge(p.hasConcierge ?? false);
+          setHasAlarm(p.hasAlarm ?? false);
           setEnergyClass(p.energyClass);
+          setCondominiumFees(p.condominiumFees ?? null);
+          setExtraCosts(p.extraCosts || "");
+          setCondition(p.condition ?? null);
+          setHeatingType(p.heatingType ?? null);
         }
       })
       .catch(() => setError("Errore nel caricamento dell'immobile. Riprova."))
@@ -61,7 +87,7 @@ export default function SellerPropertyEditPage() {
     setError("");
     setSaved(false);
     try {
-      const body: Record<string, unknown> = { price, description };
+      const body: Record<string, unknown> = { price, description, condominiumFees, extraCosts: extraCosts || null };
       if (!isPublished) {
         Object.assign(body, {
           rooms,
@@ -73,7 +99,17 @@ export default function SellerPropertyEditPage() {
           hasGarden,
           hasBalcony,
           hasElevator,
+          hasParkingSpace,
+          hasCellar,
+          hasTerrace,
+          hasPool,
+          hasAirConditioning,
+          isFurnished,
+          hasConcierge,
+          hasAlarm,
           energyClass,
+          condition,
+          heatingType,
         });
       }
 
@@ -125,6 +161,8 @@ export default function SellerPropertyEditPage() {
     );
   }
 
+  const inputCls = "w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 text-sm";
+
   return (
     <DashboardLayout role="seller">
       <div className="space-y-6 max-w-3xl">
@@ -142,13 +180,13 @@ export default function SellerPropertyEditPage() {
 
         {isPublished && (
           <div className="bg-accent/10 border border-accent/30 rounded-xl p-4 text-sm text-accent">
-            L&apos;immobile e pubblicato. Puoi modificare solo prezzo e descrizione.
+            L&apos;immobile è pubblicato. Puoi modificare solo prezzo, descrizione e spese.
           </div>
         )}
 
         {isReadOnly && (
           <div className="bg-text-muted/10 border border-text-muted/30 rounded-xl p-4 text-sm text-text-muted">
-            L&apos;immobile e in stato {getStatusLabel(property.status).toLowerCase()} e non puo essere modificato.
+            L&apos;immobile è in stato {getStatusLabel(property.status).toLowerCase()} e non può essere modificato.
           </div>
         )}
 
@@ -169,7 +207,6 @@ export default function SellerPropertyEditPage() {
         {/* Info base */}
         <div className="bg-white rounded-xl p-5 border border-border space-y-4">
           <h3 className="font-medium text-primary-dark">Informazioni</h3>
-
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-text-muted">Tipologia</span>
@@ -184,17 +221,31 @@ export default function SellerPropertyEditPage() {
 
         {/* Editable fields */}
         {!isReadOnly && (
-          <div className="bg-white rounded-xl p-5 border border-border space-y-4">
+          <div className="bg-white rounded-xl p-5 border border-border space-y-5">
             <h3 className="font-medium text-primary-dark">Dettagli modificabili</h3>
 
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Prezzo (EUR)</label>
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-              />
+            {/* Price + Condo fees */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Prezzo (EUR)</label>
+                <input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(Number(e.target.value))}
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1">Spese condominiali (EUR/mese)</label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="es. 150"
+                  value={condominiumFees ?? ""}
+                  onChange={(e) => setCondominiumFees(e.target.value ? Number(e.target.value) : null)}
+                  className={inputCls}
+                />
+              </div>
             </div>
 
             <div>
@@ -203,7 +254,18 @@ export default function SellerPropertyEditPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none"
+                className={`${inputCls} resize-none`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">Costi aggiuntivi</label>
+              <textarea
+                value={extraCosts}
+                onChange={(e) => setExtraCosts(e.target.value)}
+                rows={2}
+                placeholder="Eventuali spese extra (es. lavori straordinari, costi di ristrutturazione...)"
+                className={`${inputCls} resize-none`}
               />
             </div>
 
@@ -212,84 +274,80 @@ export default function SellerPropertyEditPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-text mb-1">Locali</label>
-                    <input
-                      type="number"
-                      value={rooms}
-                      onChange={(e) => setRooms(Number(e.target.value))}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-                    />
+                    <input type="number" value={rooms} onChange={(e) => setRooms(Number(e.target.value))} className={inputCls} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text mb-1">Bagni</label>
-                    <input
-                      type="number"
-                      value={bathrooms}
-                      onChange={(e) => setBathrooms(Number(e.target.value))}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-                    />
+                    <input type="number" value={bathrooms} onChange={(e) => setBathrooms(Number(e.target.value))} className={inputCls} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text mb-1">Superficie (m&sup2;)</label>
-                    <input
-                      type="number"
-                      value={surface}
-                      onChange={(e) => setSurface(Number(e.target.value))}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-                    />
+                    <input type="number" value={surface} onChange={(e) => setSurface(Number(e.target.value))} className={inputCls} />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-text mb-1">Piano</label>
-                    <input
-                      type="number"
-                      value={floor ?? ""}
-                      onChange={(e) => setFloor(e.target.value ? Number(e.target.value) : null)}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-                    />
+                    <input type="number" value={floor ?? ""} onChange={(e) => setFloor(e.target.value ? Number(e.target.value) : null)} className={inputCls} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text mb-1">Piani totali</label>
-                    <input
-                      type="number"
-                      value={totalFloors ?? ""}
-                      onChange={(e) => setTotalFloors(e.target.value ? Number(e.target.value) : null)}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-                    />
+                    <input type="number" value={totalFloors ?? ""} onChange={(e) => setTotalFloors(e.target.value ? Number(e.target.value) : null)} className={inputCls} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-text mb-1">Classe energetica</label>
-                    <select
-                      value={energyClass || ""}
-                      onChange={(e) => setEnergyClass(e.target.value || null)}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
-                    >
-                      <option value="">Non specificata</option>
-                      {ENERGY_CLASSES.map((ec) => (
-                        <option key={ec} value={ec}>{ec}</option>
-                      ))}
+                    <label className="block text-sm font-medium text-text mb-1">Stato</label>
+                    <select value={condition || ""} onChange={(e) => setCondition(e.target.value || null)} className={inputCls}>
+                      <option value="">Non specificato</option>
+                      {STATO_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text mb-1">Riscaldamento</label>
+                    <select value={heatingType || ""} onChange={(e) => setHeatingType(e.target.value || null)} className={inputCls}>
+                      <option value="">Non specificato</option>
+                      {RISCALDAMENTO_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {[
-                    { label: "Garage", value: hasGarage, setter: setHasGarage },
-                    { label: "Giardino", value: hasGarden, setter: setHasGarden },
-                    { label: "Balcone", value: hasBalcony, setter: setHasBalcony },
-                    { label: "Ascensore", value: hasElevator, setter: setHasElevator },
-                  ].map((feat) => (
-                    <label key={feat.label} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={feat.value}
-                        onChange={(e) => feat.setter(e.target.checked)}
-                        className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30"
-                      />
-                      <span className="text-sm text-text">{feat.label}</span>
-                    </label>
-                  ))}
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1">Classe energetica</label>
+                  <select value={energyClass || ""} onChange={(e) => setEnergyClass(e.target.value || null)} className={inputCls}>
+                    <option value="">Non specificata</option>
+                    {ENERGY_CLASSES.map((ec) => <option key={ec} value={ec}>{ec}</option>)}
+                  </select>
+                </div>
+
+                {/* All features */}
+                <div>
+                  <label className="block text-sm font-medium text-text mb-2">Caratteristiche</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {[
+                      { label: "Garage", value: hasGarage, setter: setHasGarage },
+                      { label: "Posto auto", value: hasParkingSpace, setter: setHasParkingSpace },
+                      { label: "Giardino", value: hasGarden, setter: setHasGarden },
+                      { label: "Balcone", value: hasBalcony, setter: setHasBalcony },
+                      { label: "Terrazza", value: hasTerrace, setter: setHasTerrace },
+                      { label: "Ascensore", value: hasElevator, setter: setHasElevator },
+                      { label: "Cantina", value: hasCellar, setter: setHasCellar },
+                      { label: "Piscina", value: hasPool, setter: setHasPool },
+                      { label: "Aria condizionata", value: hasAirConditioning, setter: setHasAirConditioning },
+                      { label: "Arredato", value: isFurnished, setter: setIsFurnished },
+                      { label: "Portineria", value: hasConcierge, setter: setHasConcierge },
+                      { label: "Allarme", value: hasAlarm, setter: setHasAlarm },
+                    ].map((feat) => (
+                      <label key={feat.label} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={feat.value}
+                          onChange={(e) => feat.setter(e.target.checked)}
+                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30"
+                        />
+                        <span className="text-sm text-text">{feat.label}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </>
             )}

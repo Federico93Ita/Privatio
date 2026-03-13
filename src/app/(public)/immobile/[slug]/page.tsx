@@ -114,6 +114,25 @@ function buildPropertySchema(property: {
   };
 }
 
+/* ------------------------------------------------------------------ */
+/*  All features config                                                */
+/* ------------------------------------------------------------------ */
+
+const ALL_FEATURES = [
+  { key: "hasGarage", label: "Garage", icon: "garage" },
+  { key: "hasParkingSpace", label: "Posto auto", icon: "parking" },
+  { key: "hasGarden", label: "Giardino", icon: "garden" },
+  { key: "hasBalcony", label: "Balcone", icon: "balcony" },
+  { key: "hasTerrace", label: "Terrazza", icon: "terrace" },
+  { key: "hasElevator", label: "Ascensore", icon: "elevator" },
+  { key: "hasCellar", label: "Cantina", icon: "cellar" },
+  { key: "hasPool", label: "Piscina", icon: "pool" },
+  { key: "hasAirConditioning", label: "Aria condizionata", icon: "ac" },
+  { key: "isFurnished", label: "Arredato", icon: "furnished" },
+  { key: "hasConcierge", label: "Portineria", icon: "concierge" },
+  { key: "hasAlarm", label: "Allarme", icon: "alarm" },
+] as const;
+
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
   const property = await getProperty(slug);
@@ -136,14 +155,30 @@ export default async function PropertyDetailPage({ params }: Props) {
     );
   }
 
-  const features = [
-    { key: "hasGarage", label: "Garage", value: property.hasGarage },
-    { key: "hasGarden", label: "Giardino", value: property.hasGarden },
-    { key: "hasBalcony", label: "Balcone", value: property.hasBalcony },
-    { key: "hasElevator", label: "Ascensore", value: property.hasElevator },
-  ].filter((f) => f.value);
-
+  const pricePerSqm = Math.round(property.price / property.surface);
   const schemaData = buildPropertySchema(property);
+
+  // Build quick stats array
+  const quickStats = [
+    { label: "Superficie", value: `${property.surface} mq`, icon: "surface" },
+    { label: "Locali", value: `${property.rooms}`, icon: "rooms" },
+    { label: "Bagni", value: `${property.bathrooms}`, icon: "bathrooms" },
+  ];
+  if (property.floor != null) {
+    quickStats.push({ label: "Piano", value: `${property.floor}/${property.totalFloors || "—"}`, icon: "floor" });
+  }
+  if (property.condition) {
+    quickStats.push({ label: "Stato", value: property.condition, icon: "condition" });
+  }
+  if (property.heatingType) {
+    quickStats.push({ label: "Riscaldamento", value: property.heatingType, icon: "heating" });
+  }
+  if (property.energyClass) {
+    quickStats.push({ label: "Classe energ.", value: property.energyClass, icon: "energy" });
+  }
+  if (property.yearBuilt) {
+    quickStats.push({ label: "Anno", value: `${property.yearBuilt}`, icon: "year" });
+  }
 
   return (
     <>
@@ -161,79 +196,136 @@ export default async function PropertyDetailPage({ params }: Props) {
         )}
 
         <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* ── Breadcrumb ── */}
+          <nav className="flex items-center gap-2 text-sm text-text-muted mb-6">
+            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <span>/</span>
+            <Link href="/cerca" className="hover:text-primary transition-colors">Cerca</Link>
+            <span>/</span>
+            <Link href={`/cerca?city=${encodeURIComponent(property.city)}`} className="hover:text-primary transition-colors">{property.city}</Link>
+            <span>/</span>
+            <span className="text-text truncate max-w-[200px]">{property.title}</span>
+          </nav>
+
+          {/* ── Header: Title + Price ── */}
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2 mb-3">
+              <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                {getPropertyTypeLabel(property.type)}
+              </span>
+              {property.energyClass && (
+                <span className="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
+                  Classe {property.energyClass}
+                </span>
+              )}
+              <span className="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
+                0% comm. venditore
+              </span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-light text-text tracking-tight mb-2">{property.title}</h1>
+            <p className="text-text-muted text-lg mb-4">
+              {property.address && `${property.address}, `}{property.city} ({property.province})
+            </p>
+            <div className="flex items-baseline gap-3">
+              <p className="text-4xl font-medium text-primary">{formatPrice(property.price)}</p>
+              <p className="text-lg text-text-muted">
+                {pricePerSqm.toLocaleString("it-IT")} &euro;/mq
+              </p>
+            </div>
+          </div>
+
+          {/* ── Quick Stats Strip ── */}
+          <div className="flex gap-3 overflow-x-auto pb-2 mb-8 -mx-4 px-4 scrollbar-thin">
+            {quickStats.map((stat, i) => (
+              <div key={i} className="flex-none bg-white rounded-xl px-5 py-3 border border-border min-w-[120px] text-center">
+                <p className="text-lg font-medium text-text">{stat.value}</p>
+                <p className="text-xs text-text-muted mt-0.5">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Main Grid ── */}
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Title & badges */}
-              <div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-                    {getPropertyTypeLabel(property.type)}
-                  </span>
-                  {property.energyClass && (
-                    <span className="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
-                      Classe {property.energyClass}
-                    </span>
-                  )}
-                  <span className="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">
-                    0% comm. venditore
-                  </span>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-medium text-text mb-2">{property.title}</h1>
-                <p className="text-text-muted text-lg">
-                  {property.address && `${property.address}, `}{property.city} ({property.province})
-                </p>
-                <p className="text-4xl font-medium text-primary mt-4">{formatPrice(property.price)}</p>
-              </div>
-
-              {/* Stats grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  { label: "Superficie", value: `${property.surface} mq`, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg> },
-                  { label: "Locali", value: property.rooms, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg> },
-                  { label: "Bagni", value: property.bathrooms, svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg> },
-                  { label: "Piano", value: property.floor != null ? `${property.floor}/${property.totalFloors || "—"}` : "—", svg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg> },
-                ].map((stat, i) => (
-                  <div key={i} className="bg-white rounded-xl p-4 border border-border text-center">
-                    <div className="flex justify-center text-text-muted mb-1">{stat.svg}</div>
-                    <p className="text-xl font-medium text-text">{stat.value}</p>
-                    <p className="text-sm text-text-muted">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Features */}
-              {features.length > 0 && (
-                <div className="bg-white rounded-xl p-6 border border-border">
-                  <h2 className="font-medium text-xl text-text mb-4">Caratteristiche</h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    {features.map((f) => (
-                      <div key={f.key} className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-text">{f.label}</span>
-                      </div>
-                    ))}
-                    {property.yearBuilt && (
-                      <div className="flex items-center gap-2">
-                        <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span className="text-text">Anno: {property.yearBuilt}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {/* Description */}
               {property.description && (
                 <div className="bg-white rounded-xl p-6 border border-border">
                   <h2 className="font-medium text-xl text-text mb-4">Descrizione</h2>
-                  <p className="text-text-muted leading-relaxed whitespace-pre-line">{property.description}</p>
+                  <div className="border-l-2 border-primary/20 pl-4">
+                    <p className="text-text-muted leading-relaxed whitespace-pre-line">{property.description}</p>
+                  </div>
                 </div>
               )}
+
+              {/* Costs & Fees */}
+              <div className="bg-white rounded-xl p-6 border border-border">
+                <h2 className="font-medium text-xl text-text mb-5">Costi e spese</h2>
+                <div className="divide-y divide-border">
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-text-muted">Prezzo immobile</span>
+                    <span className="font-medium text-text">{formatPrice(property.price)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-text-muted">Prezzo al mq</span>
+                    <span className="font-medium text-text">{pricePerSqm.toLocaleString("it-IT")} &euro;/mq</span>
+                  </div>
+                  {property.condominiumFees != null && property.condominiumFees > 0 && (
+                    <div className="flex justify-between items-center py-3">
+                      <span className="text-text-muted">Spese condominiali</span>
+                      <span className="font-medium text-text">{property.condominiumFees.toLocaleString("it-IT")} &euro;/mese</span>
+                    </div>
+                  )}
+                  {property.extraCosts && (
+                    <div className="py-3">
+                      <span className="text-text-muted block mb-1">Costi aggiuntivi</span>
+                      <p className="text-sm text-text">{property.extraCosts}</p>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-text-muted">Commissione venditore</span>
+                    <span className="font-medium text-success">0%</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-text-muted">Commissione acquirente</span>
+                    <span className="font-medium text-text">2% &ndash; 2,5%</span>
+                  </div>
+                </div>
+                <p className="text-xs text-text-muted mt-4">
+                  La commissione acquirente viene concordata in fase di trattativa. Nessun costo nascosto, massima trasparenza.
+                </p>
+              </div>
+
+              {/* Features Grid */}
+              <div className="bg-white rounded-xl p-6 border border-border">
+                <h2 className="font-medium text-xl text-text mb-5">Caratteristiche</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {ALL_FEATURES.map((f) => {
+                    const hasFeature = (property as Record<string, unknown>)[f.key] === true;
+                    return (
+                      <div
+                        key={f.key}
+                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm ${
+                          hasFeature
+                            ? "bg-success/5 text-text"
+                            : "bg-gray-50 text-text-muted/50"
+                        }`}
+                      >
+                        {hasFeature ? (
+                          <svg className="w-4.5 h-4.5 text-success flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4.5 h-4.5 text-text-muted/30 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        )}
+                        <span>{f.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
               {/* Map */}
               <div className="bg-white rounded-xl p-6 border border-border">
@@ -244,25 +336,6 @@ export default async function PropertyDetailPage({ params }: Props) {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Commission info */}
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
-                <h3 className="font-medium text-primary-dark mb-2">Commissioni trasparenti</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-text-muted">Commissione venditore</span>
-                    <span className="font-medium text-success">0%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-muted">Commissione acquirente</span>
-                    <span className="font-medium text-primary-dark">2% - 2.5%</span>
-                  </div>
-                </div>
-                <p className="text-xs text-text-muted mt-3">
-                  La commissione acquirente viene concordata in fase di trattativa.
-                  Nessun costo nascosto, massima trasparenza.
-                </p>
-              </div>
-
               {/* Contact Form */}
               <div className="bg-white rounded-xl p-6 border border-border sticky top-24">
                 <PropertyContactForm slug={property.slug} />
@@ -273,7 +346,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <div className="bg-white rounded-xl p-5 border border-border">
                   <h3 className="font-medium text-primary-dark mb-3">Agenzia Partner</h3>
                   <p className="font-medium text-text">{property.assignment.agency.name}</p>
-                  {property.assignment.agency.rating && (
+                  {property.assignment.agency.rating != null && property.assignment.agency.rating > 0 && (
                     <div className="flex items-center gap-1 mt-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg key={star} className={`w-4 h-4 ${star <= Math.round(property.assignment!.agency.rating!) ? "text-accent" : "text-border"}`} fill="currentColor" viewBox="0 0 20 20">
@@ -283,7 +356,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                       <span className="text-sm text-text-muted ml-1">{property.assignment.agency.rating}</span>
                     </div>
                   )}
-                  <p className="text-sm text-text-muted mt-1">{property.assignment.agency.phone}</p>
+                  {property.assignment.agency.phone && (
+                    <p className="text-sm text-text-muted mt-1">{property.assignment.agency.phone}</p>
+                  )}
                 </div>
               )}
 

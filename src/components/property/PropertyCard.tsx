@@ -29,24 +29,16 @@ export interface PropertyCardProps {
     hasGarden: boolean;
     hasBalcony: boolean;
     hasElevator: boolean;
+    hasParkingSpace?: boolean;
+    hasCellar?: boolean;
+    hasTerrace?: boolean;
+    hasPool?: boolean;
+    hasAirConditioning?: boolean;
+    isFurnished?: boolean;
+    hasConcierge?: boolean;
+    hasAlarm?: boolean;
     photos: PropertyPhoto[];
   };
-}
-
-/* ------------------------------------------------------------------ */
-/*  Feature icon helper                                                */
-/* ------------------------------------------------------------------ */
-
-function FeatureIcon({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <span
-      title={label}
-      className="flex items-center gap-1 text-text-muted text-xs"
-    >
-      {children}
-      <span className="sr-only">{label}</span>
-    </span>
-  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -64,17 +56,26 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     rooms,
     bathrooms,
     type,
-    hasGarage,
-    hasGarden,
-    hasBalcony,
-    hasElevator,
     photos,
   } = property;
 
   const coverPhoto =
     photos.find((p) => p.isCover) ?? photos[0] ?? null;
 
-  const hasAnyFeature = hasGarage || hasGarden || hasBalcony || hasElevator;
+  // Build feature labels from all boolean flags
+  const featureLabels: string[] = [];
+  if (property.hasGarage) featureLabels.push("Garage");
+  if (property.hasParkingSpace) featureLabels.push("Posto auto");
+  if (property.hasGarden) featureLabels.push("Giardino");
+  if (property.hasBalcony) featureLabels.push("Balcone");
+  if (property.hasTerrace) featureLabels.push("Terrazza");
+  if (property.hasElevator) featureLabels.push("Ascensore");
+  if (property.hasCellar) featureLabels.push("Cantina");
+  if (property.hasPool) featureLabels.push("Piscina");
+  if (property.hasAirConditioning) featureLabels.push("A/C");
+  if (property.isFurnished) featureLabels.push("Arredato");
+  if (property.hasConcierge) featureLabels.push("Portineria");
+  if (property.hasAlarm) featureLabels.push("Allarme");
 
   return (
     <Link
@@ -160,39 +161,17 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* Features row */}
-        {hasAnyFeature && (
-          <div className="flex items-center gap-3 pt-1">
-            {hasGarage && (
-              <FeatureIcon label="Garage">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25m-2.25 0h-2.25m0 0V6.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v3.375m-3.375 0h3.375" />
-                </svg>
-                <span className="text-xs">Garage</span>
-              </FeatureIcon>
-            )}
-            {hasGarden && (
-              <FeatureIcon label="Giardino">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c-1.2 0-3.6.9-3.6 4.5 0 1.2.3 2.1.6 2.7C7.2 10.5 4.5 11.4 4.5 14.25c0 2.1 1.5 3.75 3.75 3.75H12m0-15c1.2 0 3.6.9 3.6 4.5 0 1.2-.3 2.1-.6 2.7 1.8.3 4.5 1.2 4.5 4.05 0 2.1-1.5 3.75-3.75 3.75H12m0-15v15m0 0v3" />
-                </svg>
-                <span className="text-xs">Giardino</span>
-              </FeatureIcon>
-            )}
-            {hasBalcony && (
-              <FeatureIcon label="Balcone">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 13h18M5 13V7a7 7 0 0114 0v6M5 13v4m14-4v4M9 13v4m6-4v4" />
-                </svg>
-                <span className="text-xs">Balcone</span>
-              </FeatureIcon>
-            )}
-            {hasElevator && (
-              <FeatureIcon label="Ascensore">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v18h16.5V3H3.75zm6 5.25L12 5.25l2.25 3M9.75 15.75L12 18.75l2.25-3" />
-                </svg>
-                <span className="text-xs">Ascensore</span>
-              </FeatureIcon>
+        {featureLabels.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {featureLabels.slice(0, 5).map((label) => (
+              <span key={label} className="text-xs text-text-muted bg-bg-soft px-2 py-0.5 rounded-full">
+                {label}
+              </span>
+            ))}
+            {featureLabels.length > 5 && (
+              <span className="text-xs text-text-muted bg-bg-soft px-2 py-0.5 rounded-full">
+                +{featureLabels.length - 5}
+              </span>
             )}
           </div>
         )}

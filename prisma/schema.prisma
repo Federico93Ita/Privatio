@@ -112,12 +112,24 @@ model Property {
   bathrooms     Int
   floor         Int?
   totalFloors   Int?
-  hasGarage     Boolean        @default(false)
-  hasGarden     Boolean        @default(false)
-  hasBalcony    Boolean        @default(false)
-  hasElevator   Boolean        @default(false)
-  energyClass   String?
-  yearBuilt     Int?
+  hasGarage          Boolean  @default(false)
+  hasGarden          Boolean  @default(false)
+  hasBalcony         Boolean  @default(false)
+  hasElevator        Boolean  @default(false)
+  hasParkingSpace    Boolean  @default(false)
+  hasCellar          Boolean  @default(false)
+  hasTerrace         Boolean  @default(false)
+  hasPool            Boolean  @default(false)
+  hasAirConditioning Boolean  @default(false)
+  isFurnished        Boolean  @default(false)
+  hasConcierge       Boolean  @default(false)
+  hasAlarm           Boolean  @default(false)
+  energyClass        String?
+  yearBuilt          Int?
+  condominiumFees    Int?
+  extraCosts         String?  @db.Text
+  condition          String?
+  heatingType        String?
   address       String
   city          String
   province      String

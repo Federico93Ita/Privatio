@@ -17,9 +17,14 @@ interface PropertyMapProps {
 /* ------------------------------------------------------------------ */
 
 export default function PropertyMap({ lat, lng, city }: PropertyMapProps) {
-  // Google Maps embed URL showing the approximate area (zoom 14 = neighbourhood level)
-  // Using the embed API which does not require an API key for simple place embeds
-  const mapSrc = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d5000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sit!4v1`;
+  // Use the Google Maps Embed API with API key when available,
+  // otherwise fall back to a keyless embed URL
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+  const hasValidKey = apiKey && apiKey !== "placeholder";
+
+  const mapSrc = hasValidKey
+    ? `https://www.google.com/maps/embed/v1/view?key=${apiKey}&center=${lat},${lng}&zoom=15&maptype=roadmap`
+    : `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
 
   return (
     <div className="space-y-3">
@@ -40,7 +45,8 @@ export default function PropertyMap({ lat, lng, city }: PropertyMapProps) {
           title={`Mappa zona ${city}`}
           className="absolute inset-0 w-full h-full"
           style={{ border: 0 }}
-          allowFullScreen={false}
+          allowFullScreen
+          allow="fullscreen"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         />

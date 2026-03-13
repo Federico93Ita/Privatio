@@ -44,7 +44,19 @@ const updateSchema = z.object({
   hasGarden: z.boolean().optional(),
   hasBalcony: z.boolean().optional(),
   hasElevator: z.boolean().optional(),
+  hasParkingSpace: z.boolean().optional(),
+  hasCellar: z.boolean().optional(),
+  hasTerrace: z.boolean().optional(),
+  hasPool: z.boolean().optional(),
+  hasAirConditioning: z.boolean().optional(),
+  isFurnished: z.boolean().optional(),
+  hasConcierge: z.boolean().optional(),
+  hasAlarm: z.boolean().optional(),
   energyClass: z.string().optional().nullable(),
+  condominiumFees: z.number().int().min(0).optional().nullable(),
+  extraCosts: z.string().max(2000).optional().nullable(),
+  condition: z.string().optional().nullable(),
+  heatingType: z.string().optional().nullable(),
 });
 
 export async function PUT(req: NextRequest) {
