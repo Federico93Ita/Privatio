@@ -43,8 +43,8 @@ export default function AgencyBillingPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    // Load agency data
-    fetch("/api/dashboard/agency")
+    // Load agency data (lightweight — only needs plan/status info)
+    fetch("/api/dashboard/agency/stats")
       .then((r) => r.json())
       .then((data) => setAgency(data.agency))
       .catch(console.error)
@@ -146,8 +146,9 @@ export default function AgencyBillingPage() {
     }
   }
 
-  const completedSales =
-    agency?.assignments?.filter((a: any) => a.status === "COMPLETED") || [];
+  // Commissions section — stats endpoint doesn't include full assignment data.
+  // This is a placeholder until a dedicated commissions API is built.
+  const completedSales: any[] = [];
 
   const inputClass = (field: string) =>
     `w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${

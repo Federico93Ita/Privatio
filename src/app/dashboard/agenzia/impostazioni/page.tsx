@@ -19,7 +19,7 @@ export default function AgencySettingsPage() {
   });
 
   useEffect(() => {
-    fetch("/api/dashboard/agency")
+    fetch("/api/dashboard/agency/stats")
       .then((r) => r.json())
       .then((data) => {
         setAgency(data.agency);
