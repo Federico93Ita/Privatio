@@ -65,33 +65,30 @@ export default function RegistratiPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-bg-soft flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0e8ff1] to-[#0a1f44] flex items-center justify-center">
-              <span className="text-white font-bold text-lg">P</span>
-            </div>
-            <span className="text-xl font-bold text-[#0a1f44]">Privatio</span>
+          <Link href="/" className="inline-block">
+            <span className="text-xl font-semibold tracking-[-0.03em] text-primary-dark">Privatio</span>
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-[#e2e8f0] p-8">
-          <h1 className="text-2xl font-bold text-[#0a1f44] mb-2">Registrati</h1>
-          <p className="text-sm text-[#64748b] mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-border p-8">
+          <h1 className="text-2xl font-medium text-text mb-2">Registrati</h1>
+          <p className="text-sm text-text-muted mb-6">
             Crea il tuo account acquirente per salvare preferiti, ricerche e contattare i venditori.
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-lg text-sm text-[#ef4444]">
+            <div className="mb-4 p-3 bg-error/10 border border-error/15 rounded-lg text-sm text-error">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              <label className="block text-sm font-medium text-text mb-1">
                 Nome e Cognome
               </label>
               <input
@@ -100,44 +97,44 @@ export default function RegistratiPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Mario Rossi"
-                className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-1">Email</label>
+              <label className="block text-sm font-medium text-text mb-1">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="email@esempio.it"
-                className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-1">Telefono</label>
+              <label className="block text-sm font-medium text-text mb-1">Telefono</label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 placeholder="+39 333 1234567"
-                className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-1">Password</label>
+              <label className="block text-sm font-medium text-text mb-1">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Minimo 8 caratteri"
-                className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-1">
+              <label className="block text-sm font-medium text-text mb-1">
                 Conferma Password
               </label>
               <input
@@ -146,26 +143,26 @@ export default function RegistratiPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 placeholder="Ripeti la password"
-                className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#0e8ff1] text-white rounded-lg font-semibold disabled:opacity-50 hover:bg-[#0a1f44] transition-colors"
+              className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors"
             >
               {loading ? "Registrazione in corso..." : "Crea Account"}
             </button>
           </form>
 
-          <p className="text-xs text-[#64748b] mt-4 text-center">
+          <p className="text-xs text-text-muted mt-4 text-center">
             Registrandoti accetti i{" "}
-            <Link href="/termini" className="text-[#0e8ff1] hover:underline">
+            <Link href="/termini" className="text-primary hover:underline">
               Termini di Servizio
             </Link>{" "}
             e la{" "}
-            <Link href="/privacy" className="text-[#0e8ff1] hover:underline">
+            <Link href="/privacy" className="text-primary hover:underline">
               Privacy Policy
             </Link>
             .
@@ -173,15 +170,15 @@ export default function RegistratiPage() {
         </div>
 
         <div className="text-center mt-6 space-y-2">
-          <p className="text-sm text-[#64748b]">
+          <p className="text-sm text-text-muted">
             Hai gi&agrave; un account?{" "}
-            <Link href="/accedi" className="text-[#0e8ff1] font-medium hover:underline">
+            <Link href="/accedi" className="text-primary font-medium hover:underline">
               Accedi
             </Link>
           </p>
-          <p className="text-sm text-[#64748b]">
+          <p className="text-sm text-text-muted">
             Vuoi vendere?{" "}
-            <Link href="/vendi" className="text-[#0e8ff1] font-medium hover:underline">
+            <Link href="/vendi" className="text-primary font-medium hover:underline">
               Inserisci il tuo immobile
             </Link>
           </p>

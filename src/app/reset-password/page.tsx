@@ -38,18 +38,18 @@ function ForgotPasswordForm() {
   if (sent) {
     return (
       <div className="text-center py-8">
-        <div className="w-16 h-16 bg-[#0e8ff1]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-[#0e8ff1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-[#0a1f44] mb-3">Controlla la tua email</h2>
-        <p className="text-[#64748b] mb-6">
+        <h2 className="text-xl font-medium text-text mb-3">Controlla la tua email</h2>
+        <p className="text-text-muted mb-6">
           Se l&apos;indirizzo e registrato, riceverai un link per reimpostare la password.
         </p>
         <Link
           href="/accedi"
-          className="text-sm text-[#0e8ff1] hover:underline"
+          className="text-sm text-primary hover:underline"
         >
           Torna al Login
         </Link>
@@ -60,32 +60,32 @@ function ForgotPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-5">
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-heading text-[#0a1f44]">Password dimenticata?</h1>
-        <p className="text-[#64748b] mt-2">
+        <h1 className="text-2xl font-medium text-text">Password dimenticata?</h1>
+        <p className="text-text-muted mt-2">
           Inserisci la tua email e ti invieremo un link per reimpostare la password.
         </p>
       </div>
       <div>
-        <label className="block text-sm font-medium text-[#1e293b] mb-1">Email</label>
+        <label className="block text-sm font-medium text-text mb-1">Email</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="email@esempio.it"
           required
-          className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]"
+          className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
         />
       </div>
-      {error && <p className="text-sm text-[#ef4444]">{error}</p>}
+      {error && <p className="text-sm text-error">{error}</p>}
       <button
         type="submit"
         disabled={loading || !email}
-        className="w-full py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#0a1f44] transition-colors"
+        className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors duration-300"
       >
         {loading ? "Invio in corso..." : "Invia link di reset"}
       </button>
       <div className="text-center">
-        <Link href="/accedi" className="text-sm text-[#0e8ff1] hover:underline">
+        <Link href="/accedi" className="text-sm text-primary hover:underline">
           Torna al Login
         </Link>
       </div>
@@ -145,16 +145,16 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="text-center py-16">
-        <div className="w-16 h-16 bg-[#10b981]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-[#10b981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 bg-success/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-[#0a1f44] mb-3">Password reimpostata!</h2>
-        <p className="text-[#64748b] mb-6">Puoi ora accedere con la tua nuova password.</p>
+        <h2 className="text-xl font-medium text-text mb-3">Password reimpostata!</h2>
+        <p className="text-text-muted mb-6">Puoi ora accedere con la tua nuova password.</p>
         <Link
           href="/accedi"
-          className="px-6 py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium hover:bg-[#0a1f44] transition-colors inline-block"
+          className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors duration-300 inline-block"
         >
           Accedi
         </Link>
@@ -165,12 +165,12 @@ function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-5">
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-heading text-[#0a1f44]">Reimposta Password</h1>
-        <p className="text-[#64748b] mt-2">Inserisci la tua nuova password.</p>
+        <h1 className="text-2xl font-medium text-text">Reimposta Password</h1>
+        <p className="text-text-muted mt-2">Inserisci la tua nuova password.</p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-[#1e293b] mb-1">
+        <label className="block text-sm font-medium text-text mb-1">
           Nuova password
         </label>
         <input
@@ -180,11 +180,11 @@ function ResetPasswordForm() {
           placeholder="Minimo 8 caratteri"
           required
           minLength={8}
-          className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]"
+          className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-[#1e293b] mb-1">
+        <label className="block text-sm font-medium text-text mb-1">
           Conferma password
         </label>
         <input
@@ -193,19 +193,19 @@ function ResetPasswordForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Ripeti la password"
           required
-          className="w-full px-4 py-2.5 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0e8ff1]"
+          className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30"
         />
         {password && confirmPassword && password !== confirmPassword && (
-          <p className="text-xs text-[#ef4444] mt-1">Le password non coincidono</p>
+          <p className="text-xs text-error mt-1">Le password non coincidono</p>
         )}
       </div>
 
-      {error && <p className="text-sm text-[#ef4444]">{error}</p>}
+      {error && <p className="text-sm text-error">{error}</p>}
 
       <button
         type="submit"
         disabled={loading || !password || password !== confirmPassword}
-        className="w-full py-2.5 bg-[#0e8ff1] text-white rounded-lg font-medium disabled:opacity-50 hover:bg-[#0a1f44] transition-colors"
+        className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors duration-300"
       >
         {loading ? "Reimpostazione..." : "Reimposta Password"}
       </button>
@@ -217,9 +217,9 @@ export default function ResetPasswordPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[#f8fafc] pt-32 pb-16 px-4">
-        <div className="max-w-lg mx-auto bg-white rounded-2xl p-8 border border-[#e2e8f0] shadow-sm">
-          <Suspense fallback={<div className="h-64 animate-pulse bg-[#f8fafc] rounded-lg" />}>
+      <main className="min-h-screen bg-bg-soft pt-32 pb-16 px-4">
+        <div className="max-w-lg mx-auto bg-white rounded-2xl p-8 border border-border shadow-sm">
+          <Suspense fallback={<div className="h-64 animate-pulse bg-bg-soft rounded-lg" />}>
             <ResetPasswordForm />
           </Suspense>
         </div>
