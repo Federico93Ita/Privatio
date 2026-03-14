@@ -39,7 +39,7 @@ export const propertySchema = z.object({
   price: z.number().min(1000, "Prezzo non valido"),
   surface: z.number().min(1, "Superficie richiesta"),
   rooms: z.number().min(1, "Numero locali richiesto"),
-  bathrooms: z.number().min(1, "Numero bagni richiesto"),
+  bathrooms: z.number().min(0).optional(),
   floor: z.number().optional(),
   totalFloors: z.number().optional(),
   hasGarage: z.boolean().default(false),

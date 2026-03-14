@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, FormEvent, ChangeEvent, DragEvent } from "react";
+import { useState, useRef, useCallback, useEffect, FormEvent, ChangeEvent, DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -166,6 +166,49 @@ export default function VendiPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [capLoading, setCapLoading] = useState(false);
+  const lastLookedUpCap = useRef("");
+
+  /* ---- Auto-fill città/provincia da CAP ---- */
+
+  useEffect(() => {
+    const cap = form.cap.trim();
+    if (!/^\d{5}$/.test(cap) || cap === lastLookedUpCap.current) return;
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setCapLoading(true);
+      try {
+        const res = await fetch(`/api/address/lookup-by-cap?cap=${cap}`, {
+          signal: controller.signal,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          lastLookedUpCap.current = cap;
+          setForm((prev) => ({
+            ...prev,
+            citta: data.city || prev.citta,
+            provincia: data.province || prev.provincia,
+          }));
+          setErrors((prev) => {
+            const next = { ...prev };
+            delete next.citta;
+            delete next.provincia;
+            return next;
+          });
+        }
+      } catch {
+        // ignore abort / network errors
+      } finally {
+        setCapLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [form.cap]);
 
   /* ---- Field updaters ---- */
 
@@ -272,9 +315,6 @@ export default function VendiPage() {
         errs.cap = "Il CAP deve essere di 5 cifre";
       if (!form.superficie) errs.superficie = "Inserisci la superficie";
       if (!form.locali) errs.locali = "Inserisci il numero di locali";
-      if (!form.bagni) errs.bagni = "Inserisci il numero di bagni";
-      if (!form.classeEnergetica)
-        errs.classeEnergetica = "Seleziona la classe energetica";
     }
 
     if (s === 2) {
@@ -555,17 +595,27 @@ export default function VendiPage() {
             <Label htmlFor="cap" required>
               CAP
             </Label>
-            <input
-              id="cap"
-              type="text"
-              maxLength={5}
-              placeholder="es. 20100"
-              value={form.cap}
-              onChange={(e) =>
-                updateField("cap", e.target.value.replace(/\D/g, ""))
-              }
-              className={inputClass("cap")}
-            />
+            <div className="relative">
+              <input
+                id="cap"
+                type="text"
+                maxLength={5}
+                placeholder="es. 20100"
+                value={form.cap}
+                onChange={(e) =>
+                  updateField("cap", e.target.value.replace(/\D/g, ""))
+                }
+                className={inputClass("cap")}
+              />
+              {capLoading && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <svg className="h-4 w-4 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </div>
+              )}
+            </div>
             <FieldError field="cap" />
           </div>
         </div>
@@ -601,7 +651,7 @@ export default function VendiPage() {
             <FieldError field="locali" />
           </div>
           <div>
-            <Label htmlFor="bagni" required>
+            <Label htmlFor="bagni">
               N. bagni
             </Label>
             <input
@@ -691,7 +741,7 @@ export default function VendiPage() {
 
         {/* Classe energetica */}
         <div>
-          <Label htmlFor="classeEnergetica" required>
+          <Label htmlFor="classeEnergetica">
             Classe energetica
           </Label>
           <select

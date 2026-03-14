@@ -126,7 +126,7 @@ model Property {
   price         Int
   surface       Int
   rooms         Int
-  bathrooms     Int
+  bathrooms     Int?
   floor         Int?
   totalFloors   Int?
   hasGarage          Boolean  @default(false)

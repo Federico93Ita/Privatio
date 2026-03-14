@@ -160,7 +160,9 @@ export async function POST(req: NextRequest) {
       cap: formData.get("cap") as string,
       surface: parseInt(formData.get("superficie") as string, 10),
       rooms: parseInt(formData.get("locali") as string, 10),
-      bathrooms: parseInt(formData.get("bagni") as string, 10),
+      bathrooms: formData.get("bagni")
+        ? parseInt(formData.get("bagni") as string, 10)
+        : undefined,
       floor: formData.get("piano")
         ? parseInt(formData.get("piano") as string, 10)
         : undefined,
