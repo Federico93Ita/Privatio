@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, FormEvent, ChangeEvent, DragEvent } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -83,7 +83,13 @@ const INITIAL_FORM: FormData = {
   accettaMarketing: false,
 };
 
-const STEP_LABELS = ["Immobile", "Prezzo", "Foto", "I tuoi dati", "Termini"] as const;
+const ALL_STEPS = [
+  { num: 1, label: "Immobile" },
+  { num: 2, label: "Prezzo" },
+  { num: 3, label: "Foto" },
+  { num: 4, label: "I tuoi dati" },
+  { num: 5, label: "Termini" },
+] as const;
 
 const TIPI_IMMOBILE = [
   "Appartamento",
@@ -155,6 +161,8 @@ function rawPrice(value: string): number {
 
 export default function VendiPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState(1);
@@ -359,11 +367,22 @@ export default function VendiPage() {
   /* ---- Navigation ---- */
 
   function next() {
-    if (validateStep(step)) setStep((s) => Math.min(s + 1, 5));
+    if (!validateStep(step)) return;
+    setStep((s) => {
+      let nextStep = s + 1;
+      // Skip step 4 (dati personali) if already logged in
+      if (isLoggedIn && nextStep === 4) nextStep = 5;
+      return Math.min(nextStep, 5);
+    });
   }
 
   function prev() {
-    setStep((s) => Math.max(s - 1, 1));
+    setStep((s) => {
+      let prevStep = s - 1;
+      // Skip step 4 (dati personali) if already logged in
+      if (isLoggedIn && prevStep === 4) prevStep = 3;
+      return Math.max(prevStep, 1);
+    });
   }
 
   /* ---- Submit ---- */
@@ -376,36 +395,39 @@ export default function VendiPage() {
     setSubmitError("");
 
     try {
-      // 1. Create account
-      const registerRes = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.nomeCompleto,
+      // If not logged in, create account and auto-login first
+      if (!isLoggedIn) {
+        // 1. Create account
+        const registerRes = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: form.nomeCompleto,
+            email: form.email,
+            phone: form.telefono,
+            password: form.password,
+            accettaTermini: form.accettaTermini,
+            accettaPrivacy: form.accettaPrivacy,
+            accettaMarketing: form.accettaMarketing,
+            termsVersion: "1.0",
+          }),
+        });
+
+        if (!registerRes.ok) {
+          const data = await registerRes.json().catch(() => ({}));
+          throw new Error(data.error || data.message || "Errore durante la registrazione.");
+        }
+
+        // 2. Auto-login to establish session (required for property creation)
+        const loginResult = await signIn("credentials", {
           email: form.email,
-          phone: form.telefono,
           password: form.password,
-          accettaTermini: form.accettaTermini,
-          accettaPrivacy: form.accettaPrivacy,
-          accettaMarketing: form.accettaMarketing,
-          termsVersion: "1.0",
-        }),
-      });
+          redirect: false,
+        });
 
-      if (!registerRes.ok) {
-        const data = await registerRes.json().catch(() => ({}));
-        throw new Error(data.error || data.message || "Errore durante la registrazione.");
-      }
-
-      // 2. Auto-login to establish session (required for property creation)
-      const loginResult = await signIn("credentials", {
-        email: form.email,
-        password: form.password,
-        redirect: false,
-      });
-
-      if (loginResult?.error) {
-        throw new Error("Registrazione riuscita ma accesso fallito. Accedi manualmente e riprova.");
+        if (loginResult?.error) {
+          throw new Error("Registrazione riuscita ma accesso fallito. Accedi manualmente e riprova.");
+        }
       }
 
       // 3. Create property
@@ -476,6 +498,11 @@ export default function VendiPage() {
 
   const prezzoNumerico = rawPrice(form.prezzo);
   const commissioneAgenzia = Math.round(prezzoNumerico * 0.03);
+
+  // Steps visibili: utenti loggati saltano step 4 (dati personali)
+  const visibleSteps = isLoggedIn
+    ? ALL_STEPS.filter((s) => s.num !== 4)
+    : [...ALL_STEPS];
 
   /* ------------------------------------------------------------------ */
   /*  Reusable UI pieces                                                */
@@ -1498,13 +1525,12 @@ export default function VendiPage() {
           {/* ---- Progress bar ---- */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
-              {STEP_LABELS.map((label, i) => {
-                const num = i + 1;
-                const isActive = num === step;
-                const isCompleted = num < step;
+              {visibleSteps.map((s, i) => {
+                const isActive = s.num === step;
+                const isCompleted = s.num < step;
                 return (
                   <div
-                    key={label}
+                    key={s.label}
                     className="flex flex-1 flex-col items-center"
                   >
                     <div className="flex w-full items-center">
@@ -1543,11 +1569,11 @@ export default function VendiPage() {
                             />
                           </svg>
                         ) : (
-                          num
+                          i + 1
                         )}
                       </div>
                       {/* Connector right */}
-                      {i < STEP_LABELS.length - 1 && (
+                      {i < visibleSteps.length - 1 && (
                         <div
                           className={`h-0.5 flex-1 transition-colors ${
                             isCompleted ? "bg-primary" : "bg-border"
@@ -1564,7 +1590,7 @@ export default function VendiPage() {
                             : "text-text-muted"
                       }`}
                     >
-                      {label}
+                      {s.label}
                     </span>
                   </div>
                 );
