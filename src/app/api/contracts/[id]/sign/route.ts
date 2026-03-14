@@ -66,6 +66,31 @@ export async function POST(
       );
     }
 
+    // Validate role: sellers can only sign as "seller", agency users as "agency"
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true, agencyId: true },
+    });
+
+    if (role === "agency" && (!user || (user.role !== "AGENCY_ADMIN" && user.role !== "AGENCY_AGENT") || !user.agencyId)) {
+      return NextResponse.json(
+        { error: "Non sei autorizzato a firmare come agenzia" },
+        { status: 403 }
+      );
+    }
+    if (role === "seller" && (!user || user.role !== "SELLER")) {
+      return NextResponse.json(
+        { error: "Non sei autorizzato a firmare come venditore" },
+        { status: 403 }
+      );
+    }
+    if (role !== "seller" && role !== "agency") {
+      return NextResponse.json(
+        { error: "Ruolo non valido" },
+        { status: 400 }
+      );
+    }
+
     const updateData: Record<string, unknown> = {};
     if (role === "seller") {
       updateData.sellerSigned = true;

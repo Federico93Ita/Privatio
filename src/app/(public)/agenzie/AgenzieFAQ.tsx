@@ -9,19 +9,19 @@ const faqs = [
   },
   {
     q: "Quanto costa l'abbonamento?",
-    a: "Il costo dipende dal piano scelto e dalla zona in cui operi. I piani vanno da Base (a partire da €200/mese per 1 area) fino a Premier Elite (a partire da €1.800/mese per fino a 12 aree). Il prezzo varia in base al valore di mercato della zona. Nessun costo aggiuntivo sulle vendite.",
+    a: "Il costo dipende dal piano scelto e dalla zona in cui operi. I piani vanno da Base (a partire da €200/mese per 1 area) fino a Premier Elite (a partire da €1.800/mese per fino a 4 aree). Il prezzo varia in base al valore di mercato della zona. Nessun costo aggiuntivo sulle vendite.",
   },
   {
     q: "Come ricevo i lead?",
     a: "Quando un venditore nella tua zona si registra su Privatio, ricevi una segnalazione nella tua dashboard con i dati del venditore e dell'immobile. Sta a te contattarlo e gestire il rapporto professionale.",
   },
   {
-    q: "Privatio e un mediatore immobiliare?",
-    a: "No. Privatio e una piattaforma tecnologica di lead generation. Non svolgiamo attivita di mediazione immobiliare. Ti forniamo segnalazioni di potenziali clienti venditori; il rapporto professionale e contrattuale lo gestisci direttamente tu.",
+    q: "Privatio è un mediatore immobiliare?",
+    a: "No. Privatio è una piattaforma tecnologica di lead generation. Non svolgiamo attività di mediazione immobiliare. Ti forniamo segnalazioni di potenziali clienti venditori; il rapporto professionale e contrattuale lo gestisci direttamente tu.",
   },
   {
     q: "Posso disdire l'abbonamento in qualsiasi momento?",
-    a: "Assolutamente si. L'abbonamento e mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard. I lead gia ricevuti restano tuoi.",
+    a: "Assolutamente sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard. I lead già ricevuti restano tuoi.",
   },
 ];
 

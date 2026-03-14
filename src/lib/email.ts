@@ -392,18 +392,19 @@ export function agencyApprovedEmail(contactName: string, agencyName: string, reg
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; vertical-align: top; width: 48%;">
-                  <p style="margin: 0; color: #0f172a; font-weight: bold; font-size: 16px;">BASE</p>
-                  <p style="margin: 4px 0 8px; color: #2563eb; font-size: 24px; font-weight: bold;">€49<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
-                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">Fino a 5 immobili<br/>Dashboard base<br/>Supporto email</p>
+                  <p style="margin: 0; color: #0f172a; font-weight: bold; font-size: 16px;">Base</p>
+                  <p style="margin: 4px 0 8px; color: #2563eb; font-size: 24px; font-weight: bold;">da €200<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
+                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">1 area operativa<br/>Dashboard base<br/>Notifica nuovi immobili 24h</p>
                 </td>
                 <td style="width: 4%;"></td>
                 <td style="padding: 12px; border: 2px solid #2563eb; border-radius: 8px; vertical-align: top; width: 48%; background: #f0f9ff;">
-                  <p style="margin: 0; color: #0f172a; font-weight: bold; font-size: 16px;">PRO <span style="background: #2563eb; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; vertical-align: middle;">CONSIGLIATO</span></p>
-                  <p style="margin: 4px 0 8px; color: #2563eb; font-size: 24px; font-weight: bold;">€99<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
-                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">Immobili illimitati<br/>Dashboard avanzata<br/>Supporto prioritario<br/>Badge premium</p>
+                  <p style="margin: 0; color: #0f172a; font-weight: bold; font-size: 16px;">Premier City <span style="background: #2563eb; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; vertical-align: middle;">CONSIGLIATO</span></p>
+                  <p style="margin: 4px 0 8px; color: #2563eb; font-size: 24px; font-weight: bold;">da €690<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
+                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">3 aree operative<br/>Statistiche avanzate<br/>Alta visibilità venditore</p>
                 </td>
               </tr>
             </table>
+            <p style="margin: 12px 0 0; color: #94a3b8; font-size: 12px; text-align: center;">5 piani disponibili da Base a Premier Elite. Scopri tutti i dettagli dopo la registrazione.</p>
           </div>
 
           <div style="text-align: center; margin: 32px 0 16px;">

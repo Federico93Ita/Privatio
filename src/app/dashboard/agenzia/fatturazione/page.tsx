@@ -549,7 +549,7 @@ export default function AgencyBillingPage() {
                       ))}
                     </tbody>
                   </table>
-                  <p className="text-xs text-text-muted mt-3">La provvigione viene concordata direttamente tra te e il cliente. Privatio non interviene.</p>
+                  <p className="text-xs text-text-muted mt-3">Privatio non applica commissioni sulle vendite. Il tuo abbonamento territoriale copre il servizio di lead generation.</p>
                 </div>
               )}
             </div>
