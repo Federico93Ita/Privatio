@@ -29,8 +29,8 @@ const steps = [
   {
     num: "04",
     title: "Tu incassi il 100%",
-    desc: "Alla vendita, incassi l'intero prezzo pattuito. L'eventuale provvigione viene concordata direttamente tra te e l'agenzia.",
-    details: ["Zero costi per il venditore su Privatio", "Provvigione concordata con l'agenzia", "Massima trasparenza"],
+    desc: "Alla vendita, incassi l'intero prezzo pattuito. Le agenzie convenzionate Privatio si impegnano a non addebitare provvigioni al venditore.",
+    details: ["Zero costi per il venditore su Privatio", "Zero provvigioni dall'agenzia convenzionata", "Massima trasparenza"],
   },
 ];
 
@@ -86,7 +86,7 @@ export default function ComeFunzionaPage() {
               <div className="bg-white rounded-xl p-6 border-2 border-success">
                 <h3 className="text-xl font-medium text-success mb-2">Per il Venditore</h3>
                 <p className="text-5xl font-semibold text-success mb-2">€0</p>
-                <p className="text-text-muted">Privatio non ti chiede nessun costo. L&apos;eventuale provvigione la concordi direttamente con l&apos;agenzia.</p>
+                <p className="text-text-muted">Né Privatio né l&apos;agenzia convenzionata ti chiedono provvigioni. Vendi casa a costo zero.</p>
               </div>
               <div className="bg-white rounded-xl p-6 border border-border">
                 <h3 className="text-xl font-medium text-text mb-2">Per l&apos;Agenzia</h3>
