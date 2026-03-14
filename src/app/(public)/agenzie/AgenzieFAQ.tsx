@@ -5,7 +5,7 @@ import { useState } from "react";
 const faqs = [
   {
     q: "Come funziona il modello Privatio per le agenzie?",
-    a: "Privatio raccoglie venditori privati che vogliono vendere il proprio immobile. Li qualifichiamo e ti inviamo la segnalazione come lead. Tu contatti il venditore, valuti l'immobile e gestisci l'eventuale incarico in autonomia. Privatio non interviene nella mediazione.",
+    a: "Privatio raccoglie venditori privati che vogliono vendere il proprio immobile. I venditori consultano la lista delle agenzie partner nella loro zona e possono contattarti direttamente. Se un venditore non contatta nessuna agenzia entro 48 ore, i suoi dati vengono condivisi con le agenzie della zona. Il rapporto professionale lo gestisci in totale autonomia. Privatio non interviene nella mediazione.",
   },
   {
     q: "Quanto costa l'abbonamento?",
@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "Come ricevo i lead?",
-    a: "Quando un venditore nella tua zona si registra su Privatio, ricevi una segnalazione nella tua dashboard con i dati del venditore e dell'immobile. Sta a te contattarlo e gestire il rapporto professionale.",
+    a: "I venditori nella tua zona possono trovarti e contattarti direttamente dalla piattaforma. Inoltre, se un venditore non contatta nessuna agenzia entro 48 ore dalla registrazione, i suoi dati vengono automaticamente condivisi con le agenzie partner della zona. In entrambi i casi, trovi tutto nella tua dashboard.",
   },
   {
     q: "Privatio è un mediatore immobiliare?",

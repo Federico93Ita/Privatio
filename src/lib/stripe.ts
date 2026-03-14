@@ -16,7 +16,7 @@ export const PLANS = {
     features: [
       "1 area operativa",
       "Max 6 competitor/zona",
-      "Notifica nuovi immobili 24h",
+      "Visibilità nella lista venditore: 24h",
       "Profilo agenzia",
       "Dashboard base",
     ],
@@ -28,7 +28,7 @@ export const PLANS = {
     features: [
       "2 aree operative",
       "Max 5 competitor/zona",
-      "Notifica 8h",
+      "Visibilità nella lista venditore: 8h",
       "Priorità su Base",
       "Dashboard avanzata",
     ],
@@ -40,7 +40,7 @@ export const PLANS = {
     features: [
       "3 aree operative",
       "Max 4 competitor/zona",
-      "Notifica 2h",
+      "Visibilità nella lista venditore: 2h",
       "Alta visibilità venditore",
       "Statistiche avanzate",
     ],
@@ -52,7 +52,7 @@ export const PLANS = {
     features: [
       "3 aree operative",
       "Max 3 competitor/zona",
-      "Notifica 30 min",
+      "Visibilità nella lista venditore: 30 min",
       "Accesso zone top",
       "Supporto prioritario",
     ],
@@ -64,7 +64,7 @@ export const PLANS = {
     features: [
       "4 aree operative",
       "Max 3 competitor/zona",
-      "Notifica istantanea",
+      "Visibilità istantanea nella lista venditore",
       "Prima posizione con venditore",
       "Branding premium",
     ],

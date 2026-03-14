@@ -16,9 +16,9 @@ const steps = [
   },
   {
     num: "02",
-    title: "Ti mettiamo in contatto con un'agenzia",
-    desc: "Un'agenzia partner verificata nella tua zona ti contatterà per valutare il tuo immobile e proporti i propri servizi.",
-    details: ["Segnalazione automatica", "Agenzie verificate e selezionate", "Copertura su tutto il territorio"],
+    title: "Scegli l'agenzia nella tua zona",
+    desc: "Nella tua dashboard trovi la lista delle agenzie partner verificate nella tua zona. Sei tu a scegliere quale contattare per valutare il tuo immobile. Se non contatti nessuno entro 48 ore, le agenzie della tua zona potranno contattarti direttamente.",
+    details: ["Sei tu a scegliere l'agenzia", "Agenzie verificate e selezionate", "Copertura su tutto il territorio"],
   },
   {
     num: "03",

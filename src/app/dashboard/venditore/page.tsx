@@ -253,10 +253,10 @@ function AgencyCard({ agency }: { agency: Agency | null }) {
   if (!agency) {
     return (
       <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
-        <h3 className="mb-4 text-lg font-medium text-primary-dark">Agenzia Partner</h3>
+        <h3 className="mb-4 text-lg font-medium text-primary-dark">Agenzie Disponibili</h3>
         <div className="flex items-center gap-3 text-text-muted">
           <SpinnerIcon />
-          <p className="text-sm">Stiamo cercando un&apos;agenzia nella tua zona...</p>
+          <p className="text-sm">Consulta le agenzie partner disponibili nella tua zona e contatta quella che preferisci.</p>
         </div>
       </div>
     );

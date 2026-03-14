@@ -7,7 +7,13 @@ import type { PlanKey } from "./stripe";
 /**
  * Assegna un immobile all'agenzia migliore basandosi sul sistema territoriale.
  *
- * Logica:
+ * TODO: Aggiornare per il nuovo flusso di contatto:
+ *   1. Il venditore vede la lista delle agenzie nella sua zona e le contatta direttamente.
+ *   2. Solo se il venditore non contatta nessuna agenzia entro 48 ore,
+ *      i suoi dati vengono condivisi automaticamente con le agenzie della zona.
+ *   Attualmente questa funzione viene usata come fallback per il caso 48h.
+ *
+ * Logica attuale:
  * 1. Risolve la zona dell'immobile (auto-detect se non assegnata)
  * 2. Trova tutte le agenzie con territorio attivo in quella zona
  * 3. Ordina per: priorità piano (Elite > Prime > City > Local > Base)

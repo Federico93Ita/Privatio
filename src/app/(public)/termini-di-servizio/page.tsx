@@ -21,7 +21,11 @@ export default function TerminiPage() {
               Privatio è una piattaforma tecnologica di lead generation che fornisce alle agenzie
               immobiliari segnalazioni di potenziali clienti venditori. Privatio non svolge attività
               di mediazione immobiliare ai sensi della Legge 39/1989 e non è parte di alcun rapporto
-              contrattuale tra venditore e agenzia.
+              contrattuale tra venditore e agenzia. Il venditore, dopo aver inserito il proprio immobile,
+              può consultare la lista delle agenzie partner nella propria zona e contattare direttamente
+              l&apos;agenzia prescelta. Qualora il venditore non contatti alcuna agenzia entro 48 ore
+              dall&apos;inserimento dell&apos;immobile, i dati dell&apos;immobile e del venditore vengono
+              automaticamente condivisi con le agenzie partner attive nella zona di riferimento.
             </p>
 
             <h2 className="text-lg font-medium text-text mt-6">2. Modello economico</h2>
@@ -43,14 +47,14 @@ export default function TerminiPage() {
               Privatio fornisce un servizio tecnologico di segnalazione lead. Eventuali accordi,
               incarichi o contratti tra venditore e agenzia sono stipulati direttamente tra le parti,
               senza il coinvolgimento di Privatio. L&apos;autorizzazione al contatto firmata dal
-              venditore consente esclusivamente la condivisione dei dati con l&apos;agenzia partner.
+              venditore consente la condivisione dei dati con l&apos;agenzia partner scelta dal venditore o, trascorse 48 ore, con le agenzie partner attive nella zona.
             </p>
 
             <h2 className="text-lg font-medium text-text mt-6">5. Obblighi delle agenzie partner</h2>
             <ul className="text-text-muted list-disc pl-6 space-y-1">
               <li>Mantenere un abbonamento attivo sulla piattaforma</li>
               <li>Gestire professionalmente i lead ricevuti</li>
-              <li>Contattare i venditori segnalati in modo tempestivo</li>
+              <li>Gestire in modo tempestivo i contatti ricevuti dai venditori e le segnalazioni automatiche</li>
               <li>Comunicare regolarmente con il venditore</li>
             </ul>
 

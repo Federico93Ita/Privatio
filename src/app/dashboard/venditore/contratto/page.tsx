@@ -95,7 +95,7 @@ export default function SellerContractPage() {
             </div>
             <h3 className="text-lg font-medium text-primary-dark mb-2">Autorizzazione non ancora disponibile</h3>
             <p className="text-text-muted">
-              L&apos;autorizzazione al contatto verrà generata quando un&apos;agenzia partner sarà disponibile nella tua zona.
+              L&apos;autorizzazione al contatto verrà generata quando sceglierai un&apos;agenzia partner dalla lista disponibile nella tua zona.
             </p>
           </div>
         ) : (
@@ -173,7 +173,7 @@ export default function SellerContractPage() {
               <div className="bg-white rounded-xl p-6 border border-border">
                 <h2 className="font-medium text-primary-dark mb-4">Conferma Autorizzazione</h2>
                 <p className="text-sm text-text-muted mb-4">
-                  Firmando autorizzi Privatio a condividere i tuoi dati con l&apos;agenzia partner
+                  Firmando autorizzi Privatio a condividere i tuoi dati con l&apos;agenzia partner che hai scelto,
                   per essere contattato in merito alla vendita del tuo immobile.
                   Questa autorizzazione non costituisce un contratto di vendita, un mandato
                   o un incarico in esclusiva. La conferma avviene tramite OTP inviato alla tua email.
@@ -248,7 +248,7 @@ export default function SellerContractPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <h3 className="text-lg font-semibold text-success">Autorizzazione confermata</h3>
-                <p className="text-sm text-text-muted mt-1">La tua autorizzazione è stata registrata con successo. L&apos;agenzia partner ti contatterà a breve.</p>
+                <p className="text-sm text-text-muted mt-1">La tua autorizzazione è stata registrata con successo. L&apos;agenzia che hai scelto potrà ora contattarti.</p>
               </div>
             )}
           </div>

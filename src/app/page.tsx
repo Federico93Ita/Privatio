@@ -183,9 +183,9 @@ const howItWorksSteps = [
   {
     num: 2,
     icon: HandshakeIcon,
-    title: "Ti mettiamo in contatto con un'agenzia",
+    title: "Scegli la tua agenzia",
     description:
-      "Un'agenzia partner verificata nella tua zona ti contatterà per valutare il tuo immobile.",
+      "Consulta la lista delle agenzie partner nella tua zona e contatta direttamente quella che preferisci.",
   },
   {
     num: 3,
@@ -251,7 +251,7 @@ const testimonials = [
 ];
 
 const agencyBenefits = [
-  "Ricevi contatti qualificati e pre-verificati nella tua zona",
+  "I venditori nella tua zona possono trovarti e contattarti direttamente",
   "Abbonamento territoriale: investi nella tua zona e ricevi lead continui",
   "Dashboard dedicata per gestire immobili e visite",
   "Supporto marketing e visibilità su tutti i portali",
@@ -493,8 +493,8 @@ export default function HomePage() {
                   Sei un&apos;agenzia?
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-text-muted sm:text-lg">
-                  Unisciti alla rete di agenzie partner e ricevi contatti
-                  qualificati nella tua zona.
+                  Unisciti alla rete di agenzie partner e lasciati trovare
+                  dai venditori nella tua zona.
                 </p>
 
                 <ul className="mt-8 inline-block space-y-3 text-left">
@@ -544,8 +544,8 @@ export default function HomePage() {
                 Inizia ora
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
-                Compila il form e ti ricontatteremo entro 24 ore per metterti
-                in contatto con un&apos;agenzia partner nella tua zona.
+                Compila il form e ti ricontatteremo entro 24 ore. Potrai
+                consultare le agenzie partner nella tua zona e contattarle direttamente.
               </p>
             </div>
 

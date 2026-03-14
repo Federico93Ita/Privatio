@@ -7,7 +7,7 @@ import AgenzieFAQ from "./AgenzieFAQ";
 export const metadata: Metadata = {
   title: "Diventa Partner | Privatio",
   description:
-    "Entra nel network Privatio. Ricevi lead di venditori pre-qualificati nella tua zona e gestisci la tua attivita in autonomia dalla dashboard.",
+    "Entra nel network Privatio. I venditori nella tua zona ti trovano e ti contattano direttamente. Gestisci la tua attività in autonomia dalla dashboard.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -123,13 +123,13 @@ const benefits = [
     icon: <UsersIcon />,
     title: "Clienti garantiti senza ricerca",
     description:
-      "Ricevi lead di venditori pre-qualificati direttamente nella tua dashboard. Nessun costo di acquisizione, nessuna campagna pubblicitaria necessaria.",
+      "I venditori nella tua zona ti trovano direttamente nella piattaforma. Nessun costo di acquisizione, nessuna campagna pubblicitaria necessaria.",
   },
   {
     icon: <DocumentIcon />,
     title: "Lead venditori pre-qualificati",
     description:
-      "Ricevi segnalazioni di venditori privati gia verificati e motivati a vendere. Il rapporto contrattuale lo gestisci direttamente tu con il cliente, in totale autonomia.",
+      "I venditori possono contattarti direttamente. Chi non contatta un'agenzia entro 48h viene segnalato automaticamente. Il rapporto contrattuale lo gestisci direttamente tu con il cliente, in totale autonomia.",
   },
   {
     icon: <DashboardIcon />,
@@ -152,7 +152,7 @@ const piani = [
     features: [
       "1 area operativa",
       "Max 6 competitor/zona",
-      "Notifica nuovi immobili 24h",
+      "Visibilità nella lista venditore: 24h",
       "Profilo agenzia",
       "Dashboard base",
     ],
@@ -165,7 +165,7 @@ const piani = [
     features: [
       "2 aree operative",
       "Max 5 competitor/zona",
-      "Notifica 8h",
+      "Visibilità nella lista venditore: 8h",
       "Priorità su Base",
       "Dashboard avanzata",
     ],
@@ -178,7 +178,7 @@ const piani = [
     features: [
       "3 aree operative",
       "Max 4 competitor/zona",
-      "Notifica 2h",
+      "Visibilità nella lista venditore: 2h",
       "Alta visibilità venditore",
       "Statistiche avanzate",
     ],
@@ -191,7 +191,7 @@ const piani = [
     features: [
       "3 aree operative",
       "Max 3 competitor/zona",
-      "Notifica 30 min",
+      "Visibilità nella lista venditore: 30 min",
       "Accesso zone top",
       "Supporto prioritario",
     ],
@@ -204,7 +204,7 @@ const piani = [
     features: [
       "4 aree operative",
       "Max 3 competitor/zona",
-      "Notifica istantanea",
+      "Visibilità istantanea nella lista venditore",
       "Prima posizione con venditore",
       "Branding premium",
     ],
@@ -229,8 +229,8 @@ export default function AgenziePage() {
             Porta la tua agenzia nel futuro
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-muted md:text-xl">
-            Entra nel network Privatio e ricevi clienti venditori senza doverli
-            cercare.
+            Entra nel network Privatio e lasciati trovare dai venditori nella
+            tua zona.
           </p>
           <a
             href="#registrazione"

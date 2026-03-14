@@ -125,7 +125,7 @@ export async function POST(
           </div>
           <div style="padding: 30px;">
             <h2 style="color: #10b981;">Autorizzazione confermata!</h2>
-            <p>L'autorizzazione al contatto per <strong>${property.title}</strong> è stata confermata. L'agenzia partner ti contatterà a breve.</p>
+            <p>L'autorizzazione al contatto per <strong>${property.title}</strong> è stata confermata. L'agenzia che hai scelto potrà ora contattarti per organizzare i prossimi passi.</p>
             <p>Il tuo immobile verrà pubblicato a breve sulla piattaforma.</p>
           </div>
         </div>

@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
             <ul className="text-text-muted list-disc pl-6 space-y-1">
               <li>Gestione dell&apos;account e dei servizi richiesti</li>
               <li>Pubblicazione degli annunci immobiliari</li>
-              <li>Matchmaking con agenzie partner</li>
+              <li>Messa a disposizione dei dati alle agenzie partner scelte dal venditore o, trascorse 48 ore, alle agenzie della zona</li>
               <li>Comunicazioni relative al servizio</li>
               <li>Adempimenti di legge</li>
             </ul>
