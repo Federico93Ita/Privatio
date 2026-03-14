@@ -28,19 +28,19 @@ const ZONE_CLASS_PLANS: Record<ZoneClass, PlanKey[]> = {
   MICROZONA_PRIME: ["PREMIER_PRIME", "PREMIER_ELITE"],
 };
 
-/** Slot partner default per classe di zona */
+/** Slot partner default per classe di zona (max competitor per piano) */
 const DEFAULT_SLOTS: Record<ZoneClass, Record<string, number>> = {
   CLUSTER_LOCAL: {
-    maxBase: 1, maxLocal: 2, maxCity: 0, maxPrime: 0, maxElite: 0,
+    maxBase: 6, maxLocal: 5, maxCity: 0, maxPrime: 0, maxElite: 0,
   },
   COMUNE: {
-    maxBase: 2, maxLocal: 2, maxCity: 2, maxPrime: 0, maxElite: 0,
+    maxBase: 6, maxLocal: 5, maxCity: 4, maxPrime: 0, maxElite: 0,
   },
   MACROQUARTIERE: {
-    maxBase: 0, maxLocal: 1, maxCity: 2, maxPrime: 2, maxElite: 0,
+    maxBase: 0, maxLocal: 5, maxCity: 4, maxPrime: 3, maxElite: 0,
   },
   MICROZONA_PRIME: {
-    maxBase: 0, maxLocal: 0, maxCity: 0, maxPrime: 2, maxElite: 2,
+    maxBase: 0, maxLocal: 0, maxCity: 0, maxPrime: 3, maxElite: 3,
   },
 };
 
