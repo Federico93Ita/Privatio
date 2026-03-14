@@ -56,14 +56,58 @@ export async function GET() {
     }
 
     // Stats
+    const activeAssignments = agency.assignments.filter((a) => a.status === "ACTIVE");
+    const completedAssignments = agency.assignments.filter((a) => a.status === "COMPLETED");
+
+    // Pipeline counts by property status
+    const pipeline: Record<string, number> = {};
+    for (const a of agency.assignments) {
+      const s = a.property.status;
+      pipeline[s] = (pipeline[s] || 0) + 1;
+    }
+
+    // Advanced stats (for City+ plans)
+    let avgDaysToSell: number | null = null;
+    let conversionRate: number | null = null;
+
+    if (completedAssignments.length > 0) {
+      const totalDays = completedAssignments.reduce((acc, a) => {
+        const days = Math.floor(
+          (Date.now() - new Date(a.assignedAt).getTime()) / (1000 * 60 * 60 * 24)
+        );
+        return acc + days;
+      }, 0);
+      avgDaysToSell = Math.round(totalDays / completedAssignments.length);
+    }
+
+    if (agency.assignments.length > 0) {
+      conversionRate = Math.round(
+        (completedAssignments.length / agency.assignments.length) * 100
+      );
+    }
+
+    const totalLeads = agency.assignments.reduce(
+      (acc, a) => acc + (a.property._count?.leads || 0),
+      0
+    );
+    const totalVisits = agency.assignments.reduce(
+      (acc, a) => acc + (a.property._count?.visits || 0),
+      0
+    );
+
     const stats = {
       totalProperties: agency.assignments.length,
-      activeProperties: agency.assignments.filter((a) => a.status === "ACTIVE").length,
-      completedSales: agency.assignments.filter((a) => a.status === "COMPLETED").length,
+      activeProperties: activeAssignments.length,
+      completedSales: completedAssignments.length,
       pendingVisits: agency.assignments.reduce(
         (acc, a) => acc + a.property.visits.length,
         0
       ),
+      pipeline,
+      avgDaysToSell,
+      conversionRate,
+      totalLeads,
+      totalVisits,
     };
 
     return NextResponse.json({ agency, stats });

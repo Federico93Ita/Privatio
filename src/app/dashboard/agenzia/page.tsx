@@ -2,8 +2,45 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice, formatDate } from "@/lib/utils";
+
+/* ------------------------------------------------------------------ */
+/*  Plan helpers                                                       */
+/* ------------------------------------------------------------------ */
+
+const PLAN_PRIORITY: Record<string, number> = {
+  BASE: 1,
+  PREMIER_LOCAL: 2,
+  PREMIER_CITY: 3,
+  PREMIER_PRIME: 4,
+  PREMIER_ELITE: 5,
+};
+
+const PLAN_LABELS: Record<string, string> = {
+  BASE: "Base",
+  PREMIER_LOCAL: "Premier Local",
+  PREMIER_CITY: "Premier City",
+  PREMIER_PRIME: "Premier Prime",
+  PREMIER_ELITE: "Premier Elite",
+};
+
+const PLAN_COLORS: Record<string, string> = {
+  BASE: "bg-bg-soft text-text-muted border-border",
+  PREMIER_LOCAL: "bg-primary/5 text-primary border-primary/20",
+  PREMIER_CITY: "bg-primary/10 text-primary border-primary/30",
+  PREMIER_PRIME: "bg-accent/10 text-accent border-accent/30",
+  PREMIER_ELITE: "bg-accent/15 text-accent border-accent/40",
+};
+
+function hasPlan(agencyPlan: string, minPlan: string): boolean {
+  return (PLAN_PRIORITY[agencyPlan] || 0) >= (PLAN_PRIORITY[minPlan] || 0);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 export default function AgencyDashboardPage() {
   const searchParams = useSearchParams();
@@ -35,8 +72,12 @@ export default function AgencyDashboardPage() {
         return r.json();
       })
       .then((data) => {
-        setAgency(data.agency);
-        setStats(data.stats);
+        if (data.agency) {
+          setAgency(data.agency);
+          setStats(data.stats);
+        } else {
+          setFetchError("Dati agenzia non disponibili.");
+        }
       })
       .catch(() => setFetchError("Errore nel caricamento dei dati. Riprova."))
       .finally(() => setLoading(false));
@@ -62,10 +103,20 @@ export default function AgencyDashboardPage() {
     ? assignments
     : assignments.filter((a: any) => a.property.status === statusFilter);
 
+  const plan = agency?.plan || "BASE";
+
   return (
     <DashboardLayout role="agency">
       <div className="space-y-6">
-        <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Dashboard Agenzia</h1>
+        {/* Header with plan badge */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Dashboard Agenzia</h1>
+          {agency && (
+            <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${PLAN_COLORS[plan] || PLAN_COLORS.BASE}`}>
+              {PLAN_LABELS[plan] || plan}
+            </span>
+          )}
+        </div>
 
         {banner && (
           <div
@@ -101,14 +152,14 @@ export default function AgencyDashboardPage() {
               <div key={i} className="h-24 bg-bg-soft rounded-lg animate-pulse" />
             ))}
           </div>
-        ) : !agency && !fetchError ? (
+        ) : !agency ? (
           <div className="bg-white rounded-xl p-8 border border-border text-center">
             <h3 className="text-lg font-medium text-primary-dark mb-2">Agenzia non trovata</h3>
             <p className="text-text-muted">Il tuo profilo agenzia non è ancora configurato.</p>
           </div>
         ) : (
           <>
-            {/* Stats */}
+            {/* Basic Stats (all plans) */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: "Immobili Attivi", value: stats?.activeProperties || 0, color: "text-primary" },
@@ -139,7 +190,118 @@ export default function AgencyDashboardPage() {
               </div>
             )}
 
-            {/* Pipeline */}
+            {/* ============================================================ */}
+            {/*  Pipeline Stats — PREMIER_LOCAL+ only                        */}
+            {/* ============================================================ */}
+            {hasPlan(plan, "PREMIER_LOCAL") ? (
+              <div>
+                <h2 className="text-lg font-medium text-primary-dark mb-3">Riepilogo Pipeline</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {[
+                    { key: "DRAFT", label: "Da Contattare", color: "border-l-text-muted" },
+                    { key: "PENDING_REVIEW", label: "Sopralluogo", color: "border-l-accent" },
+                    { key: "PUBLISHED", label: "Pubblicati", color: "border-l-success" },
+                    { key: "UNDER_CONTRACT", label: "Trattativa", color: "border-l-primary" },
+                    { key: "SOLD", label: "Venduti", color: "border-l-primary" },
+                  ].map((stage) => (
+                    <div
+                      key={stage.key}
+                      className={`bg-white rounded-lg p-4 border border-border border-l-4 ${stage.color}`}
+                    >
+                      <p className="text-xs text-text-muted">{stage.label}</p>
+                      <p className="text-2xl font-semibold text-text mt-1">
+                        {stats?.pipeline?.[stage.key] || 0}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="relative rounded-xl border border-border bg-white p-6 overflow-hidden">
+                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                  <p className="text-sm font-medium text-text-muted mb-2">Riepilogo Pipeline</p>
+                  <p className="text-xs text-text-muted mb-3">Disponibile dal piano Premier Local</p>
+                  <Link
+                    href="/dashboard/agenzia/territori"
+                    className="px-4 py-2 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/85 transition-colors"
+                  >
+                    Upgrade Piano
+                  </Link>
+                </div>
+                <div className="grid grid-cols-5 gap-3 opacity-30">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="bg-bg-soft rounded-lg p-4">
+                      <div className="h-3 w-16 bg-border rounded mb-2" />
+                      <div className="h-6 w-8 bg-border rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ============================================================ */}
+            {/*  Advanced Stats — PREMIER_CITY+ only                         */}
+            {/* ============================================================ */}
+            {hasPlan(plan, "PREMIER_CITY") ? (
+              <div>
+                <h2 className="text-lg font-medium text-primary-dark mb-3">Statistiche Avanzate</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-white rounded-xl p-5 border border-border">
+                    <p className="text-sm text-text-muted">Tasso Conversione</p>
+                    <p className="text-3xl font-semibold text-primary mt-1">
+                      {stats?.conversionRate != null ? `${stats.conversionRate}%` : "N/D"}
+                    </p>
+                    <p className="text-xs text-text-muted mt-1">Lead ricevuti → vendite</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-5 border border-border">
+                    <p className="text-sm text-text-muted">Tempo Medio Vendita</p>
+                    <p className="text-3xl font-semibold text-accent mt-1">
+                      {stats?.avgDaysToSell != null ? `${stats.avgDaysToSell}g` : "N/D"}
+                    </p>
+                    <p className="text-xs text-text-muted mt-1">Giorni dalla ricezione</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-5 border border-border">
+                    <p className="text-sm text-text-muted">Richieste Acquirenti</p>
+                    <p className="text-3xl font-semibold text-success mt-1">
+                      {stats?.totalLeads || 0}
+                    </p>
+                    <p className="text-xs text-text-muted mt-1">Totale su tutti gli immobili</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-5 border border-border">
+                    <p className="text-sm text-text-muted">Visite Totali</p>
+                    <p className="text-3xl font-semibold text-primary-dark mt-1">
+                      {stats?.totalVisits || 0}
+                    </p>
+                    <p className="text-xs text-text-muted mt-1">Effettuate e programmate</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative rounded-xl border border-border bg-white p-6 overflow-hidden">
+                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                  <p className="text-sm font-medium text-text-muted mb-2">Statistiche Avanzate</p>
+                  <p className="text-xs text-text-muted mb-3">Disponibile dal piano Premier City</p>
+                  <Link
+                    href="/dashboard/agenzia/territori"
+                    className="px-4 py-2 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/85 transition-colors"
+                  >
+                    Upgrade Piano
+                  </Link>
+                </div>
+                <div className="grid grid-cols-4 gap-4 opacity-30">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="bg-bg-soft rounded-xl p-5">
+                      <div className="h-3 w-20 bg-border rounded mb-2" />
+                      <div className="h-8 w-12 bg-border rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ============================================================ */}
+            {/*  Pipeline (all plans)                                        */}
+            {/* ============================================================ */}
             <div>
               <h2 className="text-lg font-medium text-primary-dark mb-4">Pipeline Immobili</h2>
               <div className="flex gap-2 flex-wrap mb-4">
