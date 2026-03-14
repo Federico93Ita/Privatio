@@ -393,7 +393,7 @@ export function agencyApprovedEmail(contactName: string, agencyName: string, reg
                 <td style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; vertical-align: top; width: 48%;">
                   <p style="margin: 0; color: #0f172a; font-weight: bold; font-size: 16px;">Base</p>
                   <p style="margin: 4px 0 8px; color: #2563eb; font-size: 24px; font-weight: bold;">da €200<span style="font-size: 14px; color: #64748b; font-weight: normal;">/mese</span></p>
-                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">1 area operativa<br/>Dashboard base<br/>Visibilità nella lista venditore: 24h</p>
+                  <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">1 area operativa<br/>Dashboard base<br/>Notifica nuovi immobili 24h</p>
                 </td>
                 <td style="width: 4%;"></td>
                 <td style="padding: 12px; border: 2px solid #2563eb; border-radius: 8px; vertical-align: top; width: 48%; background: #f0f9ff;">

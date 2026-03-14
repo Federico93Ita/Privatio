@@ -152,7 +152,7 @@ const piani = [
     features: [
       "1 area operativa",
       "Max 6 competitor/zona",
-      "Visibilità nella lista venditore: 24h",
+      "Notifica nuovi immobili 24h",
       "Profilo agenzia",
       "Dashboard base",
     ],
@@ -165,7 +165,7 @@ const piani = [
     features: [
       "2 aree operative",
       "Max 5 competitor/zona",
-      "Visibilità nella lista venditore: 8h",
+      "Notifica 8h",
       "Priorità su Base",
       "Dashboard avanzata",
     ],
@@ -178,7 +178,7 @@ const piani = [
     features: [
       "3 aree operative",
       "Max 4 competitor/zona",
-      "Visibilità nella lista venditore: 2h",
+      "Notifica 2h",
       "Alta visibilità venditore",
       "Statistiche avanzate",
     ],
@@ -191,7 +191,7 @@ const piani = [
     features: [
       "3 aree operative",
       "Max 3 competitor/zona",
-      "Visibilità nella lista venditore: 30 min",
+      "Notifica 30 min",
       "Accesso zone top",
       "Supporto prioritario",
     ],
@@ -204,7 +204,7 @@ const piani = [
     features: [
       "4 aree operative",
       "Max 3 competitor/zona",
-      "Visibilità istantanea nella lista venditore",
+      "Notifica istantanea",
       "Prima posizione con venditore",
       "Branding premium",
     ],
