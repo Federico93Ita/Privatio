@@ -12,7 +12,6 @@ const agencySettingsSchema = z.object({
   city: z.string().min(2, "Città richiesta"),
   province: z.string().length(2, "Provincia deve essere di 2 caratteri"),
   description: z.string().optional(),
-  coverageRadius: z.number().min(5).max(50),
 });
 
 export async function PUT(req: NextRequest) {
@@ -75,7 +74,6 @@ export async function PUT(req: NextRequest) {
         city: parsed.data.city,
         province: parsed.data.province.toUpperCase(),
         description: parsed.data.description || null,
-        coverageRadius: parsed.data.coverageRadius,
         ...geoData,
       },
     });

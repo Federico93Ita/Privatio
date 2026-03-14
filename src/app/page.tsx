@@ -222,9 +222,9 @@ const howItWorksSteps = [
   {
     num: 2,
     icon: HandshakeIcon,
-    title: "Ti assegniamo un'agenzia locale",
+    title: "Ti mettiamo in contatto con un'agenzia",
     description:
-      "Selezioniamo un'agenzia partner verificata nella tua zona.",
+      "Un'agenzia partner verificata nella tua zona ti contatterà per valutare il tuo immobile.",
   },
   {
     num: 3,
@@ -285,7 +285,7 @@ const testimonials = [
   },
   {
     quote:
-      "Servizio professionale e trasparente. L'agenzia assegnata è stata impeccabile.",
+      "Servizio professionale e trasparente. L'agenzia partner è stata impeccabile.",
     author: "Giulia P.",
     location: "Roma",
     savings: 7500,
@@ -595,8 +595,8 @@ export default function HomePage() {
                 Inizia ora
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
-                Compila il form e ti ricontatteremo entro 24 ore per assegnarti
-                un&apos;agenzia partner nella tua zona.
+                Compila il form e ti ricontatteremo entro 24 ore per metterti
+                in contatto con un&apos;agenzia partner nella tua zona.
               </p>
             </div>
 

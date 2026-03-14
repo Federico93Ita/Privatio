@@ -55,7 +55,7 @@ export async function GET() {
     }
 
     // Compute stats with lightweight aggregate queries
-    const [activeCount, completedCount, pendingVisitsCount] = await Promise.all([
+    const [activeCount, completedCount, pendingVisitsCount, activeTerritories] = await Promise.all([
       prisma.propertyAssignment.count({
         where: { agencyId: user.agencyId, status: "ACTIVE" },
       }),
@@ -70,6 +70,9 @@ export async function GET() {
           },
         },
       }),
+      prisma.territoryAssignment.count({
+        where: { agencyId: user.agencyId, isActive: true },
+      }),
     ]);
 
     const stats = {
@@ -77,6 +80,7 @@ export async function GET() {
       activeProperties: activeCount,
       completedSales: completedCount,
       pendingVisits: pendingVisitsCount,
+      activeTerritories,
     };
 
     return NextResponse.json({ agency, stats });

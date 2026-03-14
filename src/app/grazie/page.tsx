@@ -18,8 +18,8 @@ export default function GraziePage() {
             Il tuo immobile è stato inserito con successo.
           </p>
           <p className="text-text-muted mb-8">
-            Il nostro team verificherà il tuo annuncio e ti assegnerà un&apos;agenzia
-            partner nella tua zona. Riceverai una email di conferma a breve.
+            Il nostro team verificherà il tuo annuncio e ti metterà in contatto
+            con un&apos;agenzia partner nella tua zona. Riceverai una email di conferma a breve.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -67,7 +67,7 @@ async function main() {
       lat: 45.4642,
       lng: 9.19,
       coverageRadius: 20,
-      plan: "PRO",
+      plan: "PREMIER_LOCAL",
       isActive: true,
       description: "Agenzia immobiliare leader nel mercato milanese dal 1985.",
       rating: 4.5,

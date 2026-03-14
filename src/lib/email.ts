@@ -53,7 +53,7 @@ export function sellerWelcomeEmail(name: string) {
           <h2 style="color: #0f172a;">Ciao ${esc(name)}!</h2>
           <p style="color: #64748b; line-height: 1.6;">
             Grazie per aver inserito il tuo immobile su Privatio. Il nostro team sta
-            verificando il tuo annuncio e ti assegneremo un'agenzia partner nella tua zona.
+            verificando il tuo annuncio e ti metteremo in contatto con un'agenzia partner nella tua zona.
           </p>
           <p style="color: #64748b; line-height: 1.6;">
             Ricorda: con Privatio <strong>non paghi nessuna commissione</strong>.
@@ -79,7 +79,7 @@ export function sellerWelcomeEmail(name: string) {
 
 export function agencyAssignedEmail(sellerName: string, agencyName: string, agencyPhone: string) {
   return {
-    subject: "La tua agenzia è stata assegnata — Privatio",
+    subject: "Un'agenzia partner ti contatterà — Privatio",
     html: `
       <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
@@ -88,10 +88,10 @@ export function agencyAssignedEmail(sellerName: string, agencyName: string, agen
         <div style="padding: 30px; background: white;">
           <h2 style="color: #0f172a;">Ciao ${esc(sellerName)}!</h2>
           <p style="color: #64748b; line-height: 1.6;">
-            Ottime notizie! Abbiamo assegnato il tuo immobile a un'agenzia partner nella tua zona.
+            Ottime notizie! Abbiamo trovato un'agenzia partner per il tuo immobile nella tua zona. Ti contatterà a breve.
           </p>
           <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin: 20px 0;">
-            <h3 style="color: #0f172a; margin-top: 0;">La tua agenzia</h3>
+            <h3 style="color: #0f172a; margin-top: 0;">Agenzia partner</h3>
             <p style="color: #1e293b; margin: 4px 0;"><strong>${esc(agencyName)}</strong></p>
             <p style="color: #64748b; margin: 4px 0;">Tel: ${esc(agencyPhone)}</p>
           </div>
@@ -110,7 +110,7 @@ export function agencyAssignedEmail(sellerName: string, agencyName: string, agen
 
 export function agencyNewAssignmentEmail(agencyName: string, propertyTitle: string, propertyAddress: string) {
   return {
-    subject: "Nuovo immobile assegnato — Privatio",
+    subject: "Nuovo lead ricevuto — Privatio",
     html: `
       <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
@@ -119,7 +119,7 @@ export function agencyNewAssignmentEmail(agencyName: string, propertyTitle: stri
         <div style="padding: 30px; background: white;">
           <h2 style="color: #0f172a;">Ciao ${esc(agencyName)}!</h2>
           <p style="color: #64748b; line-height: 1.6;">
-            Un nuovo immobile è stato assegnato alla tua agenzia.
+            Hai ricevuto una nuova segnalazione di un venditore nella tua zona.
           </p>
           <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin: 20px 0;">
             <h3 style="color: #0f172a; margin-top: 0;">${esc(propertyTitle)}</h3>
@@ -128,7 +128,7 @@ export function agencyNewAssignmentEmail(agencyName: string, propertyTitle: stri
           <div style="text-align: center; margin: 30px 0;">
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia"
                style="background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-              Gestisci Immobile
+              Vedi Segnalazione
             </a>
           </div>
         </div>
@@ -248,10 +248,10 @@ export function welcomeEmail(name: string) {
             </div>
 
             <div style="margin-bottom: 16px;">
-              <p style="color: #2563eb; font-weight: bold; margin: 0 0 4px; font-size: 14px;">STEP 2 — Ti assegniamo un'agenzia partner</p>
+              <p style="color: #2563eb; font-weight: bold; margin: 0 0 4px; font-size: 14px;">STEP 2 — Un'agenzia partner ti contatta</p>
               <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
-                Il nostro team verifica il tuo annuncio e ti assegna un'agenzia immobiliare
-                partner nella tua zona. Riceverai un'email con i contatti dell'agenzia.
+                Il nostro team verifica il tuo annuncio e segnala il tuo immobile a un'agenzia
+                partner nella tua zona, che ti contatterà direttamente.
               </p>
             </div>
 
@@ -363,10 +363,10 @@ export function agencyApprovedEmail(contactName: string, agencyName: string, reg
             </div>
 
             <div style="margin-bottom: 16px;">
-              <p style="color: #2563eb; font-weight: bold; margin: 0 0 4px; font-size: 14px;">2. Ricevi immobili nella tua zona</p>
+              <p style="color: #2563eb; font-weight: bold; margin: 0 0 4px; font-size: 14px;">2. Ricevi lead nella tua zona</p>
               <p style="color: #475569; margin: 0; line-height: 1.6; font-size: 14px;">
-                I venditori della tua area vengono automaticamente assegnati alla tua agenzia.
-                Riceverai una notifica per ogni nuovo immobile.
+                Ricevi segnalazioni di venditori nella tua area direttamente nella dashboard.
+                Riceverai una notifica per ogni nuovo lead.
               </p>
             </div>
 

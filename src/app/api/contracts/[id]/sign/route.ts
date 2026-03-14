@@ -99,9 +99,9 @@ export async function POST(
             <h1 style="color: white; margin: 0;">Privatio</h1>
           </div>
           <div style="padding: 30px;">
-            <h2 style="color: #10b981;">Contratto firmato!</h2>
-            <p>Il contratto di esclusiva per <strong>${property.title}</strong> è stato firmato da entrambe le parti.</p>
-            <p>L'immobile verrà pubblicato a breve sulla piattaforma.</p>
+            <h2 style="color: #10b981;">Autorizzazione confermata!</h2>
+            <p>L'autorizzazione al contatto per <strong>${property.title}</strong> è stata confermata. L'agenzia partner ti contatterà a breve.</p>
+            <p>Il tuo immobile verrà pubblicato a breve sulla piattaforma.</p>
           </div>
         </div>
       `;

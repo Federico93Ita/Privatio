@@ -16,9 +16,9 @@ const steps = [
   },
   {
     num: "02",
-    title: "Ti assegniamo un'agenzia locale",
-    desc: "Il nostro algoritmo seleziona l'agenzia partner più adatta nella tua zona, in base a disponibilità, valutazioni e vicinanza.",
-    details: ["Matchmaking automatico", "Agenzie verificate e selezionate", "Copertura su tutto il territorio"],
+    title: "Ti mettiamo in contatto con un'agenzia",
+    desc: "Un'agenzia partner verificata nella tua zona ti contatterà per valutare il tuo immobile e proporti i propri servizi.",
+    details: ["Segnalazione automatica", "Agenzie verificate e selezionate", "Copertura su tutto il territorio"],
   },
   {
     num: "03",
@@ -29,8 +29,8 @@ const steps = [
   {
     num: "04",
     title: "Tu incassi il 100%",
-    desc: "Alla vendita, incassi l'intero prezzo pattuito. La commissione del 2-2.5% viene pagata dall'acquirente, non da te.",
-    details: ["Zero commissioni per il venditore", "Commissione acquirente trasparente", "Contratto digitale tutelante"],
+    desc: "Alla vendita, incassi l'intero prezzo pattuito. L'eventuale provvigione viene concordata direttamente tra te e l'agenzia.",
+    details: ["Zero costi per il venditore su Privatio", "Provvigione concordata con l'agenzia", "Massima trasparenza"],
   },
 ];
 
@@ -84,14 +84,14 @@ export default function ComeFunzionaPage() {
             <h2 className="text-2xl font-light tracking-[-0.03em] text-text text-center mb-8">Chi paga cosa?</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-xl p-6 border-2 border-success">
-                <h3 className="text-xl font-medium text-success mb-2">Venditore</h3>
-                <p className="text-5xl font-semibold text-success mb-2">0%</p>
-                <p className="text-text-muted">Nessuna commissione, nessun costo nascosto. Incassi il 100% del prezzo di vendita.</p>
+                <h3 className="text-xl font-medium text-success mb-2">Per il Venditore</h3>
+                <p className="text-5xl font-semibold text-success mb-2">€0</p>
+                <p className="text-text-muted">Privatio non ti chiede nessun costo. L&apos;eventuale provvigione la concordi direttamente con l&apos;agenzia.</p>
               </div>
               <div className="bg-white rounded-xl p-6 border border-border">
-                <h3 className="text-xl font-medium text-text mb-2">Acquirente</h3>
-                <p className="text-5xl font-semibold text-primary mb-2">2 - 2.5%</p>
-                <p className="text-text-muted">L&apos;acquirente paga una commissione ridotta sul prezzo di vendita. Trasparenza totale.</p>
+                <h3 className="text-xl font-medium text-text mb-2">Per l&apos;Agenzia</h3>
+                <p className="text-5xl font-semibold text-primary mb-2">Abbonamento</p>
+                <p className="text-text-muted">Le agenzie pagano un abbonamento territoriale a Privatio. Nessuna commissione sulle vendite.</p>
               </div>
             </div>
           </div>

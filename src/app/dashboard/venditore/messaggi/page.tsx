@@ -103,7 +103,7 @@ export default function SellerMessagesPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               <h3 className="text-lg font-medium text-primary-dark mb-2">Messaggi non disponibili</h3>
-              <p className="text-text-muted">I messaggi saranno disponibili dopo l&apos;assegnazione dell&apos;agenzia.</p>
+              <p className="text-text-muted">I messaggi saranno disponibili dopo il contatto con l&apos;agenzia partner.</p>
             </div>
           </div>
         ) : (

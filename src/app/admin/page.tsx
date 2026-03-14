@@ -24,13 +24,14 @@ export default function AdminDashboard() {
   const [sellerLeads, setSellerLeads] = useState<any[]>([]);
   const [agencyLeads, setAgencyLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "properties" | "agencies" | "leads" | "assignments">("overview");
+  const [zones, setZones] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<"overview" | "properties" | "agencies" | "leads" | "assignments" | "territories">("overview");
   const searchParams = useSearchParams();
 
   // Read initial tab from URL query param
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab === "properties" || tab === "agencies" || tab === "leads" || tab === "assignments") {
+    if (tab === "properties" || tab === "agencies" || tab === "leads" || tab === "assignments" || tab === "territories") {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -41,10 +42,11 @@ export default function AdminDashboard() {
 
   async function loadData() {
     try {
-      const [propsRes, agenciesRes, leadsRes] = await Promise.all([
+      const [propsRes, agenciesRes, leadsRes, zonesRes] = await Promise.all([
         fetch("/api/admin/properties"),
         fetch("/api/admin/agencies"),
         fetch("/api/admin/leads"),
+        fetch("/api/admin/zones"),
       ]);
 
       if (propsRes.ok) {
@@ -59,6 +61,10 @@ export default function AdminDashboard() {
         const data = await leadsRes.json();
         setSellerLeads(data.sellerLeads || []);
         setAgencyLeads(data.agencyLeads || []);
+      }
+      if (zonesRes.ok) {
+        const data = await zonesRes.json();
+        setZones(data.zones || []);
       }
     } catch (err) {
       console.error("Error loading admin data:", err);
@@ -113,10 +119,10 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Agenzia assegnata con successo!");
+        alert("Agenzia collegata con successo!");
         loadData();
       } else {
-        alert(data.error || "Errore nell'assegnazione");
+        alert(data.error || "Errore nel collegamento");
       }
     } catch (err) {
       alert("Errore nell'assegnazione");
@@ -129,6 +135,7 @@ export default function AdminDashboard() {
     { id: "agencies" as const, label: "Agenzie" },
     { id: "leads" as const, label: "Lead" },
     { id: "assignments" as const, label: "Assegnazioni" },
+    { id: "territories" as const, label: "Territori" },
   ];
 
   const statusLabels: Record<string, string> = {
@@ -332,8 +339,8 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-3 px-4 text-sm">{a.city} ({a.province})</td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${a.plan === "PRO" ? "bg-primary/10 text-primary" : "bg-bg-soft text-text-muted"}`}>
-                              {a.plan}
+                            <span className={`text-xs px-2 py-1 rounded-full ${a.plan !== "BASE" ? "bg-primary/10 text-primary" : "bg-bg-soft text-text-muted"}`}>
+                              {a.plan?.replace("_", " ") || "BASE"}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-sm">{a._count?.assignments || 0}</td>
@@ -502,7 +509,7 @@ export default function AdminDashboard() {
             {activeTab === "assignments" && (
               <div className="space-y-4">
                 <p className="text-sm text-text-muted">
-                  Immobili senza agenzia assegnata. Clicca &quot;Auto-Assegna&quot; per avviare il matchmaking automatico.
+                  Immobili senza agenzia collegata. Clicca &quot;Auto-Assegna&quot; per avviare il matchmaking automatico.
                 </p>
                 <div className="space-y-3">
                   {properties
@@ -524,6 +531,97 @@ export default function AdminDashboard() {
                   {properties.filter((p: any) => !p.assignment).length === 0 && (
                     <p className="text-center py-8 text-text-muted">Tutti gli immobili sono assegnati.</p>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Territories / Zones */}
+            {activeTab === "territories" && (
+              <div className="space-y-6">
+                {/* Zone Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: "Zone Totali", value: zones.length, color: "text-primary" },
+                    { label: "Zone Attive", value: zones.filter((z: any) => z.isActive).length, color: "text-success" },
+                    { label: "Territori Assegnati", value: zones.reduce((acc: number, z: any) => acc + (z._count?.territories || 0), 0), color: "text-accent" },
+                    { label: "Province Coperte", value: new Set(zones.map((z: any) => z.province)).size, color: "text-primary-dark" },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white rounded-xl p-5 border border-border">
+                      <p className="text-sm text-text-muted">{stat.label}</p>
+                      <p className={`text-3xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Zones Table */}
+                <div className="bg-white rounded-xl border border-border">
+                  <div className="p-5 border-b border-border flex items-center justify-between">
+                    <h3 className="font-medium text-primary-dark">Zone Territoriali</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Zona</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Classe</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Provincia</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Score</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Popolazione</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Partner</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Prezzo Base</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {zones.map((zone: any) => {
+                          const classLabels: Record<string, string> = {
+                            CLUSTER_LOCAL: "Cluster",
+                            COMUNE: "Comune",
+                            MACROQUARTIERE: "Macroquartiere",
+                            MICROZONA_PRIME: "Microzona Prime",
+                          };
+                          const classColors: Record<string, string> = {
+                            CLUSTER_LOCAL: "bg-bg-soft text-text-muted",
+                            COMUNE: "bg-primary/10 text-primary",
+                            MACROQUARTIERE: "bg-accent/10 text-accent",
+                            MICROZONA_PRIME: "bg-success/10 text-success",
+                          };
+                          const activePartners = zone._count?.territories || 0;
+                          const lowestPrice = zone.priceBase || zone.priceLocal || zone.priceCity || zone.pricePrime || zone.priceElite;
+                          return (
+                            <tr key={zone.id} className="border-b border-border hover:bg-bg-soft">
+                              <td className="py-3 px-4">
+                                <p className="text-sm font-medium">{zone.name}</p>
+                                {zone.city && <p className="text-xs text-text-muted">{zone.city}</p>}
+                              </td>
+                              <td className="py-3 px-4">
+                                <span className={`text-xs px-2 py-1 rounded-full ${classColors[zone.zoneClass] || "bg-bg-soft text-text-muted"}`}>
+                                  {classLabels[zone.zoneClass] || zone.zoneClass}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-sm">{zone.province}</td>
+                              <td className="py-3 px-4">
+                                <span className="text-sm font-medium">{zone.marketScore}/10</span>
+                              </td>
+                              <td className="py-3 px-4 text-sm">{zone.population?.toLocaleString("it-IT") || "—"}</td>
+                              <td className="py-3 px-4 text-sm font-medium">{activePartners}</td>
+                              <td className="py-3 px-4 text-sm">
+                                {lowestPrice ? `€${(lowestPrice / 100).toLocaleString("it-IT")}` : "—"}
+                              </td>
+                              <td className="py-3 px-4">
+                                <span className={`text-xs px-2 py-1 rounded-full ${zone.isActive ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
+                                  {zone.isActive ? "Attiva" : "Inattiva"}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    {zones.length === 0 && (
+                      <p className="text-center py-8 text-text-muted">Nessuna zona creata. Esegui lo script di import ISTAT.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

@@ -68,7 +68,7 @@ model Agency {
   province         String
   lat              Float?
   lng              Float?
-  coverageRadius   Int       @default(15)
+  coverageRadius   Int?
   plan             AgencyPlan @default(BASE)
   isActive         Boolean   @default(false)
   stripeCustomerId String?
@@ -92,11 +92,22 @@ model Agency {
   agents           User[]
   assignments      PropertyAssignment[]
   reviews          Review[]
+  territories      TerritoryAssignment[]
 }
 
 enum AgencyPlan {
   BASE
-  PRO
+  PREMIER_LOCAL
+  PREMIER_CITY
+  PREMIER_PRIME
+  PREMIER_ELITE
+}
+
+enum ZoneClass {
+  CLUSTER_LOCAL
+  COMUNE
+  MACROQUARTIERE
+  MICROZONA_PRIME
 }
 
 model Property {
@@ -136,6 +147,8 @@ model Property {
   cap           String
   lat           Float
   lng           Float
+  zone          Zone?          @relation("PropertyZone", fields: [zoneId], references: [id])
+  zoneId        String?
   photos        PropertyPhoto[]
   seller        User           @relation(fields: [sellerId], references: [id])
   sellerId      String
@@ -153,6 +166,7 @@ model Property {
   @@index([city, status])
   @@index([status])
   @@index([sellerId])
+  @@index([zoneId])
 }
 
 enum PropertyType {
@@ -369,4 +383,63 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Zone {
+  id             String     @id @default(cuid())
+  name           String
+  slug           String     @unique
+  zoneClass      ZoneClass
+  region         String
+  province       String
+  city           String?
+  capCodes       String[]
+  municipalities String[]
+
+  // Dati di mercato (ISTAT/OMI/NTN)
+  population     Int        @default(0)
+  ntn            Float      @default(0)
+  marketScore    Int        @default(1)
+
+  // Prezzi mensili per piano (centesimi). null = non disponibile
+  priceBase      Int?
+  priceLocal     Int?
+  priceCity      Int?
+  pricePrime     Int?
+  priceElite     Int?
+
+  // Limiti partner per piano. 0 = non disponibile
+  maxBase        Int        @default(0)
+  maxLocal       Int        @default(0)
+  maxCity        Int        @default(0)
+  maxPrime       Int        @default(0)
+  maxElite       Int        @default(0)
+
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  territories    TerritoryAssignment[]
+  properties     Property[] @relation("PropertyZone")
+
+  @@index([province])
+  @@index([region])
+  @@index([zoneClass])
+}
+
+model TerritoryAssignment {
+  id           String     @id @default(cuid())
+  agency       Agency     @relation(fields: [agencyId], references: [id])
+  agencyId     String
+  zone         Zone       @relation(fields: [zoneId], references: [id])
+  zoneId       String
+  plan         AgencyPlan
+  monthlyPrice Int
+  isActive     Boolean    @default(true)
+  stripeItemId String?
+  createdAt    DateTime   @default(now())
+
+  @@unique([agencyId, zoneId])
+  @@index([zoneId, isActive])
+  @@index([agencyId, isActive])
 }

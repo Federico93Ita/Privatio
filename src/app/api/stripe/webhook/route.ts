@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe, PLANS } from "@/lib/stripe";
+import { stripe, highestPlan } from "@/lib/stripe";
+import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import Stripe from "stripe";
-
-/** Determine plan (BASE | PRO) from subscription price ID */
-function planFromSubscription(subscription: Stripe.Subscription): "BASE" | "PRO" | null {
-  const priceId = subscription.items?.data?.[0]?.price?.id;
-  if (!priceId) return null;
-  if (priceId === PLANS.PRO.priceId) return "PRO";
-  if (priceId === PLANS.BASE.priceId) return "BASE";
-  return null;
-}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -31,25 +23,64 @@ export async function POST(req: NextRequest) {
   }
 
   switch (event.type) {
+    /* -------------------------------------------------------------- */
+    /*  Checkout completato — primo territorio acquistato               */
+    /* -------------------------------------------------------------- */
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const customerId = session.customer as string;
-      const plan = (session.metadata?.plan as "BASE" | "PRO") || null;
+      const plan = session.metadata?.plan as PlanKey | undefined;
+      const zoneId = session.metadata?.zoneId;
+      const monthlyPrice = parseInt(session.metadata?.monthlyPrice || "0", 10);
+      const agencyId = session.metadata?.agencyId;
+      const subscriptionId = session.subscription as string;
 
-      if (customerId && plan) {
-        const agency = await prisma.agency.findFirst({
-          where: { stripeCustomerId: customerId },
+      if (customerId && plan && zoneId && agencyId && subscriptionId) {
+        // Recupera subscription per ottenere lo subscription item ID
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const itemId = subscription.items.data[0]?.id;
+
+        // Crea o riattiva TerritoryAssignment
+        await prisma.territoryAssignment.upsert({
+          where: { agencyId_zoneId: { agencyId, zoneId } },
+          update: {
+            plan,
+            monthlyPrice,
+            isActive: true,
+            stripeItemId: itemId || null,
+          },
+          create: {
+            agencyId,
+            zoneId,
+            plan,
+            monthlyPrice,
+            isActive: true,
+            stripeItemId: itemId || null,
+          },
         });
-        if (agency) {
-          await prisma.agency.update({
-            where: { id: agency.id },
-            data: { plan },
-          });
-        }
+
+        // Aggiorna piano agenzia al piano massimo attivo
+        const allTerritories = await prisma.territoryAssignment.findMany({
+          where: { agencyId, isActive: true },
+          select: { plan: true },
+        });
+        const topPlan = highestPlan(allTerritories.map((t) => t.plan as PlanKey));
+
+        await prisma.agency.update({
+          where: { id: agencyId },
+          data: {
+            plan: topPlan,
+            isActive: true,
+            stripeSubId: subscriptionId,
+          },
+        });
       }
       break;
     }
 
+    /* -------------------------------------------------------------- */
+    /*  Subscription creata/aggiornata                                  */
+    /* -------------------------------------------------------------- */
     case "customer.subscription.created":
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
@@ -60,32 +91,39 @@ export async function POST(req: NextRequest) {
       });
 
       if (agency) {
-        const detectedPlan = planFromSubscription(subscription);
+        const isActive = subscription.status === "active";
 
         await prisma.agency.update({
           where: { id: agency.id },
           data: {
-            isActive: subscription.status === "active",
+            isActive,
             stripeSubId: subscription.id,
-            ...(detectedPlan ? { plan: detectedPlan } : {}),
           },
         });
 
-        if (subscription.status === "active") {
+        // Sincronizza territori con stato subscription
+        if (!isActive) {
+          await prisma.territoryAssignment.updateMany({
+            where: { agencyId: agency.id },
+            data: { isActive: false },
+          });
+        }
+
+        if (isActive && event.type === "customer.subscription.created") {
           await sendEmail({
             to: agency.email,
-            subject: "Abbonamento attivato — Privatio",
+            subject: "Territorio attivato — Privatio",
             html: `
               <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
                   <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
                 </div>
                 <div style="padding: 30px; background: white;">
-                  <h2 style="color: #059669;">Abbonamento attivato!</h2>
-                  <p style="color: #6b7280; line-height: 1.6;">Il tuo abbonamento è ora attivo. Puoi iniziare a ricevere immobili nella tua zona.</p>
-                  <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia"
+                  <h2 style="color: #059669;">Territorio attivato!</h2>
+                  <p style="color: #6b7280; line-height: 1.6;">Il tuo territorio è ora attivo. Puoi iniziare a ricevere immobili nella tua zona.</p>
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/territori"
                      style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500; margin-top: 16px;">
-                    Vai alla Dashboard
+                    Vedi i tuoi territori
                   </a>
                 </div>
               </div>
@@ -96,6 +134,9 @@ export async function POST(req: NextRequest) {
       break;
     }
 
+    /* -------------------------------------------------------------- */
+    /*  Subscription cancellata                                        */
+    /* -------------------------------------------------------------- */
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
@@ -105,6 +146,12 @@ export async function POST(req: NextRequest) {
       });
 
       if (agency) {
+        // Disattiva tutti i territori
+        await prisma.territoryAssignment.updateMany({
+          where: { agencyId: agency.id },
+          data: { isActive: false },
+        });
+
         await prisma.agency.update({
           where: { id: agency.id },
           data: { isActive: false, stripeSubId: null },
@@ -120,8 +167,8 @@ export async function POST(req: NextRequest) {
               </div>
               <div style="padding: 30px; background: white;">
                 <h2 style="color: #0f172a;">Abbonamento disattivato</h2>
-                <p style="color: #6b7280; line-height: 1.6;">Il tuo abbonamento Privatio è stato disattivato. Non riceverai nuovi immobili.</p>
-                <p style="color: #6b7280; line-height: 1.6;">Puoi riattivare il tuo piano in qualsiasi momento dalla dashboard.</p>
+                <p style="color: #6b7280; line-height: 1.6;">Il tuo abbonamento Privatio è stato disattivato. I tuoi territori non sono più attivi.</p>
+                <p style="color: #6b7280; line-height: 1.6;">Puoi riattivare i tuoi territori in qualsiasi momento dalla dashboard.</p>
               </div>
             </div>
           `,
@@ -130,6 +177,9 @@ export async function POST(req: NextRequest) {
       break;
     }
 
+    /* -------------------------------------------------------------- */
+    /*  Pagamento fallito                                               */
+    /* -------------------------------------------------------------- */
     case "invoice.payment_failed": {
       const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;

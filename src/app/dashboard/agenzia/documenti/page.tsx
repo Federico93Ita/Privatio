@@ -13,7 +13,7 @@ export default function AgencyDocumentsPage() {
           </svg>
           <h3 className="text-lg font-medium text-primary-dark mb-2">Nessun documento</h3>
           <p className="text-text-muted">
-            I contratti e documenti relativi ai tuoi immobili appariranno qui dopo la firma.
+            I documenti e le autorizzazioni relative ai tuoi lead appariranno qui.
           </p>
         </div>
       </div>

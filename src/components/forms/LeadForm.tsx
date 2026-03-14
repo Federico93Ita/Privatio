@@ -214,7 +214,7 @@ export default function LeadForm() {
         </h3>
         <p className="mt-3 text-text-muted">
           Grazie per averci contattato. Ti ricontatteremo entro 24 ore per
-          assegnarti un&apos;agenzia partner nella tua zona.
+          metterti in contatto con un&apos;agenzia partner nella tua zona.
         </p>
       </div>
     );

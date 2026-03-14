@@ -15,7 +15,6 @@ const agencyRegisterSchema = z.object({
   city: z.string().min(2, "Città richiesta"),
   province: z.string().min(2, "Provincia richiesta"),
   description: z.string().optional(),
-  coverageRadius: z.number().min(5).max(50).default(15),
   approvalToken: z.string().optional(),
 });
 
@@ -78,7 +77,6 @@ export async function POST(req: NextRequest) {
           city: data.city,
           province: data.province,
           description: data.description,
-          coverageRadius: data.coverageRadius,
           lat: coords?.lat ?? null,
           lng: coords?.lng ?? null,
           plan: "BASE",

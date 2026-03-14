@@ -7,7 +7,7 @@ import AgenzieFAQ from "./AgenzieFAQ";
 export const metadata: Metadata = {
   title: "Diventa Partner | Privatio",
   description:
-    "Entra nel network Privatio. Ricevi clienti venditori pre-qualificati, gestisci tutto dalla dashboard e guadagna provvigioni certe.",
+    "Entra nel network Privatio. Ricevi lead di venditori pre-qualificati nella tua zona e gestisci la tua attivita in autonomia dalla dashboard.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -127,9 +127,9 @@ const benefits = [
   },
   {
     icon: <DocumentIcon />,
-    title: "Contratti di esclusiva gia firmati",
+    title: "Lead venditori pre-qualificati",
     description:
-      "Ogni incarico arriva con un contratto di esclusiva digitale gia firmato dal venditore. Lavori in totale serenita senza rischio di perdere il mandato.",
+      "Ricevi segnalazioni di venditori privati gia verificati e motivati a vendere. Il rapporto contrattuale lo gestisci direttamente tu con il cliente, in totale autonomia.",
   },
   {
     icon: <DashboardIcon />,
@@ -139,39 +139,77 @@ const benefits = [
   },
   {
     icon: <MoneyIcon />,
-    title: "Provvigioni certe 1.5-2%",
+    title: "Guadagni direttamente dal cliente",
     description:
-      "La provvigione viene applicata esclusivamente all'acquirente. Tu guadagni una percentuale garantita sul prezzo di vendita, senza sorprese.",
+      "La tua provvigione la concordi direttamente con il cliente. Privatio non trattiene commissioni sulle vendite e non interviene nella trattativa.",
   },
 ];
 
-const pianoBase = {
-  name: "Piano Base",
-  price: "49",
-  features: [
-    "Max 5 immobili attivi",
-    "Dashboard gestione",
-    "Notifiche email",
-    "Supporto base",
-  ],
-  cta: "Inizia con il Base",
-  highlighted: false,
-};
-
-const pianoPro = {
-  name: "Piano Pro",
-  price: "99",
-  features: [
-    "Immobili illimitati",
-    "Dashboard avanzata",
-    "Priorita assegnazione",
-    "Supporto prioritario",
-    "Statistiche avanzate",
-    "Badge Premium",
-  ],
-  cta: "Scegli il Pro",
-  highlighted: true,
-};
+const piani = [
+  {
+    name: "Base",
+    priceFrom: "200",
+    features: [
+      "1 area operativa",
+      "Profilo agenzia",
+      "Visibilita standard",
+      "Dashboard gestione",
+    ],
+    cta: "Inizia con il Base",
+    highlighted: false,
+  },
+  {
+    name: "Premier Local",
+    priceFrom: "390",
+    features: [
+      "Fino a 3 aree",
+      "Priorita su Base",
+      "Meno competitor in zona",
+      "Dashboard avanzata",
+    ],
+    cta: "Scegli Local",
+    highlighted: false,
+  },
+  {
+    name: "Premier City",
+    priceFrom: "690",
+    features: [
+      "Fino a 5 aree",
+      "Visibilita superiore",
+      "Max 2 competitor in zona",
+      "Statistiche avanzate",
+    ],
+    cta: "Scegli City",
+    highlighted: true,
+  },
+  {
+    name: "Premier Prime",
+    priceFrom: "1.100",
+    features: [
+      "Fino a 8 aree",
+      "Accesso zone top",
+      "Presenza molto forte",
+      "Max 2 partner in area",
+      "Supporto prioritario",
+    ],
+    cta: "Scegli Prime",
+    highlighted: false,
+  },
+  {
+    name: "Premier Elite",
+    priceFrom: "1.800",
+    features: [
+      "Fino a 12 aree",
+      "Zone ultra-selezionate",
+      "Massimo prestigio",
+      "Max 2 partner",
+      "Branding premium",
+      "Supporto dedicato",
+    ],
+    cta: "Scegli Elite",
+    highlighted: false,
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
@@ -240,14 +278,15 @@ export default function AgenziePage() {
             Scegli il tuo piano
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
-            Prezzi trasparenti, nessun costo nascosto. Inizia subito.
+            Acquista presenza e priorita nelle zone in cui operi. Prezzi variabili
+            in base al mercato della zona.
           </p>
 
-          <div className="mx-auto mt-12 grid max-w-4xl gap-8 lg:grid-cols-2">
-            {[pianoBase, pianoPro].map((plan) => (
+          <div className="mx-auto mt-12 grid max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {piani.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-md ${
+                className={`relative rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${
                   plan.highlighted
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-border"
@@ -258,26 +297,27 @@ export default function AgenziePage() {
                     Consigliato
                   </span>
                 )}
-                <h3 className="text-xl font-medium text-text" style={{ fontFamily: "var(--font-sans)" }}>
+                <h3 className="text-lg font-medium text-text" style={{ fontFamily: "var(--font-sans)" }}>
                   {plan.name}
                 </h3>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-medium text-primary-dark">
-                    &euro;{plan.price}
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="text-xs text-text-muted">da</span>
+                  <span className="text-2xl font-medium text-primary-dark">
+                    &euro;{plan.priceFrom}
                   </span>
-                  <span className="text-text-muted">/mese</span>
+                  <span className="text-text-muted text-sm">/mese</span>
                 </div>
-                <ul className="mt-6 space-y-3">
+                <ul className="mt-5 space-y-2.5">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-text">
+                    <li key={f} className="flex items-start gap-2 text-sm text-text">
                       <CheckIcon />
-                      {f}
+                      <span>{f}</span>
                     </li>
                   ))}
                 </ul>
                 <a
                   href="#registrazione"
-                  className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold transition-colors ${
+                  className={`mt-6 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary/90"
                       : "border border-primary text-primary hover:bg-primary/5"
@@ -288,6 +328,11 @@ export default function AgenziePage() {
               </div>
             ))}
           </div>
+
+          <p className="text-center text-sm text-text-muted mt-8">
+            Il prezzo varia in base al valore di mercato della zona scelta.
+            Tutti i prezzi sono + IVA.
+          </p>
         </div>
       </section>
 

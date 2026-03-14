@@ -15,7 +15,6 @@ export default function AgencySettingsPage() {
     city: "",
     province: "",
     description: "",
-    coverageRadius: 15,
   });
 
   useEffect(() => {
@@ -31,7 +30,6 @@ export default function AgencySettingsPage() {
             city: data.agency.city || "",
             province: data.agency.province || "",
             description: data.agency.description || "",
-            coverageRadius: data.agency.coverageRadius || 15,
           });
         }
       })
@@ -117,17 +115,6 @@ export default function AgencySettingsPage() {
                   <label className="block text-sm font-medium text-text mb-1">Descrizione</label>
                   <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4}
                     className="w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1">
-                    Raggio di copertura: {form.coverageRadius} km
-                  </label>
-                  <input type="range" min={5} max={50} value={form.coverageRadius}
-                    onChange={(e) => setForm({ ...form, coverageRadius: parseInt(e.target.value) })}
-                    className="w-full accent-primary" />
-                  <div className="flex justify-between text-xs text-text-muted">
-                    <span>5 km</span><span>50 km</span>
-                  </div>
                 </div>
                 <button onClick={handleSave} disabled={saving}
                   className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors">

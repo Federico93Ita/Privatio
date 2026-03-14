@@ -1,6 +1,19 @@
 import { prisma } from "./prisma";
 import { sendEmail, agencyAssignedEmail, agencyNewAssignmentEmail } from "./email";
+import { autoAssignZoneToProperty } from "./zones";
+import { PLANS } from "./stripe";
+import type { PlanKey } from "./stripe";
 
+/**
+ * Assegna un immobile all'agenzia migliore basandosi sul sistema territoriale.
+ *
+ * Logica:
+ * 1. Risolve la zona dell'immobile (auto-detect se non assegnata)
+ * 2. Trova tutte le agenzie con territorio attivo in quella zona
+ * 3. Ordina per: priorità piano (Elite > Prime > City > Local > Base)
+ *    → workload (meno incarichi attivi) → rating (più alto)
+ * 4. Assegna alla migliore candidata
+ */
 export async function assignAgencyToProperty(propertyId: string) {
   const property = await prisma.property.findUnique({
     where: { id: propertyId },
@@ -9,54 +22,54 @@ export async function assignAgencyToProperty(propertyId: string) {
 
   if (!property || property.assignment) return null;
 
-  const agencies = await prisma.agency.findMany({
-    where: { isActive: true },
+  // 1. Risolvi zona
+  let zoneId = property.zoneId;
+  if (!zoneId) {
+    zoneId = await autoAssignZoneToProperty(propertyId);
+  }
+
+  if (!zoneId) {
+    await notifyAdminNoZoneFound(propertyId, property.title);
+    return null;
+  }
+
+  // 2. Trova agenzie con territorio attivo in questa zona
+  const territoryAssignments = await prisma.territoryAssignment.findMany({
+    where: {
+      zoneId,
+      isActive: true,
+      agency: { isActive: true },
+    },
     include: {
-      assignments: {
-        where: { status: "ACTIVE" },
+      agency: {
+        include: {
+          assignments: {
+            where: { status: "ACTIVE" },
+          },
+        },
       },
     },
   });
 
-  // Filter by distance
-  const nearbyAgencies = agencies.filter((agency) => {
-    if (!agency.lat || !agency.lng) return false;
-    const distance = haversineDistance(
-      property.lat,
-      property.lng,
-      agency.lat,
-      agency.lng
-    );
-    return distance <= agency.coverageRadius;
-  });
-
-  // Filter by plan capacity
-  const availableAgencies = nearbyAgencies.filter((agency) => {
-    if (agency.plan === "BASE" && agency.assignments.length >= 5) return false;
-    return true;
-  });
-
-  // Sort by: PRO first, then workload (ascending), then rating (descending)
-  availableAgencies.sort((a, b) => {
-    // PRO agencies get priority over BASE
-    const aPro = a.plan === "PRO" ? 0 : 1;
-    const bPro = b.plan === "PRO" ? 0 : 1;
-    if (aPro !== bPro) return aPro - bPro;
-
-    // Then by workload (fewer active assignments first)
-    const loadDiff = a.assignments.length - b.assignments.length;
-    if (loadDiff !== 0) return loadDiff;
-
-    // Then by rating (higher first)
-    return (b.rating || 0) - (a.rating || 0);
-  });
-
-  if (availableAgencies.length === 0) {
+  if (territoryAssignments.length === 0) {
     await notifyAdminNoAgencyAvailable(propertyId, property.title);
     return null;
   }
 
-  const selectedAgency = availableAgencies[0];
+  // 3. Ordina per priorità piano → workload → rating
+  territoryAssignments.sort((a, b) => {
+    const aPriority = PLANS[a.plan as PlanKey]?.priority || 0;
+    const bPriority = PLANS[b.plan as PlanKey]?.priority || 0;
+    if (aPriority !== bPriority) return bPriority - aPriority;
+
+    const loadDiff = a.agency.assignments.length - b.agency.assignments.length;
+    if (loadDiff !== 0) return loadDiff;
+
+    return (b.agency.rating || 0) - (a.agency.rating || 0);
+  });
+
+  // 4. Assegna alla migliore
+  const selectedAgency = territoryAssignments[0].agency;
 
   const assignment = await prisma.propertyAssignment.create({
     data: {
@@ -91,6 +104,24 @@ export async function assignAgencyToProperty(propertyId: string) {
   return assignment;
 }
 
+async function notifyAdminNoZoneFound(propertyId: string, propertyTitle: string) {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return;
+
+  await sendEmail({
+    to: adminEmail,
+    subject: "Nessuna zona trovata per immobile — Privatio",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>Attenzione: Zona non risolta</h2>
+        <p>L'immobile <strong>${propertyTitle}</strong> (ID: ${propertyId}) non corrisponde a nessuna zona configurata.</p>
+        <p>Verifica l'indirizzo e assegna manualmente la zona dall'admin panel.</p>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin">Vai all'Admin Panel</a>
+      </div>
+    `,
+  });
+}
+
 async function notifyAdminNoAgencyAvailable(propertyId: string, propertyTitle: string) {
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail) return;
@@ -100,34 +131,11 @@ async function notifyAdminNoAgencyAvailable(propertyId: string, propertyTitle: s
     subject: "Nessuna agenzia disponibile — Privatio",
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2>Attenzione: Nessuna agenzia disponibile</h2>
-        <p>L'immobile <strong>${propertyTitle}</strong> (ID: ${propertyId}) non ha agenzie disponibili nella zona.</p>
+        <h2>Attenzione: Nessuna agenzia nella zona</h2>
+        <p>L'immobile <strong>${propertyTitle}</strong> (ID: ${propertyId}) è in una zona senza agenzie partner attive.</p>
         <p>È necessario un intervento manuale per l'assegnazione.</p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin">Vai all'Admin Panel</a>
       </div>
     `,
   });
-}
-
-function haversineDistance(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 6371; // km
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-function toRad(deg: number) {
-  return deg * (Math.PI / 180);
 }

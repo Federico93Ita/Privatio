@@ -108,9 +108,9 @@ export async function POST(
             <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
           </div>
           <div style="padding: 30px; background: #ffffff;">
-            <h2 style="color: #0f172a; margin-top: 0;">Codice OTP per firma contratto</h2>
+            <h2 style="color: #0f172a; margin-top: 0;">Codice OTP per autorizzazione al contatto</h2>
             <p style="color: #64748b;">Ciao ${esc(userName)},</p>
-            <p style="color: #64748b;">Hai richiesto un codice OTP per firmare il contratto di esclusiva per il tuo immobile.</p>
+            <p style="color: #64748b;">Hai richiesto un codice OTP per confermare l'autorizzazione al contatto per il tuo immobile.</p>
             <div style="background: #f8fafc; border: 2px solid #2563eb; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
               <p style="color: #64748b; margin: 0 0 8px 0; font-size: 14px;">Il tuo codice OTP:</p>
               <p style="color: #0f172a; font-size: 36px; font-weight: bold; letter-spacing: 8px; margin: 0;">${otpCode}</p>

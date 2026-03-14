@@ -320,14 +320,14 @@ export default function AgencyPropertyPage({
               </div>
 
               <div className="bg-white rounded-xl p-5 border border-border">
-                <h3 className="font-medium text-primary-dark mb-3">Assegnazione</h3>
+                <h3 className="font-medium text-primary-dark mb-3">Segnalazione</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-text-muted">Data assegnazione</span>
+                    <span className="text-text-muted">Data ricezione</span>
                     <span className="text-primary-dark">{assignment ? formatDate(assignment.assignedAt) : "—"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-muted">Giorni dall&apos;assegnazione</span>
+                    <span className="text-text-muted">Giorni dalla ricezione</span>
                     <span className="text-primary-dark font-medium">
                       {assignment ? Math.floor((Date.now() - new Date(assignment.assignedAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
                     </span>
@@ -528,8 +528,8 @@ export default function AgencyPropertyPage({
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-text-muted mb-4">Nessun contratto ancora creato per questo immobile.</p>
-                <p className="text-sm text-text-muted">Il contratto viene generato quando l&apos;immobile passa allo stato &quot;In trattativa&quot;.</p>
+                <p className="text-text-muted mb-4">Nessuna autorizzazione al contatto ancora creata per questo immobile.</p>
+                <p className="text-sm text-text-muted">L&apos;autorizzazione viene generata quando il venditore conferma il contatto con la tua agenzia.</p>
               </div>
             )}
           </div>

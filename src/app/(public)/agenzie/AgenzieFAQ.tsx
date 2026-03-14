@@ -5,23 +5,23 @@ import { useState } from "react";
 const faqs = [
   {
     q: "Come funziona il modello Privatio per le agenzie?",
-    a: "Privatio raccoglie venditori privati che vogliono vendere senza pagare commissioni. Li qualifichiamo e li assegniamo alla tua agenzia. Tu gestisci la vendita e guadagni una provvigione del 1.5-2% pagata dall'acquirente.",
+    a: "Privatio raccoglie venditori privati che vogliono vendere il proprio immobile. Li qualifichiamo e ti inviamo la segnalazione come lead. Tu contatti il venditore, valuti l'immobile e gestisci l'eventuale incarico in autonomia. Privatio non interviene nella mediazione.",
   },
   {
     q: "Quanto costa l'abbonamento?",
-    a: "Il Piano Base costa €49/mese (max 5 immobili attivi). Il Piano Pro costa €99/mese con immobili illimitati, priorità di assegnazione e supporto dedicato. Nessun costo aggiuntivo sulle provvigioni.",
+    a: "Il costo dipende dal piano scelto e dalla zona in cui operi. I piani vanno da Base (a partire da €200/mese per 1 area) fino a Premier Elite (a partire da €1.800/mese per fino a 12 aree). Il prezzo varia in base al valore di mercato della zona. Nessun costo aggiuntivo sulle vendite.",
   },
   {
-    q: "Come vengono assegnati gli immobili?",
-    a: "Il nostro algoritmo assegna automaticamente gli immobili all'agenzia più vicina e con maggiore disponibilità. Consideriamo la distanza, il carico di lavoro e la valutazione dell'agenzia.",
+    q: "Come ricevo i lead?",
+    a: "Quando un venditore nella tua zona si registra su Privatio, ricevi una segnalazione nella tua dashboard con i dati del venditore e dell'immobile. Sta a te contattarlo e gestire il rapporto professionale.",
   },
   {
-    q: "Il contratto di esclusiva è già firmato dal venditore?",
-    a: "Sì. Prima dell'assegnazione, il venditore firma un contratto di esclusiva digitale della durata di 90 giorni. Lavori con la tranquillità di un mandato in esclusiva.",
+    q: "Privatio e un mediatore immobiliare?",
+    a: "No. Privatio e una piattaforma tecnologica di lead generation. Non svolgiamo attivita di mediazione immobiliare. Ti forniamo segnalazioni di potenziali clienti venditori; il rapporto professionale e contrattuale lo gestisci direttamente tu.",
   },
   {
     q: "Posso disdire l'abbonamento in qualsiasi momento?",
-    a: "Assolutamente sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard. Gli immobili già assegnati rimangono fino alla conclusione del mandato.",
+    a: "Assolutamente si. L'abbonamento e mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard. I lead gia ricevuti restano tuoi.",
   },
 ];
 

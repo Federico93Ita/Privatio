@@ -159,7 +159,7 @@ export default function ReviewPage() {
         {!loading && !assignment && (
           <div className="rounded-xl border border-border bg-white p-6 text-center">
             <p className="text-sm text-text-muted">
-              Non hai un&apos;agenzia assegnata o la vendita non è ancora completata.
+              Non hai ancora un&apos;agenzia partner o la vendita non è ancora completata.
             </p>
           </div>
         )}

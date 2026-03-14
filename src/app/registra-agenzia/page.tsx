@@ -41,7 +41,6 @@ export default function RegistraAgenziaPage() {
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [description, setDescription] = useState("");
-  const [coverageRadius, setCoverageRadius] = useState(15);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -113,7 +112,6 @@ export default function RegistraAgenziaPage() {
           city,
           province,
           description: description || undefined,
-          coverageRadius,
           approvalToken: token,
         }),
       });
@@ -340,26 +338,6 @@ export default function RegistraAgenziaPage() {
                   maxLength={2}
                   className={inputClass}
                 />
-              </div>
-            </div>
-
-            {/* Coverage radius */}
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">
-                Raggio di copertura: <span className="text-primary font-medium">{coverageRadius} km</span>
-              </label>
-              <input
-                type="range"
-                min={5}
-                max={50}
-                step={1}
-                value={coverageRadius}
-                onChange={(e) => setCoverageRadius(Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none bg-border accent-primary cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-text-muted mt-1">
-                <span>5 km</span>
-                <span>50 km</span>
               </div>
             </div>
 

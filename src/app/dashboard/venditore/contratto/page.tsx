@@ -78,7 +78,7 @@ export default function SellerContractPage() {
   return (
     <DashboardLayout role="seller">
       <div className="space-y-6">
-        <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Contratto di Esclusiva</h1>
+        <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Autorizzazione al Contatto</h1>
 
         {loading ? (
           <div className="space-y-4">
@@ -93,20 +93,20 @@ export default function SellerContractPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-primary-dark mb-2">Contratto non ancora disponibile</h3>
+            <h3 className="text-lg font-medium text-primary-dark mb-2">Autorizzazione non ancora disponibile</h3>
             <p className="text-text-muted">
-              Il contratto verrà generato dopo che l&apos;agenzia avrà effettuato il sopralluogo del tuo immobile.
+              L&apos;autorizzazione al contatto verrà generata quando un&apos;agenzia partner sarà disponibile nella tua zona.
             </p>
           </div>
         ) : (
           <div className="space-y-6">
             {/* Contract details */}
             <div className="bg-white rounded-xl p-6 border border-border">
-              <h2 className="font-medium text-primary-dark mb-4">Dettagli Contratto</h2>
+              <h2 className="font-medium text-primary-dark mb-4">Dettagli Autorizzazione</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-text-muted">Tipo</p>
-                  <p className="font-medium">Esclusiva 90 giorni</p>
+                  <p className="font-medium">Autorizzazione al contatto</p>
                 </div>
                 <div>
                   <p className="text-sm text-text-muted">Durata</p>
@@ -171,11 +171,12 @@ export default function SellerContractPage() {
             {/* Sign section */}
             {!contract.sellerSigned && !signed && (
               <div className="bg-white rounded-xl p-6 border border-border">
-                <h2 className="font-medium text-primary-dark mb-4">Firma il Contratto</h2>
+                <h2 className="font-medium text-primary-dark mb-4">Conferma Autorizzazione</h2>
                 <p className="text-sm text-text-muted mb-4">
-                  Firmando il contratto confermi di voler affidare la vendita del tuo immobile
-                  all&apos;agenzia partner assegnata per un periodo di {contract.duration} giorni.
-                  La firma avviene tramite OTP inviato alla tua email (art. 1326 c.c.).
+                  Firmando autorizzi Privatio a condividere i tuoi dati con l&apos;agenzia partner
+                  per essere contattato in merito alla vendita del tuo immobile.
+                  Questa autorizzazione non costituisce un contratto di vendita, un mandato
+                  o un incarico in esclusiva. La conferma avviene tramite OTP inviato alla tua email.
                 </p>
 
                 <label className="flex items-start gap-3 mb-4">
@@ -186,7 +187,7 @@ export default function SellerContractPage() {
                     className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary/30"
                   />
                   <span className="text-sm text-text-muted">
-                    Confermo di aver letto e accettato i termini del contratto di esclusiva
+                    Confermo di aver letto e accettato i termini dell&apos;autorizzazione al contatto
                   </span>
                 </label>
 
@@ -246,8 +247,8 @@ export default function SellerContractPage() {
                 <svg className="w-12 h-12 text-success mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <h3 className="text-lg font-semibold text-success">Contratto firmato</h3>
-                <p className="text-sm text-text-muted mt-1">La tua firma è stata registrata con successo.</p>
+                <h3 className="text-lg font-semibold text-success">Autorizzazione confermata</h3>
+                <p className="text-sm text-text-muted mt-1">La tua autorizzazione è stata registrata con successo. L&apos;agenzia partner ti contatterà a breve.</p>
               </div>
             )}
           </div>

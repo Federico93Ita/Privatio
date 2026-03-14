@@ -127,14 +127,14 @@ export default function AgencyDashboardPage() {
             {!agency.isActive && (
               <div className="bg-accent/10 border border-accent/30 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-medium text-primary-dark">Abbonamento non attivo</h3>
-                  <p className="text-sm text-text-muted">Attiva un piano per iniziare a ricevere immobili.</p>
+                  <h3 className="font-medium text-primary-dark">Nessun territorio attivo</h3>
+                  <p className="text-sm text-text-muted">Scegli i tuoi territori per iniziare a ricevere immobili.</p>
                 </div>
                 <a
-                  href="/dashboard/agenzia/fatturazione"
+                  href="/dashboard/agenzia/territori"
                   className="px-5 py-2.5 bg-accent text-white rounded-lg font-medium hover:bg-accent/85 transition-colors"
                 >
-                  Attiva Piano
+                  Scegli Territori
                 </a>
               </div>
             )}

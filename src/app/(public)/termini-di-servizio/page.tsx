@@ -18,51 +18,53 @@ export default function TerminiPage() {
 
             <h2 className="text-lg font-medium text-text mt-6">1. Descrizione del servizio</h2>
             <p className="text-text-muted">
-              Privatio è una piattaforma digitale che consente ai privati di vendere immobili senza pagare
-              commissioni di agenzia. La piattaforma mette in contatto venditori privati con agenzie
-              immobiliari partner che gestiscono il processo di vendita.
+              Privatio è una piattaforma tecnologica di lead generation che fornisce alle agenzie
+              immobiliari segnalazioni di potenziali clienti venditori. Privatio non svolge attività
+              di mediazione immobiliare ai sensi della Legge 39/1989 e non è parte di alcun rapporto
+              contrattuale tra venditore e agenzia.
             </p>
 
-            <h2 className="text-lg font-medium text-text mt-6">2. Modello commissionale</h2>
+            <h2 className="text-lg font-medium text-text mt-6">2. Modello economico</h2>
             <p className="text-text-muted">
-              Il venditore non paga alcuna commissione a Privatio o alle agenzie partner.
-              L&apos;acquirente paga una commissione compresa tra il 2% e il 2.5% del prezzo di vendita,
-              suddivisa tra l&apos;agenzia partner (1.5%-2%) e Privatio (0.5%).
+              Privatio si sostiene tramite abbonamenti territoriali sottoscritti dalle agenzie partner.
+              Il venditore non paga alcun costo a Privatio. L&apos;eventuale provvigione tra agenzia
+              e cliente è un rapporto diretto tra le parti, in cui Privatio non interviene.
             </p>
 
             <h2 className="text-lg font-medium text-text mt-6">3. Obblighi del venditore</h2>
             <ul className="text-text-muted list-disc pl-6 space-y-1">
               <li>Fornire informazioni veritiere sull&apos;immobile</li>
               <li>Garantire la titolarità o il diritto di vendita dell&apos;immobile</li>
-              <li>Collaborare con l&apos;agenzia assegnata per visite e documentazione</li>
-              <li>Rispettare il contratto di esclusiva firmato</li>
+              <li>Collaborare in buona fede con l&apos;agenzia contattata</li>
             </ul>
 
-            <h2 className="text-lg font-medium text-text mt-6">4. Contratto di esclusiva</h2>
+            <h2 className="text-lg font-medium text-text mt-6">4. Natura del servizio</h2>
             <p className="text-text-muted">
-              Alla pubblicazione dell&apos;immobile, il venditore firma un contratto di esclusiva digitale
-              (art. 1326 c.c.) con l&apos;agenzia partner assegnata, della durata standard di 90 giorni.
-              La firma avviene tramite OTP via email (firma semplice).
+              Privatio fornisce un servizio tecnologico di segnalazione lead. Eventuali accordi,
+              incarichi o contratti tra venditore e agenzia sono stipulati direttamente tra le parti,
+              senza il coinvolgimento di Privatio. L&apos;autorizzazione al contatto firmata dal
+              venditore consente esclusivamente la condivisione dei dati con l&apos;agenzia partner.
             </p>
 
             <h2 className="text-lg font-medium text-text mt-6">5. Obblighi delle agenzie partner</h2>
             <ul className="text-text-muted list-disc pl-6 space-y-1">
               <li>Mantenere un abbonamento attivo sulla piattaforma</li>
-              <li>Gestire professionalmente gli immobili assegnati</li>
-              <li>Effettuare sopralluoghi, foto e pubblicazione annunci</li>
+              <li>Gestire professionalmente i lead ricevuti</li>
+              <li>Contattare i venditori segnalati in modo tempestivo</li>
               <li>Comunicare regolarmente con il venditore</li>
             </ul>
 
             <h2 className="text-lg font-medium text-text mt-6">6. Limitazione di responsabilità</h2>
             <p className="text-text-muted">
-              Privatio agisce come intermediario tecnologico e non è parte nelle trattative di compravendita.
-              Privatio non garantisce la vendita dell&apos;immobile né i tempi di vendita.
+              Privatio è una piattaforma tecnologica e non svolge attività di mediazione immobiliare.
+              Non è parte nelle trattative di compravendita né in alcun rapporto contrattuale tra
+              venditore e agenzia. Privatio non garantisce la vendita dell&apos;immobile né i tempi di vendita.
             </p>
 
             <h2 className="text-lg font-medium text-text mt-6">7. Recesso</h2>
             <p className="text-text-muted">
-              L&apos;utente può cancellare il proprio account in qualsiasi momento scrivendo a supporto@privatio.it.
-              Il ritiro di un immobile è soggetto ai termini del contratto di esclusiva.
+              L&apos;utente può cancellare il proprio account e ritirare il proprio immobile
+              in qualsiasi momento scrivendo a supporto@privatio.it.
             </p>
 
             <h2 className="text-lg font-medium text-text mt-6">8. Foro competente</h2>

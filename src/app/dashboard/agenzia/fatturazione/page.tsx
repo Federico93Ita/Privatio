@@ -72,24 +72,14 @@ export default function AgencyBillingPage() {
       .finally(() => setBillingLoading(false));
   }, []);
 
-  async function handleSubscribe(plan: "BASE" | "PRO") {
-    setCheckoutLoading(true);
-    try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setCheckoutLoading(false);
-    }
-  }
+  const [territories, setTerritories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/dashboard/agency/territories")
+      .then((r) => r.json())
+      .then((data) => setTerritories(data.territories || []))
+      .catch(console.error);
+  }, []);
 
   async function handleManageSubscription() {
     setPortalLoading(true);
@@ -173,65 +163,79 @@ export default function AgencyBillingPage() {
           </div>
         ) : (
           <>
-            {/* Current plan */}
+            {/* Current plan & territories */}
             <div className="bg-white rounded-xl p-6 border border-border">
               <h2 className="font-medium text-primary-dark mb-4">
-                Piano Attuale
+                Piano e Territori
               </h2>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        agency?.plan === "PRO"
-                          ? "bg-primary/10 text-primary"
-                          : "bg-bg-soft text-text-muted"
-                      }`}
-                    >
-                      Piano {agency?.plan || "—"}
-                    </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        agency?.isActive
-                          ? "bg-success/10 text-success"
-                          : "bg-error/10 text-error"
-                      }`}
-                    >
-                      {agency?.isActive ? "Attivo" : "Non attivo"}
-                    </span>
-                  </div>
-                  <p className="text-text-muted mt-2">
-                    {agency?.plan === "PRO"
-                      ? "Immobili illimitati — €99/mese"
-                      : "Max 5 immobili — €49/mese"}
-                  </p>
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="px-3 py-1 rounded-full text-sm font-semibold bg-primary/10 text-primary">
+                    {agency?.plan === "PREMIER_ELITE" ? "Premier Elite" :
+                     agency?.plan === "PREMIER_PRIME" ? "Premier Prime" :
+                     agency?.plan === "PREMIER_CITY" ? "Premier City" :
+                     agency?.plan === "PREMIER_LOCAL" ? "Premier Local" : "Base"}
+                  </span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      agency?.isActive
+                        ? "bg-success/10 text-success"
+                        : "bg-error/10 text-error"
+                    }`}
+                  >
+                    {agency?.isActive ? "Attivo" : "Non attivo"}
+                  </span>
                 </div>
-                {!agency?.isActive ? (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleSubscribe("BASE")}
-                      disabled={checkoutLoading}
-                      className="px-5 py-2.5 border border-primary text-primary rounded-lg font-medium hover:bg-primary/5 transition-colors disabled:opacity-50"
-                    >
-                      Base — €49/mese
-                    </button>
-                    <button
-                      onClick={() => handleSubscribe("PRO")}
-                      disabled={checkoutLoading}
-                      className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors disabled:opacity-50"
-                    >
-                      Pro — €99/mese
-                    </button>
+
+                {/* Territori attivi */}
+                {territories.filter((t: any) => t.isActive).length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-text-muted">Territori attivi:</p>
+                    {territories
+                      .filter((t: any) => t.isActive)
+                      .map((t: any) => (
+                        <div key={t.id} className="flex items-center justify-between py-2 px-3 bg-bg-soft rounded-lg text-sm">
+                          <span className="text-text">{t.zone?.name || "—"}</span>
+                          <span className="text-text-muted">
+                            {new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(t.monthlyPrice / 100)}/mese
+                          </span>
+                        </div>
+                      ))}
+                    <p className="text-sm font-medium text-text pt-1">
+                      Totale mensile:{" "}
+                      {new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(
+                        territories
+                          .filter((t: any) => t.isActive)
+                          .reduce((sum: number, t: any) => sum + t.monthlyPrice, 0) / 100
+                      )}
+                    </p>
                   </div>
                 ) : (
-                  <button
-                    onClick={handleManageSubscription}
-                    disabled={portalLoading}
-                    className="px-5 py-2.5 border border-border text-text rounded-lg font-medium hover:bg-bg-soft transition-colors disabled:opacity-50"
-                  >
-                    {portalLoading ? "Caricamento..." : "Gestisci abbonamento"}
-                  </button>
+                  <p className="text-text-muted text-sm">
+                    Nessun territorio attivo.{" "}
+                    <a href="/dashboard/agenzia/territori" className="text-primary hover:underline">
+                      Scegli i tuoi territori
+                    </a>
+                  </p>
                 )}
+
+                <div className="flex gap-3 pt-2">
+                  <a
+                    href="/dashboard/agenzia/territori"
+                    className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors text-sm"
+                  >
+                    Gestisci Territori
+                  </a>
+                  {agency?.isActive && (
+                    <button
+                      onClick={handleManageSubscription}
+                      disabled={portalLoading}
+                      className="px-5 py-2.5 border border-border text-text rounded-lg font-medium hover:bg-bg-soft transition-colors disabled:opacity-50 text-sm"
+                    >
+                      {portalLoading ? "Caricamento..." : "Gestisci pagamento"}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -502,10 +506,10 @@ export default function AgencyBillingPage() {
               )}
             </div>
 
-            {/* Commissions */}
+            {/* Completed Sales */}
             <div className="bg-white rounded-xl p-6 border border-border">
               <h2 className="font-medium text-primary-dark mb-4">
-                Provvigioni Maturate
+                Vendite Completate
               </h2>
               {completedSales.length === 0 ? (
                 <p className="text-text-muted text-center py-4">
@@ -523,9 +527,6 @@ export default function AgencyBillingPage() {
                           Prezzo Vendita
                         </th>
                         <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
-                          Provvigione (1.5%)
-                        </th>
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
                           Stato
                         </th>
                       </tr>
@@ -539,20 +540,16 @@ export default function AgencyBillingPage() {
                           <td className="py-3 px-3 text-sm font-semibold">
                             {formatPrice(sale.property.price)}
                           </td>
-                          <td className="py-3 px-3 text-sm font-semibold text-success">
-                            {formatPrice(
-                              Math.round(sale.property.price * 0.015)
-                            )}
-                          </td>
                           <td className="py-3 px-3">
-                            <span className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
-                              In attesa
+                            <span className="text-xs px-2 py-1 rounded-full bg-success/10 text-success">
+                              Completata
                             </span>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                  <p className="text-xs text-text-muted mt-3">La provvigione viene concordata direttamente tra te e il cliente. Privatio non interviene.</p>
                 </div>
               )}
             </div>
