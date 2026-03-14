@@ -39,7 +39,10 @@ interface FormData {
   telefono: string;
   password: string;
   confermaPassword: string;
+  // Step 5 - Termini e condizioni
   accettaTermini: boolean;
+  accettaPrivacy: boolean;
+  accettaMarketing: boolean;
 }
 
 interface PhotoItem {
@@ -76,9 +79,11 @@ const INITIAL_FORM: FormData = {
   password: "",
   confermaPassword: "",
   accettaTermini: false,
+  accettaPrivacy: false,
+  accettaMarketing: false,
 };
 
-const STEP_LABELS = ["Immobile", "Prezzo", "Foto", "I tuoi dati"] as const;
+const STEP_LABELS = ["Immobile", "Prezzo", "Foto", "I tuoi dati", "Termini"] as const;
 
 const TIPI_IMMOBILE = [
   "Appartamento",
@@ -298,8 +303,13 @@ export default function VendiPage() {
         errs.confermaPassword = "Conferma la password";
       else if (form.password !== form.confermaPassword)
         errs.confermaPassword = "Le password non coincidono";
+    }
+
+    if (s === 5) {
       if (!form.accettaTermini)
-        errs.accettaTermini = "Devi accettare la Privacy Policy e i Termini di Servizio";
+        errs.accettaTermini = "Devi accettare i Termini e Condizioni del Servizio";
+      if (!form.accettaPrivacy)
+        errs.accettaPrivacy = "Devi accettare l'Informativa sulla Privacy";
     }
 
     setErrors(errs);
@@ -309,7 +319,7 @@ export default function VendiPage() {
   /* ---- Navigation ---- */
 
   function next() {
-    if (validateStep(step)) setStep((s) => Math.min(s + 1, 4));
+    if (validateStep(step)) setStep((s) => Math.min(s + 1, 5));
   }
 
   function prev() {
@@ -320,7 +330,7 @@ export default function VendiPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!validateStep(4)) return;
+    if (!validateStep(5)) return;
 
     setSubmitting(true);
     setSubmitError("");
@@ -335,6 +345,10 @@ export default function VendiPage() {
           email: form.email,
           phone: form.telefono,
           password: form.password,
+          accettaTermini: form.accettaTermini,
+          accettaPrivacy: form.accettaPrivacy,
+          accettaMarketing: form.accettaMarketing,
+          termsVersion: "1.0",
         }),
       });
 
@@ -384,6 +398,12 @@ export default function VendiPage() {
         propertyPayload.append("statoImmobile", form.statoImmobile);
       if (form.riscaldamento)
         propertyPayload.append("riscaldamento", form.riscaldamento);
+
+      // Consent metadata
+      propertyPayload.append("accettaTermini", String(form.accettaTermini));
+      propertyPayload.append("accettaPrivacy", String(form.accettaPrivacy));
+      propertyPayload.append("accettaMarketing", String(form.accettaMarketing));
+      propertyPayload.append("termsVersion", "1.0");
 
       photos.forEach((p, i) => {
         propertyPayload.append("foto", p.file);
@@ -1154,39 +1174,252 @@ export default function VendiPage() {
           <FieldError field="confermaPassword" />
         </div>
 
-        {/* Accetta termini */}
-        <div>
-          <label className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              checked={form.accettaTermini}
-              onChange={(e) =>
-                updateField("accettaTermini", e.target.checked)
-              }
-              className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
-            />
-            <span className="text-sm text-text-muted">
-              Accetto la{" "}
-              <Link
-                href="/privacy-policy"
-                className="font-medium text-primary underline hover:text-primary-dark"
-                target="_blank"
-              >
-                Privacy Policy
-              </Link>{" "}
-              e i{" "}
-              <Link
-                href="/termini-di-servizio"
-                className="font-medium text-primary underline hover:text-primary-dark"
-                target="_blank"
-              >
-                Termini di Servizio
-              </Link>
-              <span className="ml-0.5 text-error">*</span>
-            </span>
-          </label>
-          <FieldError field="accettaTermini" />
+      </div>
+    );
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  Step 5 – Termini e condizioni                                      */
+  /* ------------------------------------------------------------------ */
+
+  function renderStep5() {
+    return (
+      <div className="space-y-6">
+        {/* Contract text in scrollable container */}
+        <div className="rounded-xl border border-border bg-bg-soft p-1">
+          <div className="h-[400px] overflow-y-auto rounded-lg bg-white p-5 text-sm leading-relaxed text-text">
+            <h3 className="mb-4 text-center text-base font-semibold text-primary-dark">
+              TERMINI E CONDIZIONI DEL SERVIZIO PRIVATIO
+            </h3>
+            <p className="mb-3 text-xs text-text-muted text-center">
+              Versione 1.0 — Ultimo aggiornamento: 14 marzo 2025
+            </p>
+
+            <p className="mb-4">
+              Il presente documento disciplina i termini e le condizioni di utilizzo del servizio offerto dalla piattaforma
+              Privatio (di seguito &quot;Piattaforma&quot;), accessibile tramite il sito web <strong>privatio.it</strong>.
+              L&apos;accettazione dei presenti termini è condizione necessaria per l&apos;utilizzo del servizio.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 1 — Natura del servizio
+            </h4>
+            <p className="mb-2">
+              1.1 — Privatio è una piattaforma tecnologica che consente ai proprietari di immobili (di seguito &quot;Venditori&quot;) di
+              pubblicare informazioni relative ai propri immobili in vendita e di consultare un elenco di agenzie immobiliari
+              convenzionate (di seguito &quot;Agenzie Partner&quot;) operanti nella zona dell&apos;immobile.
+            </p>
+            <p className="mb-2">
+              1.2 — Il servizio di Privatio si articola in due fasi:
+            </p>
+            <ul className="mb-2 ml-4 list-disc space-y-1">
+              <li><strong>Fase 1 — Contatto diretto:</strong> Il Venditore, dopo aver pubblicato l&apos;immobile, può consultare la lista delle Agenzie Partner nella zona dell&apos;immobile e contattarle direttamente.</li>
+              <li><strong>Fase 2 — Condivisione automatica:</strong> Qualora il Venditore non contatti alcuna Agenzia Partner entro 48 ore dalla pubblicazione, i dati dell&apos;immobile e del Venditore saranno automaticamente condivisi con le Agenzie Partner operanti nella zona, che potranno contattare il Venditore.</li>
+            </ul>
+            <p className="mb-4">
+              1.3 — Privatio <strong>non è un&apos;agenzia immobiliare</strong>, non svolge attività di mediazione immobiliare ai sensi della
+              Legge 39/1989, non partecipa alle trattative di compravendita e non percepisce provvigioni sulle transazioni concluse.
+              Il rapporto contrattuale tra Venditore e Agenzia Partner è regolato esclusivamente tra le parti.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 2 — Registrazione e pubblicazione
+            </h4>
+            <p className="mb-2">
+              2.1 — Per utilizzare il servizio, il Venditore deve registrarsi sulla Piattaforma fornendo dati veritieri e completi
+              e pubblicare le informazioni relative all&apos;immobile in vendita.
+            </p>
+            <p className="mb-4">
+              2.2 — La pubblicazione dell&apos;immobile sulla Piattaforma è <strong>gratuita</strong> per il Venditore e non comporta alcun costo né commissione.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 3 — Visibilità dei dati del Venditore
+            </h4>
+            <p className="mb-2">
+              3.1 — <strong>Fase 1 (0–48 ore):</strong> Dopo la pubblicazione, i dati dell&apos;immobile (indirizzo, caratteristiche, foto e prezzo richiesto) saranno
+              visibili alle Agenzie Partner nella zona. I dati personali del Venditore (nome, email, telefono) <strong>non saranno condivisi</strong> con le Agenzie Partner, salvo
+              che il Venditore scelga autonomamente di contattare un&apos;Agenzia.
+            </p>
+            <p className="mb-4">
+              3.2 — <strong>Fase 2 (dopo 48 ore):</strong> Qualora il Venditore non contatti alcuna Agenzia Partner entro 48 ore dalla pubblicazione,
+              i suoi dati personali saranno automaticamente condivisi con le Agenzie Partner operanti nella zona dell&apos;immobile, che potranno
+              contattare il Venditore per proporre i propri servizi.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 4 — Diritto di rimozione
+            </h4>
+            <p className="mb-4">
+              4.1 — Il Venditore può in qualsiasi momento richiedere la rimozione del proprio immobile e dei propri dati dalla Piattaforma,
+              scrivendo a <strong>info@privatio.it</strong> o tramite la propria dashboard. La rimozione sarà effettuata entro 48 ore dalla richiesta.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 5 — Obblighi del Venditore
+            </h4>
+            <p className="mb-2">Il Venditore si impegna a:</p>
+            <ul className="mb-4 ml-4 list-disc space-y-1">
+              <li>Fornire dati veritieri, completi e aggiornati relativi all&apos;immobile e alla propria identità;</li>
+              <li>Non pubblicare contenuti illeciti, offensivi, ingannevoli o lesivi dei diritti di terzi;</li>
+              <li>Mantenere riservate le proprie credenziali di accesso alla Piattaforma;</li>
+              <li>Comunicare tempestivamente eventuali variazioni dei dati forniti (vendita completata, variazione di prezzo, ecc.).</li>
+            </ul>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 6 — Limitazione di responsabilità
+            </h4>
+            <p className="mb-2">
+              6.1 — Privatio non garantisce la conclusione della vendita dell&apos;immobile né la qualità dei servizi offerti dalle Agenzie Partner.
+            </p>
+            <p className="mb-4">
+              6.2 — Privatio non è responsabile per eventuali danni diretti o indiretti derivanti dall&apos;utilizzo della Piattaforma,
+              dal rapporto tra Venditore e Agenzia Partner, o dalla mancata conclusione di una trattativa.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 7 — Proprietà intellettuale
+            </h4>
+            <p className="mb-4">
+              Tutti i contenuti della Piattaforma (testi, grafiche, loghi, software) sono di proprietà esclusiva di Privatio o dei suoi licenzianti
+              e sono protetti dalle leggi sulla proprietà intellettuale. È vietata la riproduzione non autorizzata.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 8 — Durata e recesso
+            </h4>
+            <p className="mb-2">
+              8.1 — L&apos;account del Venditore resta attivo fino alla cancellazione volontaria o alla rimozione per violazione dei presenti termini.
+            </p>
+            <p className="mb-4">
+              8.2 — Il Venditore può recedere in qualsiasi momento cancellando il proprio account dalla dashboard o scrivendo a info@privatio.it.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 9 — Modifiche ai termini
+            </h4>
+            <p className="mb-4">
+              Privatio si riserva il diritto di modificare i presenti termini in qualsiasi momento. Le modifiche saranno comunicate tramite
+              la Piattaforma e/o via email. L&apos;utilizzo continuato del servizio dopo la comunicazione delle modifiche costituisce accettazione
+              delle stesse.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 10 — Legge applicabile e foro competente
+            </h4>
+            <p className="mb-4">
+              I presenti termini sono regolati dalla legge italiana. Per qualsiasi controversia sarà competente il Foro di Torino, salvo
+              il foro inderogabile del consumatore ai sensi del D.Lgs. 206/2005.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 11 — Accettazione digitale
+            </h4>
+            <p className="mb-4">
+              L&apos;accettazione dei presenti termini avviene tramite la selezione delle apposite caselle di controllo durante la procedura di
+              pubblicazione dell&apos;immobile. L&apos;accettazione ha pieno valore legale ai sensi del D.Lgs. 82/2005 (Codice dell&apos;Amministrazione
+              Digitale). Al momento dell&apos;accettazione vengono registrati: indirizzo IP, data e ora, indirizzo email e versione dei termini.
+            </p>
+
+            <h4 className="mb-2 mt-5 font-semibold text-primary-dark">
+              Art. 12 — Approvazione specifica ai sensi degli artt. 1341 e 1342 c.c.
+            </h4>
+            <p className="mb-4">
+              Ai sensi e per gli effetti degli artt. 1341 e 1342 del Codice Civile, il Venditore dichiara di aver letto, compreso e
+              specificamente approvato le seguenti clausole: Art. 3 (Visibilità dei dati — condivisione automatica dopo 48 ore),
+              Art. 6 (Limitazione di responsabilità), Art. 9 (Modifiche unilaterali ai termini), Art. 10 (Foro competente).
+            </p>
+
+            <hr className="my-6 border-border" />
+
+            <h3 className="mb-4 text-center text-base font-semibold text-primary-dark">
+              INFORMATIVA SULLA PRIVACY
+            </h3>
+            <p className="mb-2">
+              Ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003, Privatio, in qualità di Titolare del trattamento,
+              informa che i dati personali forniti saranno trattati per le seguenti finalità:
+            </p>
+            <ul className="mb-4 ml-4 list-disc space-y-1">
+              <li><strong>Erogazione del servizio:</strong> pubblicazione dell&apos;immobile, gestione dell&apos;account, messa a disposizione dei dati alle Agenzie Partner (secondo il meccanismo delle due fasi descritto all&apos;Art. 3);</li>
+              <li><strong>Comunicazioni di servizio:</strong> notifiche relative allo stato dell&apos;immobile, aggiornamenti e comunicazioni tecniche;</li>
+              <li><strong>Marketing (facoltativo):</strong> invio di comunicazioni promozionali, newsletter e offerte personalizzate (solo con consenso esplicito).</li>
+            </ul>
+            <p className="mb-2">
+              <strong>Base giuridica:</strong> esecuzione del contratto (Art. 6.1.b GDPR) per le finalità di servizio; consenso (Art. 6.1.a GDPR) per le finalità di marketing.
+            </p>
+            <p className="mb-2">
+              <strong>Conservazione:</strong> i dati saranno conservati per la durata dell&apos;account e per 12 mesi successivi alla cancellazione, salvo obblighi di legge.
+            </p>
+            <p className="mb-4">
+              <strong>Diritti dell&apos;interessato:</strong> il Venditore può esercitare i diritti di accesso, rettifica, cancellazione, portabilità e opposizione
+              scrivendo a <strong>privacy@privatio.it</strong>.
+            </p>
+          </div>
         </div>
+
+        {/* Checkboxes */}
+        <div className="space-y-4">
+          {/* Termini e Condizioni (obbligatorio) */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.accettaTermini}
+                onChange={(e) => updateField("accettaTermini", e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <span className="text-sm text-text">
+                Dichiaro di aver letto, compreso e accettato i{" "}
+                <strong>Termini e Condizioni del Servizio</strong>, incluse le clausole
+                specificamente approvate ai sensi degli artt. 1341 e 1342 c.c. (Art. 3, Art. 6, Art. 9, Art. 10)
+                <span className="ml-0.5 text-error">*</span>
+              </span>
+            </label>
+            <FieldError field="accettaTermini" />
+          </div>
+
+          {/* Privacy Policy (obbligatorio) */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.accettaPrivacy}
+                onChange={(e) => updateField("accettaPrivacy", e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <span className="text-sm text-text">
+                Dichiaro di aver letto e compreso l&apos;<strong>Informativa sulla Privacy</strong> e acconsento
+                al trattamento dei miei dati personali per le finalità di erogazione del servizio e
+                comunicazioni di servizio, inclusa la condivisione con le Agenzie Partner secondo le
+                modalità descritte all&apos;Art. 3
+                <span className="ml-0.5 text-error">*</span>
+              </span>
+            </label>
+            <FieldError field="accettaPrivacy" />
+          </div>
+
+          {/* Marketing (facoltativo) */}
+          <div>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.accettaMarketing}
+                onChange={(e) => updateField("accettaMarketing", e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <span className="text-sm text-text-muted">
+                Acconsento al trattamento dei miei dati per finalità di <strong>marketing</strong> (newsletter,
+                offerte personalizzate e comunicazioni promozionali). <em>Facoltativo.</em>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <p className="text-xs text-text-muted">
+          <span className="text-error">*</span> Campi obbligatori. Procedendo con la pubblicazione,
+          verranno registrati il tuo indirizzo IP, data e ora di accettazione, indirizzo email e la versione
+          dei termini accettati, ai sensi dell&apos;Art. 11 delle Condizioni del Servizio.
+        </p>
       </div>
     );
   }
@@ -1301,6 +1534,7 @@ export default function VendiPage() {
               {step === 2 && "Il prezzo"}
               {step === 3 && "Le foto"}
               {step === 4 && "I tuoi dati"}
+              {step === 5 && "Termini e condizioni"}
             </h2>
 
             {/* Step content */}
@@ -1308,6 +1542,7 @@ export default function VendiPage() {
             {step === 2 && renderStep2()}
             {step === 3 && renderStep3()}
             {step === 4 && renderStep4()}
+            {step === 5 && renderStep5()}
 
             {/* Submit error */}
             {submitError && (
@@ -1343,7 +1578,7 @@ export default function VendiPage() {
                 <div />
               )}
 
-              {step < 4 ? (
+              {step < 5 ? (
                 <button
                   type="button"
                   onClick={next}

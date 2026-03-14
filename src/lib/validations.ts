@@ -89,4 +89,9 @@ export const registerSchema = z.object({
   phone: z.string().min(8, "Telefono richiesto"),
   password: z.string().min(8, "Password minimo 8 caratteri"),
   role: z.enum(["SELLER", "BUYER"]).optional(),
+  // Consent tracking
+  accettaTermini: z.boolean().optional(),
+  accettaPrivacy: z.boolean().optional(),
+  accettaMarketing: z.boolean().optional(),
+  termsVersion: z.string().optional(),
 });

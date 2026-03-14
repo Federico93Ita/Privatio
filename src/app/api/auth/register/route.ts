@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, phone, password, role } = parsed.data;
+    const { name, email, phone, password, role, accettaTermini, accettaPrivacy, accettaMarketing, termsVersion } = parsed.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -35,6 +35,13 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Extract IP for consent tracking
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("x-real-ip")
+      || "unknown";
+
+    const now = new Date();
+
     const user = await prisma.user.create({
       data: {
         name,
@@ -42,6 +49,11 @@ export async function POST(req: NextRequest) {
         phone,
         password: hashedPassword,
         role: role || "SELLER",
+        ...(accettaTermini && { termsAcceptedAt: now }),
+        ...(accettaPrivacy && { privacyAcceptedAt: now }),
+        marketingConsent: accettaMarketing || false,
+        termsVersion: termsVersion || null,
+        termsAcceptedIp: accettaTermini ? ip : null,
       },
     });
 

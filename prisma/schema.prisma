@@ -30,6 +30,12 @@ model User {
   favorites         Favorite[]
   savedSearches     SavedSearch[]
   reviews           Review[]
+  // Consent tracking
+  termsAcceptedAt    DateTime?
+  privacyAcceptedAt  DateTime?
+  marketingConsent   Boolean   @default(false)
+  termsVersion       String?
+  termsAcceptedIp    String?
 }
 
 enum Role {
