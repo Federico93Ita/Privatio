@@ -480,7 +480,7 @@ export default function VendiPage() {
       if (!propertyRes.ok) {
         const data = await propertyRes.json().catch(() => ({}));
         throw new Error(
-          data.message || "Errore durante la pubblicazione dell'immobile.",
+          data.error || "Errore durante la pubblicazione dell'immobile.",
         );
       }
 

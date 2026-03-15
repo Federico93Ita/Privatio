@@ -207,6 +207,7 @@ export async function POST(req: NextRequest) {
     // Validate with Zod schema
     const parsed = propertySchema.safeParse(propertyData);
     if (!parsed.success) {
+      console.error("Property validation error:", parsed.error.flatten());
       return NextResponse.json(
         { error: "Dati non validi", details: parsed.error.flatten() },
         { status: 400 }

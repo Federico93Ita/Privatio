@@ -47,7 +47,10 @@ export async function PATCH(
 
       const registrationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/registra-agenzia?token=${approvalToken}`;
       const emailContent = agencyApprovedEmail(lead.contactName, lead.agencyName, registrationUrl);
-      await sendEmail({ to: lead.email, ...emailContent });
+      const approveEmailResult = await sendEmail({ to: lead.email, ...emailContent });
+      if (!approveEmailResult.success) {
+        console.error("Failed to send agency approval email:", approveEmailResult.error);
+      }
 
       return NextResponse.json({ message: "Lead approvato, email inviata" });
     }
@@ -59,7 +62,10 @@ export async function PATCH(
     });
 
     const emailContent = agencyRejectedEmail(lead.contactName, lead.agencyName);
-    await sendEmail({ to: lead.email, ...emailContent });
+    const rejectEmailResult = await sendEmail({ to: lead.email, ...emailContent });
+    if (!rejectEmailResult.success) {
+      console.error("Failed to send agency rejection email:", rejectEmailResult.error);
+    }
 
     return NextResponse.json({ message: "Lead rifiutato, email inviata" });
   } catch (error) {

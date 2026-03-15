@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Confirmation email to agency
-    await sendEmail({
+    const confirmResult = await sendEmail({
       to: parsed.data.email,
       subject: "Richiesta ricevuta — Privatio Partner",
       html: `
@@ -40,11 +40,15 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     });
+    if (!confirmResult.success) {
+      console.error("Failed to send agency confirmation email:", confirmResult.error);
+    }
 
     // Notify admin
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
-      await sendEmail({
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.vercel.app";
+      const adminResult = await sendEmail({
         to: adminEmail,
         subject: `Nuovo lead agenzia: ${parsed.data.agencyName} — ${parsed.data.city}`,
         html: `
@@ -57,9 +61,15 @@ export async function POST(req: NextRequest) {
             <p><strong>Città:</strong> ${parsed.data.city} (${parsed.data.province})</p>
             ${parsed.data.agentCount ? `<p><strong>Agenti:</strong> ${parsed.data.agentCount}</p>` : ""}
             ${parsed.data.message ? `<p><strong>Messaggio:</strong> ${parsed.data.message}</p>` : ""}
+            <p style="margin-top: 20px;">
+              <a href="${appUrl}/admin?tab=leads" style="display: inline-block; padding: 10px 20px; background: #0f172a; color: white; text-decoration: none; border-radius: 6px;">Gestisci Lead</a>
+            </p>
           </div>
         `,
       });
+      if (!adminResult.success) {
+        console.error("Failed to send admin notification email:", adminResult.error);
+      }
     }
 
     return NextResponse.json({ lead: { id: lead.id } }, { status: 201 });
