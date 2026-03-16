@@ -158,8 +158,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Map Italian display names to enum values
+    const TYPE_MAP: Record<string, string> = {
+      "Appartamento": "APPARTAMENTO",
+      "Villa": "VILLA",
+      "Casa Indipendente": "CASA_INDIPENDENTE",
+      "Attico": "ATTICO",
+      "Mansarda": "MANSARDA",
+      "Loft": "LOFT",
+      "Terreno": "TERRENO",
+      "Negozio": "NEGOZIO",
+      "Ufficio": "UFFICIO",
+    };
+    const rawType = formData.get("tipoImmobile") as string;
+    const mappedType = TYPE_MAP[rawType] || rawType.toUpperCase().replace(/ /g, "_");
+
     const propertyData = {
-      type: formData.get("tipoImmobile") as string,
+      type: mappedType,
       address,
       city,
       province,
