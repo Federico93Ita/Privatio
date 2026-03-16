@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(data.password, 12);
 
     // Geocode agency address for matchmaking
-    const coords = await geocodeAddress(data.address, data.city, data.province);
+    const geocodeResult = await geocodeAddress(data.address, data.city, data.province);
 
     // Create agency and admin user in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
           city: data.city,
           province: data.province,
           description: data.description,
-          lat: coords?.lat ?? null,
-          lng: coords?.lng ?? null,
+          lat: geocodeResult.ok ? geocodeResult.lat : null,
+          lng: geocodeResult.ok ? geocodeResult.lng : null,
           plan: "BASE",
           isActive: false, // activated after payment
         },

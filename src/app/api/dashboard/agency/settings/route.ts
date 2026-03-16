@@ -55,13 +55,13 @@ export async function PUT(req: NextRequest) {
 
     let geoData: { lat?: number | null; lng?: number | null } = {};
     if (addressChanged) {
-      const coords = await geocodeAddress(
+      const geocodeResult = await geocodeAddress(
         parsed.data.address,
         parsed.data.city,
         parsed.data.province
       );
-      geoData = coords
-        ? { lat: coords.lat, lng: coords.lng }
+      geoData = geocodeResult.ok
+        ? { lat: geocodeResult.lat, lng: geocodeResult.lng }
         : { lat: null, lng: null };
     }
 

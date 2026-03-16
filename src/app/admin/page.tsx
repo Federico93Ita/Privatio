@@ -443,18 +443,37 @@ export default function AdminDashboard() {
                           <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Contatto</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Email</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Zona</th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Zone Preferite</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Data</th>
                           <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Azioni</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {agencyLeads.map((lead: any) => (
+                        {agencyLeads.map((lead: any) => {
+                          const prefZones = Array.isArray(lead.preferredZones) ? lead.preferredZones : [];
+                          return (
                           <tr key={lead.id} className="border-b border-border hover:bg-bg-soft">
-                            <td className="py-3 px-4 text-sm font-medium">{lead.agencyName}</td>
+                            <td className="py-3 px-4">
+                              <p className="text-sm font-medium">{lead.agencyName}</p>
+                              {lead.address && <p className="text-xs text-text-muted">{lead.address}</p>}
+                            </td>
                             <td className="py-3 px-4 text-sm">{lead.contactName}</td>
                             <td className="py-3 px-4 text-sm text-text-muted">{lead.email}</td>
                             <td className="py-3 px-4 text-sm">{lead.city} ({lead.province})</td>
+                            <td className="py-3 px-4">
+                              {prefZones.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {prefZones.map((z: any, i: number) => (
+                                    <span key={i} className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                                      {z.zoneName} <span className="text-primary/60">{z.plan?.replace(/_/g, " ")}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-text-muted">—</span>
+                              )}
+                            </td>
                             <td className="py-3 px-4">
                               <span className={`text-xs px-2 py-1 rounded-full ${
                                 lead.status === "NEW" ? "bg-success/10 text-success" :
@@ -494,7 +513,8 @@ export default function AdminDashboard() {
                               )}
                             </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                     {agencyLeads.length === 0 && (

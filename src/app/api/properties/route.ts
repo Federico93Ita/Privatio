@@ -144,10 +144,16 @@ export async function POST(req: NextRequest) {
     const province = (formData.get("provincia") as string)?.toUpperCase();
 
     // Geocode address
-    const coords = await geocodeAddress(address, city, province);
-    if (!coords) {
+    const geocodeResult = await geocodeAddress(address, city, province);
+    if (!geocodeResult.ok) {
+      const errorMessages: Record<string, string> = {
+        API_KEY_MISSING: "Servizio di geolocalizzazione non configurato. Contatta l'assistenza.",
+        API_KEY_INVALID: "Servizio di geolocalizzazione temporaneamente non disponibile. Riprova più tardi.",
+        ADDRESS_NOT_FOUND: "Impossibile determinare le coordinate dell'indirizzo. Verifica l'indirizzo inserito.",
+        NETWORK_ERROR: "Errore di connessione al servizio di geolocalizzazione. Riprova.",
+      };
       return NextResponse.json(
-        { error: "Impossibile determinare le coordinate dell'indirizzo. Verifica l'indirizzo inserito." },
+        { error: errorMessages[geocodeResult.reason] || errorMessages.ADDRESS_NOT_FOUND },
         { status: 400 }
       );
     }
@@ -193,8 +199,8 @@ export async function POST(req: NextRequest) {
       extraCosts: (formData.get("costiExtra") as string) || undefined,
       condition: (formData.get("statoImmobile") as string) || undefined,
       heatingType: (formData.get("riscaldamento") as string) || undefined,
-      lat: coords.lat,
-      lng: coords.lng,
+      lat: geocodeResult.lat,
+      lng: geocodeResult.lng,
       title: "", // Will be generated below
     };
 

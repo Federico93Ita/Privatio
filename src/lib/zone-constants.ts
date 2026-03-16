@@ -1,0 +1,52 @@
+/**
+ * Shared constants for zone classes and agency plans.
+ * Used by territory dashboard, zone preference selector, and admin panel.
+ */
+
+export const PLAN_LABELS: Record<string, string> = {
+  BASE: "Base",
+  PREMIER_LOCAL: "Premier Local",
+  PREMIER_CITY: "Premier City",
+  PREMIER_PRIME: "Premier Prime",
+  PREMIER_ELITE: "Premier Elite",
+};
+
+export const ZONE_CLASS_LABELS: Record<string, string> = {
+  CLUSTER_LOCAL: "Cluster",
+  COMUNE: "Comune",
+  MACROQUARTIERE: "Quartiere",
+  MICROZONA_PRIME: "Microzona Prime",
+};
+
+export const ZONE_CLASS_COLORS: Record<string, string> = {
+  CLUSTER_LOCAL: "bg-gray-100 text-gray-700",
+  COMUNE: "bg-blue-50 text-blue-700",
+  MACROQUARTIERE: "bg-purple-50 text-purple-700",
+  MICROZONA_PRIME: "bg-amber-50 text-amber-700",
+};
+
+/** Maps zone class to available plans */
+export const ZONE_CLASS_PLANS: Record<string, string[]> = {
+  CLUSTER_LOCAL: ["BASE"],
+  COMUNE: ["PREMIER_LOCAL"],
+  MACROQUARTIERE: ["PREMIER_CITY"],
+  MICROZONA_PRIME: ["PREMIER_PRIME", "PREMIER_ELITE"],
+};
+
+/** Price field keys per plan in zone data */
+export const PLAN_PRICE_KEYS: Record<string, string> = {
+  BASE: "priceBase",
+  PREMIER_LOCAL: "priceLocal",
+  PREMIER_CITY: "priceCity",
+  PREMIER_PRIME: "pricePrime",
+  PREMIER_ELITE: "priceElite",
+};
+
+/** Max slot field keys per plan */
+export const PLAN_MAX_KEYS: Record<string, string> = {
+  BASE: "maxBase",
+  PREMIER_LOCAL: "maxLocal",
+  PREMIER_CITY: "maxCity",
+  PREMIER_PRIME: "maxPrime",
+  PREMIER_ELITE: "maxElite",
+};

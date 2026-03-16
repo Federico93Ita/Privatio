@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import {
+  PLAN_LABELS,
+  ZONE_CLASS_LABELS,
+  ZONE_CLASS_COLORS,
+} from "@/lib/zone-constants";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -43,28 +48,6 @@ interface ZoneAvailable {
 interface RegionsData {
   regions: Record<string, string[]>;
 }
-
-const PLAN_LABELS: Record<string, string> = {
-  BASE: "Base",
-  PREMIER_LOCAL: "Premier Local",
-  PREMIER_CITY: "Premier City",
-  PREMIER_PRIME: "Premier Prime",
-  PREMIER_ELITE: "Premier Elite",
-};
-
-const ZONE_CLASS_LABELS: Record<string, string> = {
-  CLUSTER_LOCAL: "Cluster",
-  COMUNE: "Comune",
-  MACROQUARTIERE: "Quartiere",
-  MICROZONA_PRIME: "Microzona Prime",
-};
-
-const ZONE_CLASS_COLORS: Record<string, string> = {
-  CLUSTER_LOCAL: "bg-gray-100 text-gray-700",
-  COMUNE: "bg-blue-50 text-blue-700",
-  MACROQUARTIERE: "bg-purple-50 text-purple-700",
-  MICROZONA_PRIME: "bg-amber-50 text-amber-700",
-};
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */

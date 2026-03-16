@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import ZonePreferenceSelector, {
+  type ZonePreference,
+} from "@/components/agency/ZonePreferenceSelector";
 
 export default function AgenzieRegistrationForm() {
   const [form, setForm] = useState({
@@ -8,11 +11,13 @@ export default function AgenzieRegistrationForm() {
     contactName: "",
     email: "",
     phone: "",
+    address: "",
     city: "",
     province: "",
     agentCount: "",
     message: "",
   });
+  const [preferredZones, setPreferredZones] = useState<ZonePreference[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -29,6 +34,7 @@ export default function AgenzieRegistrationForm() {
         body: JSON.stringify({
           ...form,
           agentCount: form.agentCount ? parseInt(form.agentCount) : undefined,
+          preferredZones: preferredZones.length > 0 ? preferredZones : undefined,
         }),
       });
 
@@ -54,7 +60,23 @@ export default function AgenzieRegistrationForm() {
           </svg>
         </div>
         <h3 className="text-xl font-medium text-primary-dark">Richiesta inviata!</h3>
-        <p className="mt-2 text-text-muted">Ti contatteremo entro 24 ore lavorative per procedere con l&apos;attivazione.</p>
+        <p className="mt-2 text-text-muted">
+          La tua richiesta è stata ricevuta e verrà valutata dal nostro team.
+        </p>
+        {preferredZones.length > 0 && (
+          <p className="mt-2 text-sm text-text-muted">
+            Hai indicato <strong>{preferredZones.length} {preferredZones.length === 1 ? "zona" : "zone"}</strong> di interesse.
+            Verranno riservate per te dopo l&apos;approvazione.
+          </p>
+        )}
+        <p className="mt-3 text-sm text-text-muted">
+          Riceverai una <strong>email di conferma</strong> all&apos;indirizzo indicato.
+          Una volta approvata la richiesta, ti invieremo un <strong>link per completare
+          la registrazione</strong> e accedere alla tua dashboard agenzia.
+        </p>
+        <p className="mt-2 text-sm text-text-muted">
+          Tempi di risposta: entro 24 ore lavorative.
+        </p>
       </div>
     );
   }
@@ -91,6 +113,14 @@ export default function AgenzieRegistrationForm() {
         </div>
       </div>
 
+      {/* Indirizzo sede */}
+      <div>
+        <label className="mb-1 block text-sm font-medium text-text">Indirizzo sede</label>
+        <input type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
+          placeholder="Via Roma 1"
+          className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
+      </div>
+
       <div className="grid gap-5 sm:grid-cols-3">
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Città *</label>
@@ -100,6 +130,7 @@ export default function AgenzieRegistrationForm() {
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Provincia *</label>
           <input type="text" required maxLength={2} value={form.province} onChange={(e) => setForm({ ...form, province: e.target.value.toUpperCase() })}
+            placeholder="MI"
             className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
         </div>
         <div>
@@ -108,6 +139,13 @@ export default function AgenzieRegistrationForm() {
             className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
         </div>
       </div>
+
+      {/* Zone preference selector — appears when province is filled */}
+      <ZonePreferenceSelector
+        province={form.province}
+        selectedZones={preferredZones}
+        onSelectionChange={setPreferredZones}
+      />
 
       <div>
         <label className="mb-1 block text-sm font-medium text-text">Messaggio</label>

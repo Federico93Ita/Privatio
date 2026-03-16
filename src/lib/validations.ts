@@ -11,15 +11,25 @@ export const sellerLeadSchema = z.object({
   source: z.string().optional(),
 });
 
+export const zonePreferenceSchema = z.object({
+  zoneId: z.string(),
+  zoneName: z.string(),
+  zoneClass: z.string(),
+  plan: z.string(),
+  priceMonthly: z.number(),
+});
+
 export const agencyLeadSchema = z.object({
   agencyName: z.string().min(2, "Nome agenzia richiesto"),
   contactName: z.string().min(2, "Nome contatto richiesto"),
   email: z.string().email("Email non valida"),
   phone: z.string().min(8, "Telefono richiesto"),
+  address: z.string().optional(),
   city: z.string().min(2, "Città richiesta"),
   province: z.string().min(2, "Provincia richiesta"),
   agentCount: z.number().optional(),
   message: z.string().optional(),
+  preferredZones: z.array(zonePreferenceSchema).max(3).optional(),
 });
 
 export const propertySchema = z.object({
