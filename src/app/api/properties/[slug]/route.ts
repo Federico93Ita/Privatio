@@ -26,7 +26,7 @@ const sellerUpdateSchema = z.object({
   cap: z.string().min(5).optional(),
 });
 
-// Admin can also update status
+// Admin can update everything
 const adminUpdateSchema = sellerUpdateSchema.extend({
   status: z
     .enum([
@@ -38,6 +38,34 @@ const adminUpdateSchema = sellerUpdateSchema.extend({
       "WITHDRAWN",
     ])
     .optional(),
+  type: z
+    .enum([
+      "APPARTAMENTO",
+      "VILLA",
+      "CASA_INDIPENDENTE",
+      "ATTICO",
+      "MANSARDA",
+      "LOFT",
+      "TERRENO",
+      "NEGOZIO",
+      "UFFICIO",
+    ])
+    .optional(),
+  condition: z.string().nullable().optional(),
+  heatingType: z.string().nullable().optional(),
+  condominiumFees: z.number().nullable().optional(),
+  extraCosts: z.string().nullable().optional(),
+  hasParkingSpace: z.boolean().optional(),
+  hasCellar: z.boolean().optional(),
+  hasTerrace: z.boolean().optional(),
+  hasPool: z.boolean().optional(),
+  hasAirConditioning: z.boolean().optional(),
+  isFurnished: z.boolean().optional(),
+  hasConcierge: z.boolean().optional(),
+  hasAlarm: z.boolean().optional(),
+  publishedAt: z.string().datetime().nullable().optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
 });
 
 // GET /api/properties/[slug] — Public property detail
@@ -142,9 +170,15 @@ export async function PUT(
       }
     }
 
+    // Convert publishedAt string to Date if present
+    const updateData: any = { ...parsed.data };
+    if (updateData.publishedAt !== undefined) {
+      updateData.publishedAt = updateData.publishedAt ? new Date(updateData.publishedAt) : null;
+    }
+
     const updated = await prisma.property.update({
       where: { slug },
-      data: parsed.data,
+      data: updateData,
     });
 
     return NextResponse.json({ property: updated });
@@ -152,6 +186,50 @@ export async function PUT(
     console.error("Property update error:", error);
     return NextResponse.json(
       { error: "Errore durante l'aggiornamento" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/properties/[slug] — Admin only
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
+    }
+
+    const userRole = (session.user as { role: string }).role;
+    if (userRole !== "ADMIN") {
+      return NextResponse.json({ error: "Non autorizzato" }, { status: 403 });
+    }
+
+    const { slug } = await params;
+    const property = await prisma.property.findUnique({ where: { slug } });
+    if (!property) {
+      return NextResponse.json({ error: "Immobile non trovato" }, { status: 404 });
+    }
+
+    // Delete all related records in a transaction
+    await prisma.$transaction([
+      prisma.buyerLead.deleteMany({ where: { propertyId: property.id } }),
+      prisma.visit.deleteMany({ where: { propertyId: property.id } }),
+      prisma.favorite.deleteMany({ where: { propertyId: property.id } }),
+      prisma.document.deleteMany({ where: { propertyId: property.id } }),
+      prisma.propertyPhoto.deleteMany({ where: { propertyId: property.id } }),
+      prisma.contract.deleteMany({ where: { propertyId: property.id } }),
+      prisma.propertyAssignment.deleteMany({ where: { propertyId: property.id } }),
+      prisma.property.delete({ where: { id: property.id } }),
+    ]);
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Property delete error:", error);
+    return NextResponse.json(
+      { error: "Errore durante l'eliminazione" },
       { status: 500 }
     );
   }

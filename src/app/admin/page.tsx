@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice } from "@/lib/utils";
+import PropertyEditModal from "@/components/admin/PropertyEditModal";
+import AgencyEditModal from "@/components/admin/AgencyEditModal";
+import UserEditModal from "@/components/admin/UserEditModal";
+import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
 
 interface Stats {
   totalProperties: number;
@@ -21,17 +25,25 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [properties, setProperties] = useState<any[]>([]);
   const [agencies, setAgencies] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [sellerLeads, setSellerLeads] = useState<any[]>([]);
   const [agencyLeads, setAgencyLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [zones, setZones] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<"overview" | "properties" | "agencies" | "leads" | "assignments" | "territories">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "properties" | "agencies" | "users" | "leads" | "assignments" | "territories">("overview");
   const searchParams = useSearchParams();
+
+  // Modal state
+  const [editingProperty, setEditingProperty] = useState<any | null>(null);
+  const [editingAgency, setEditingAgency] = useState<any | null>(null);
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [deletingItem, setDeletingItem] = useState<{ type: string; id: string; name: string } | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Read initial tab from URL query param
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab === "properties" || tab === "agencies" || tab === "leads" || tab === "assignments" || tab === "territories") {
+    if (tab === "properties" || tab === "agencies" || tab === "users" || tab === "leads" || tab === "assignments" || tab === "territories") {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -42,11 +54,12 @@ export default function AdminDashboard() {
 
   async function loadData() {
     try {
-      const [propsRes, agenciesRes, leadsRes, zonesRes] = await Promise.all([
+      const [propsRes, agenciesRes, leadsRes, zonesRes, usersRes] = await Promise.all([
         fetch("/api/admin/properties"),
         fetch("/api/admin/agencies"),
         fetch("/api/admin/leads"),
         fetch("/api/admin/zones"),
+        fetch("/api/admin/users"),
       ]);
 
       if (propsRes.ok) {
@@ -65,6 +78,10 @@ export default function AdminDashboard() {
       if (zonesRes.ok) {
         const data = await zonesRes.json();
         setZones(data.zones || []);
+      }
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        setUsers(data.users || []);
       }
     } catch (err) {
       console.error("Error loading admin data:", err);
@@ -129,10 +146,53 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleToggleAgencyActive(agency: any) {
+    try {
+      const res = await fetch(`/api/admin/agencies/${agency.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !agency.isActive }),
+      });
+      if (res.ok) {
+        loadData();
+      }
+    } catch (err) {
+      console.error("Error toggling agency:", err);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deletingItem) return;
+    setDeleteLoading(true);
+    try {
+      let url = "";
+      if (deletingItem.type === "property") {
+        url = `/api/properties/${deletingItem.id}`;
+      } else if (deletingItem.type === "agency") {
+        url = `/api/admin/agencies/${deletingItem.id}`;
+      } else if (deletingItem.type === "user") {
+        url = `/api/admin/users/${deletingItem.id}`;
+      }
+      const res = await fetch(url, { method: "DELETE" });
+      if (res.ok) {
+        loadData();
+        setDeletingItem(null);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Errore durante l'eliminazione");
+      }
+    } catch (err) {
+      alert("Errore di rete");
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
   const tabs = [
     { id: "overview" as const, label: "Panoramica" },
     { id: "properties" as const, label: "Immobili" },
     { id: "agencies" as const, label: "Agenzie" },
+    { id: "users" as const, label: "Utenti" },
     { id: "leads" as const, label: "Lead" },
     { id: "assignments" as const, label: "Assegnazioni" },
     { id: "territories" as const, label: "Territori" },
@@ -156,18 +216,34 @@ export default function AdminDashboard() {
     WITHDRAWN: "bg-error/10 text-error",
   };
 
+  const roleLabels: Record<string, string> = {
+    SELLER: "Venditore",
+    BUYER: "Acquirente",
+    AGENCY_ADMIN: "Admin Agenzia",
+    AGENCY_AGENT: "Agente",
+    ADMIN: "Amministratore",
+  };
+
+  const roleColors: Record<string, string> = {
+    SELLER: "bg-primary/10 text-primary",
+    BUYER: "bg-accent/10 text-accent",
+    AGENCY_ADMIN: "bg-success/10 text-success",
+    AGENCY_AGENT: "bg-success/10 text-success",
+    ADMIN: "bg-red-100 text-red-700",
+  };
+
   return (
     <DashboardLayout role="admin">
       <div className="space-y-6">
         <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Pannello Admin</h1>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-border">
+        <div className="flex gap-1 border-b border-border overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-white text-primary border-b-2 border-primary"
                   : "text-text-muted hover:text-text"
@@ -194,7 +270,7 @@ export default function AdminDashboard() {
                     { label: "Immobili Totali", value: properties.length, color: "text-primary" },
                     { label: "Pubblicati", value: properties.filter((p) => p.status === "PUBLISHED").length, color: "text-success" },
                     { label: "Agenzie Totali", value: agencies.length, color: "text-primary-dark" },
-                    { label: "Agenzie Attive", value: agencies.filter((a: any) => a.isActive).length, color: "text-accent" },
+                    { label: "Utenti Totali", value: users.length, color: "text-accent" },
                   ].map((stat, i) => (
                     <div key={i} className="bg-white rounded-xl p-5 border border-border">
                       <p className="text-sm text-text-muted">{stat.label}</p>
@@ -272,37 +348,39 @@ export default function AdminDashboard() {
                           <td className="py-3 px-4 text-sm">{p.seller?.name || "—"}</td>
                           <td className="py-3 px-4 text-sm font-semibold">{formatPrice(p.price)}</td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${statusColors[p.status]}`}>
-                              {statusLabels[p.status]}
-                            </span>
+                            <select
+                              value={p.status}
+                              onChange={(e) => handleStatusChange(p.id, p.slug, e.target.value)}
+                              className={`text-xs px-2 py-1 rounded-lg border-0 cursor-pointer font-medium ${statusColors[p.status]}`}
+                            >
+                              {Object.entries(statusLabels).map(([val, label]) => (
+                                <option key={val} value={val}>{label}</option>
+                              ))}
+                            </select>
                           </td>
                           <td className="py-3 px-4 text-sm">{p.assignment?.agency?.name || "Non assegnata"}</td>
                           <td className="py-3 px-4">
-                            <div className="flex gap-2">
-                              {p.status === "DRAFT" && (
-                                <button
-                                  onClick={() => handleStatusChange(p.id, p.slug, "PENDING_REVIEW")}
-                                  className="text-xs px-3 py-1 bg-accent/10 text-accent rounded-lg hover:bg-accent/20"
-                                >
-                                  Revisiona
-                                </button>
-                              )}
-                              {p.status === "PENDING_REVIEW" && (
-                                <button
-                                  onClick={() => handleStatusChange(p.id, p.slug, "PUBLISHED")}
-                                  className="text-xs px-3 py-1 bg-success/10 text-success rounded-lg hover:bg-success/20"
-                                >
-                                  Pubblica
-                                </button>
-                              )}
+                            <div className="flex gap-1.5">
+                              <button
+                                onClick={() => setEditingProperty(p)}
+                                className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 font-medium"
+                              >
+                                Modifica
+                              </button>
                               {!p.assignment && (
                                 <button
                                   onClick={() => handleAssign(p.id)}
-                                  className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20"
+                                  className="text-xs px-3 py-1 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 font-medium"
                                 >
                                   Assegna
                                 </button>
                               )}
+                              <button
+                                onClick={() => setDeletingItem({ type: "property", id: p.slug, name: p.title })}
+                                className="text-xs px-3 py-1 bg-error/10 text-error rounded-lg hover:bg-error/20 font-medium"
+                              >
+                                Elimina
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -324,10 +402,11 @@ export default function AdminDashboard() {
                     <thead>
                       <tr className="border-b border-border">
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Agenzia</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Città</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Citta</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Piano</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Immobili</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Azioni</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -340,14 +419,33 @@ export default function AdminDashboard() {
                           <td className="py-3 px-4 text-sm">{a.city} ({a.province})</td>
                           <td className="py-3 px-4">
                             <span className={`text-xs px-2 py-1 rounded-full ${a.plan !== "BASE" ? "bg-primary/10 text-primary" : "bg-bg-soft text-text-muted"}`}>
-                              {a.plan?.replace("_", " ") || "BASE"}
+                              {a.plan?.replace(/_/g, " ") || "BASE"}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-sm">{a._count?.assignments || 0}</td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${a.isActive ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
+                            <button
+                              onClick={() => handleToggleAgencyActive(a)}
+                              className={`text-xs px-2 py-1 rounded-full font-medium cursor-pointer transition-colors ${a.isActive ? "bg-success/10 text-success hover:bg-success/20" : "bg-error/10 text-error hover:bg-error/20"}`}
+                            >
                               {a.isActive ? "Attiva" : "Inattiva"}
-                            </span>
+                            </button>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-1.5">
+                              <button
+                                onClick={() => setEditingAgency(a)}
+                                className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 font-medium"
+                              >
+                                Modifica
+                              </button>
+                              <button
+                                onClick={() => setDeletingItem({ type: "agency", id: a.id, name: a.name })}
+                                className="text-xs px-3 py-1 bg-error/10 text-error rounded-lg hover:bg-error/20 font-medium"
+                              >
+                                Elimina
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -355,6 +453,83 @@ export default function AdminDashboard() {
                   </table>
                   {agencies.length === 0 && (
                     <p className="text-center py-8 text-text-muted">Nessuna agenzia registrata.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Users */}
+            {activeTab === "users" && (
+              <div className="space-y-4">
+                {/* User Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {[
+                    { label: "Totali", value: users.length, color: "text-primary" },
+                    { label: "Venditori", value: users.filter((u: any) => u.role === "SELLER").length, color: "text-primary-dark" },
+                    { label: "Acquirenti", value: users.filter((u: any) => u.role === "BUYER").length, color: "text-accent" },
+                    { label: "Agenzie", value: users.filter((u: any) => u.role === "AGENCY_ADMIN" || u.role === "AGENCY_AGENT").length, color: "text-success" },
+                    { label: "Admin", value: users.filter((u: any) => u.role === "ADMIN").length, color: "text-red-600" },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white rounded-xl p-4 border border-border">
+                      <p className="text-xs text-text-muted">{stat.label}</p>
+                      <p className={`text-2xl font-semibold mt-1 ${stat.color}`}>{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Utente</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Email</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Ruolo</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Registrazione</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Immobili</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Agenzia</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Azioni</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((u: any) => (
+                        <tr key={u.id} className="border-b border-border hover:bg-bg-soft">
+                          <td className="py-3 px-4">
+                            <p className="text-sm font-medium">{u.name || "—"}</p>
+                            {u.phone && <p className="text-xs text-text-muted">{u.phone}</p>}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-text-muted">{u.email}</td>
+                          <td className="py-3 px-4">
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${roleColors[u.role] || "bg-bg-soft text-text-muted"}`}>
+                              {roleLabels[u.role] || u.role}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-text-muted">
+                            {new Date(u.createdAt).toLocaleDateString("it-IT")}
+                          </td>
+                          <td className="py-3 px-4 text-sm">{u._count?.properties || 0}</td>
+                          <td className="py-3 px-4 text-sm">{u.agency?.name || "—"}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-1.5">
+                              <button
+                                onClick={() => setEditingUser(u)}
+                                className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 font-medium"
+                              >
+                                Modifica
+                              </button>
+                              <button
+                                onClick={() => setDeletingItem({ type: "user", id: u.id, name: u.name || u.email })}
+                                className="text-xs px-3 py-1 bg-error/10 text-error rounded-lg hover:bg-error/20 font-medium"
+                              >
+                                Elimina
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {users.length === 0 && (
+                    <p className="text-center py-8 text-text-muted">Nessun utente registrato.</p>
                   )}
                 </div>
               </div>
@@ -626,7 +801,7 @@ export default function AdminDashboard() {
                               <td className="py-3 px-4 text-sm">{zone.population?.toLocaleString("it-IT") || "—"}</td>
                               <td className="py-3 px-4 text-sm font-medium">{activePartners}</td>
                               <td className="py-3 px-4 text-sm">
-                                {lowestPrice ? `€${(lowestPrice / 100).toLocaleString("it-IT")}` : "—"}
+                                {lowestPrice ? `\u20AC${(lowestPrice / 100).toLocaleString("it-IT")}` : "—"}
                               </td>
                               <td className="py-3 px-4">
                                 <span className={`text-xs px-2 py-1 rounded-full ${zone.isActive ? "bg-success/10 text-success" : "bg-error/10 text-error"}`}>
@@ -648,6 +823,33 @@ export default function AdminDashboard() {
           </>
         )}
       </div>
+
+      {/* Modals */}
+      <PropertyEditModal
+        isOpen={!!editingProperty}
+        onClose={() => setEditingProperty(null)}
+        property={editingProperty}
+        onSaved={loadData}
+      />
+      <AgencyEditModal
+        isOpen={!!editingAgency}
+        onClose={() => setEditingAgency(null)}
+        agency={editingAgency}
+        onSaved={loadData}
+      />
+      <UserEditModal
+        isOpen={!!editingUser}
+        onClose={() => setEditingUser(null)}
+        user={editingUser}
+        onSaved={loadData}
+      />
+      <DeleteConfirmModal
+        isOpen={!!deletingItem}
+        onClose={() => setDeletingItem(null)}
+        onConfirm={handleDelete}
+        itemName={deletingItem?.name || ""}
+        loading={deleteLoading}
+      />
     </DashboardLayout>
   );
 }
