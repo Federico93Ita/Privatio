@@ -106,6 +106,39 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Notify admin of new agency registration
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (adminEmail) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.vercel.app";
+      try {
+        await sendEmail({
+          to: adminEmail,
+          subject: `Nuova agenzia registrata: ${data.agencyName} — ${data.city}`,
+          html: `
+            <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #0f172a; padding: 30px; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 24px;">Nuova Registrazione Agenzia</h1>
+              </div>
+              <div style="padding: 30px; background: white;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Agenzia</td><td style="padding: 8px 0; font-weight: 600;">${data.agencyName}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Contatto</td><td style="padding: 8px 0; font-weight: 600;">${data.name}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Email</td><td style="padding: 8px 0; font-weight: 600;">${data.email}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Telefono</td><td style="padding: 8px 0; font-weight: 600;">${data.phone}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Indirizzo</td><td style="padding: 8px 0; font-weight: 600;">${data.address}, ${data.city} (${data.province})</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Da lead approvato</td><td style="padding: 8px 0; font-weight: 600;">${approvedLead ? "Sì" : "No (registrazione diretta)"}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Data</td><td style="padding: 8px 0; font-weight: 600;">${new Date().toLocaleString("it-IT", { timeZone: "Europe/Rome" })}</td></tr>
+                </table>
+                <a href="${appUrl}/admin" style="display: inline-block; margin-top: 20px; background: #2563eb; color: white; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 500;">Pannello Admin</a>
+              </div>
+            </div>
+          `,
+        });
+      } catch (err) {
+        console.error("Failed to send admin notification for new agency:", err);
+      }
+    }
+
     // Welcome email
     await sendEmail({
       to: data.email,

@@ -21,6 +21,21 @@ async function main() {
   });
   console.log(`Admin user created: ${admin.email}`);
 
+  // Create real admin user
+  const realAdminPassword = await hash("Admin123!", 12);
+  const realAdmin = await prisma.user.upsert({
+    where: { email: "federicoferrero93@gmail.com" },
+    update: { role: "ADMIN" },
+    create: {
+      email: "federicoferrero93@gmail.com",
+      name: "Federico Ferrero",
+      password: realAdminPassword,
+      role: "ADMIN",
+      emailVerified: new Date(),
+    },
+  });
+  console.log(`Real admin user created: ${realAdmin.email}`);
+
   // Create test seller
   const sellerPassword = await hash("Seller123!", 12);
   const seller = await prisma.user.upsert({
