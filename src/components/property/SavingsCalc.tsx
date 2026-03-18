@@ -87,7 +87,7 @@ export default function SavingsCalc() {
             Agenzia tradizionale
           </p>
           <p className="text-text text-sm">
-            Commissione venditore 3%
+            Commissione venditore 4%
           </p>
           <div className="text-2xl md:text-3xl font-semibold text-error">
             <AnimatedPrice value={traditionalCommission} className="text-error" />

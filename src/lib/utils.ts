@@ -6,7 +6,7 @@ import slugify from "slugify";
  * Standard commission rate that traditional agencies charge the seller.
  * Privatio sellers save this percentage.
  */
-export const TRADITIONAL_COMMISSION_RATE = 0.03;
+export const TRADITIONAL_COMMISSION_RATE = 0.04;
 
 /** Merges Tailwind classes safely, resolving conflicts (e.g. p-2 + p-4 → p-4). */
 export function cn(...inputs: ClassValue[]) {

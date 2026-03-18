@@ -229,7 +229,7 @@ const testimonials = [
       "Ho venduto il mio appartamento a Milano senza pagare un centesimo di commissione. Incredibile.",
     author: "Marco R.",
     location: "Milano",
-    savings: 9000,
+    savings: 12000,
     stars: 5,
   },
   {
@@ -237,7 +237,7 @@ const testimonials = [
       "Servizio professionale e trasparente. L'agenzia partner è stata impeccabile.",
     author: "Giulia P.",
     location: "Roma",
-    savings: 7500,
+    savings: 10000,
     stars: 5,
   },
   {
@@ -245,7 +245,7 @@ const testimonials = [
       "Finalmente una piattaforma dalla parte del venditore. La consiglio a tutti.",
     author: "Andrea B.",
     location: "Torino",
-    savings: 12000,
+    savings: 16000,
     stars: 5,
   },
 ];
@@ -270,8 +270,14 @@ export default function HomePage() {
         {/* ============================================================ */}
         {/*  1. HERO                                                      */}
         {/* ============================================================ */}
-        <section className="relative flex min-h-[85vh] items-center pt-20">
+        <section className="relative flex min-h-[85vh] items-center pt-20 bg-gradient-to-b from-primary/[0.03] to-transparent">
           <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:px-8 lg:py-32">
+              {/* Badge */}
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/5 px-4 py-1.5">
+                <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                <span className="text-sm font-medium text-success">Risparmio medio: {formatPrice(10000)}</span>
+              </div>
+
               <h1 className="text-4xl font-light leading-[1.1] tracking-[-0.03em] text-text sm:text-5xl lg:text-6xl">
                 Vendi casa.
                 <br />
@@ -286,22 +292,36 @@ export default function HomePage() {
               <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
                   href="/vendi"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-7 py-3.5 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:bg-primary/85 hover:shadow-xl hover:shadow-primary/25 hover:-translate-y-0.5"
                 >
                   Inserisci il tuo immobile
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
                 <a
                   href="#come-funziona"
-                  className="inline-flex items-center justify-center gap-2 text-base text-text-muted transition-colors duration-200 hover:text-text"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-7 py-3.5 text-base font-medium text-text-muted transition-all duration-200 hover:text-text hover:border-text/20 hover:bg-white"
                 >
                   Scopri come funziona
                 </a>
               </div>
 
-              <p className="mt-8 flex items-center justify-center gap-2 text-sm text-text-muted/70">
-                Già 150+ venditori iscritti &middot; 45 agenzie partner
-              </p>
+              {/* Stats row */}
+              <div className="mt-12 flex items-center justify-center gap-8 sm:gap-12">
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-primary">150+</p>
+                  <p className="text-xs text-text-muted mt-0.5">Venditori iscritti</p>
+                </div>
+                <div className="h-8 w-px bg-border" />
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-primary">45</p>
+                  <p className="text-xs text-text-muted mt-0.5">Agenzie partner</p>
+                </div>
+                <div className="h-8 w-px bg-border" />
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-success">0%</p>
+                  <p className="text-xs text-text-muted mt-0.5">Commissione venditore</p>
+                </div>
+              </div>
           </div>
         </section>
 
@@ -335,15 +355,20 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 lg:gap-10">
-              {howItWorksSteps.map((step) => (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-4 lg:gap-8">
+              {howItWorksSteps.map((step, i) => (
                 <div
                   key={step.num}
-                  className="relative rounded-2xl bg-white p-8 text-center transition-all duration-300"
+                  className="relative rounded-2xl border border-border bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md"
                 >
                   {/* Step number */}
-                  <div className="mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full border border-border text-sm font-medium text-text-muted">
+                  <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
                     {step.num}
+                  </div>
+
+                  {/* Icon */}
+                  <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center">
+                    <step.icon className="h-6 w-6 text-primary/70" />
                   </div>
 
                   <h3 className="mb-2 text-base font-medium text-text">
@@ -352,6 +377,13 @@ export default function HomePage() {
                   <p className="text-sm leading-relaxed text-text-muted">
                     {step.description}
                   </p>
+
+                  {/* Connector arrow (hidden on mobile and last item) */}
+                  {i < 2 && (
+                    <div className="absolute -right-5 top-1/2 hidden -translate-y-1/2 text-border md:block lg:-right-6">
+                      <ArrowRightIcon className="h-5 w-5" />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -373,16 +405,16 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {features.map((feature) => (
                 <div
                   key={feature.title}
-                  className="group rounded-2xl p-6 transition-all duration-300"
+                  className="group rounded-2xl border border-border bg-white p-7 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                 >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-bg-soft">
-                    <feature.icon className="h-5 w-5 text-text-muted" />
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                    <feature.icon className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="mb-2 text-base font-medium text-text">
+                  <h3 className="mb-2 text-base font-semibold text-text">
                     {feature.title}
                   </h3>
                   <p className="text-sm leading-relaxed text-text-muted">
@@ -438,21 +470,24 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {testimonials.map((testimonial) => (
                 <div
                   key={testimonial.author}
-                  className="flex flex-col justify-between rounded-2xl border border-border bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] md:p-8"
+                  className="flex flex-col justify-between rounded-2xl border border-border bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md md:p-8"
                 >
-                  {/* Stars */}
+                  {/* Stars + decorative quote */}
                   <div>
-                    <div className="mb-4 flex gap-0.5">
-                      {Array.from({ length: testimonial.stars }).map((_, i) => (
-                        <StarIcon
-                          key={i}
-                          className="h-5 w-5 text-accent"
-                        />
-                      ))}
+                    <div className="mb-4 flex items-center justify-between">
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: testimonial.stars }).map((_, i) => (
+                          <StarIcon
+                            key={i}
+                            className="h-5 w-5 text-accent"
+                          />
+                        ))}
+                      </div>
+                      <span className="text-4xl font-serif text-primary/15 leading-none">&ldquo;</span>
                     </div>
 
                     {/* Quote */}
@@ -471,9 +506,12 @@ export default function HomePage() {
                         {testimonial.location}
                       </p>
                     </div>
-                    <div className="rounded-full bg-success/10 px-3 py-1">
+                    <div className="rounded-full bg-success/10 px-4 py-1.5 flex items-center gap-1.5">
+                      <svg className="h-3.5 w-3.5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
                       <p className="text-xs font-bold text-success">
-                        Risparmio: {formatPrice(testimonial.savings)}
+                        {formatPrice(testimonial.savings)}
                       </p>
                     </div>
                   </div>
@@ -486,9 +524,9 @@ export default function HomePage() {
         {/* ============================================================ */}
         {/*  7. AGENCIES CTA                                              */}
         {/* ============================================================ */}
-        <section className="border-t border-border py-20 md:py-28">
+        <section className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto max-w-3xl rounded-3xl bg-gradient-to-br from-primary/[0.04] to-accent/[0.04] border border-primary/10 p-10 md:p-14 text-center">
                 <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
                   Sei un&apos;agenzia?
                 </h2>
@@ -541,15 +579,39 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="text-3xl font-light tracking-[-0.03em] text-text sm:text-4xl">
-                Inizia ora
+                Inizia ora, è gratuito
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-text-muted sm:text-lg">
-                Compila il form e ti ricontatteremo entro 24 ore. Potrai
-                consultare le agenzie partner nella tua zona e contattarle direttamente.
+                Compila il form e ti ricontatteremo entro 24 ore. Nessun costo, nessun impegno.
               </p>
             </div>
 
-            <LeadForm />
+            <div className="grid md:grid-cols-5 gap-10 items-start">
+              {/* Benefits sidebar */}
+              <div className="md:col-span-2 space-y-5 md:pt-4">
+                {[
+                  { title: "Zero costi nascosti", desc: "Non paghi nulla. Mai." },
+                  { title: "Risposte in 24h", desc: "Ti ricontattiamo rapidamente per guidarti." },
+                  { title: "Agenzie nella tua zona", desc: "Collaboriamo con professionisti locali verificati." },
+                  { title: "Supporto completo", desc: "Ti seguiamo dalla pubblicazione al rogito." },
+                ].map((b) => (
+                  <div key={b.title} className="flex gap-3">
+                    <svg className="h-5 w-5 mt-0.5 shrink-0 text-success" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-text">{b.title}</p>
+                      <p className="text-xs text-text-muted mt-0.5">{b.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Form */}
+              <div className="md:col-span-3">
+                <LeadForm />
+              </div>
+            </div>
           </div>
         </section>
       </main>
