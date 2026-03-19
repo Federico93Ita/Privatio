@@ -272,12 +272,6 @@ export default function HomePage() {
         {/* ============================================================ */}
         <section className="relative flex min-h-[85vh] items-center pt-20 bg-gradient-to-b from-primary/[0.03] to-transparent">
           <div className="relative mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:px-8 lg:py-32">
-              {/* Badge */}
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/5 px-4 py-1.5">
-                <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                <span className="text-sm font-medium text-success">Risparmio medio: {formatPrice(10000)}</span>
-              </div>
-
               <h1 className="text-4xl font-light leading-[1.1] tracking-[-0.03em] text-text sm:text-5xl lg:text-6xl">
                 Vendi casa.
                 <br />

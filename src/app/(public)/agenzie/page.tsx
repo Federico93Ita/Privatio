@@ -148,67 +148,41 @@ const benefits = [
 const piani = [
   {
     name: "Base",
-    priceFrom: "200",
+    priceRange: "200–300",
     features: [
-      "1 area operativa",
-      "Max 6 competitor/zona",
-      "Notifica nuovi immobili 24h",
-      "Profilo agenzia",
-      "Dashboard base",
+      "1 zona operativa",
+      "Max 6 agenzie per zona",
+      "Notifica nuovi immobili entro 24h",
+      "Profilo agenzia sulla piattaforma",
+      "Dashboard di gestione",
     ],
     cta: "Inizia con il Base",
     highlighted: false,
   },
   {
-    name: "Premier Local",
-    priceFrom: "390",
+    name: "Professional",
+    priceRange: "390–1.100",
     features: [
-      "2 aree operative",
-      "Max 5 competitor/zona",
-      "Notifica 8h",
-      "Priorità su Base",
-      "Dashboard avanzata",
+      "Fino a 3 zone operative",
+      "Max 4 agenzie per zona",
+      "Notifica rapida entro 2 ore",
+      "Alta visibilità con i venditori",
+      "Statistiche avanzate e reportistica",
     ],
-    cta: "Scegli Local",
-    highlighted: false,
-  },
-  {
-    name: "Premier City",
-    priceFrom: "690",
-    features: [
-      "3 aree operative",
-      "Max 4 competitor/zona",
-      "Notifica 2h",
-      "Alta visibilità venditore",
-      "Statistiche avanzate",
-    ],
-    cta: "Scegli City",
+    cta: "Scegli Professional",
     highlighted: true,
   },
   {
-    name: "Premier Prime",
-    priceFrom: "1.100",
+    name: "Premium",
+    priceRange: "1.100–3.000",
     features: [
-      "3 aree operative",
-      "Max 3 competitor/zona",
-      "Notifica 30 min",
-      "Accesso zone top",
-      "Supporto prioritario",
+      "Fino a 4 zone operative",
+      "Max 3 agenzie per zona",
+      "Notifica istantanea nuovi immobili",
+      "Prima posizione nelle ricerche",
+      "Branding premium e supporto dedicato",
     ],
-    cta: "Scegli Prime",
-    highlighted: false,
-  },
-  {
-    name: "Premier Elite",
-    priceFrom: "1.800",
-    features: [
-      "4 aree operative",
-      "Max 3 competitor/zona",
-      "Notifica istantanea",
-      "Prima posizione con venditore",
-      "Branding premium",
-    ],
-    cta: "Scegli Elite",
+    cta: "Scegli Premium",
     highlighted: false,
   },
 ];
@@ -284,11 +258,11 @@ export default function AgenziePage() {
             in base al mercato della zona.
           </p>
 
-          <div className="mx-auto mt-12 grid max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {piani.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${
+                className={`relative rounded-2xl border bg-white p-7 shadow-sm transition-shadow hover:shadow-md ${
                   plan.highlighted
                     ? "border-primary ring-2 ring-primary/20"
                     : "border-border"
@@ -299,17 +273,16 @@ export default function AgenziePage() {
                     Consigliato
                   </span>
                 )}
-                <h3 className="text-lg font-medium text-text" style={{ fontFamily: "var(--font-sans)" }}>
+                <h3 className="text-lg font-semibold text-text">
                   {plan.name}
                 </h3>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-xs text-text-muted">da</span>
                   <span className="text-2xl font-medium text-primary-dark">
-                    &euro;{plan.priceFrom}
+                    &euro;{plan.priceRange}
                   </span>
                   <span className="text-text-muted text-sm">/mese</span>
                 </div>
-                <ul className="mt-5 space-y-2.5">
+                <ul className="mt-6 space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-text">
                       <CheckIcon />
@@ -319,7 +292,7 @@ export default function AgenziePage() {
                 </ul>
                 <a
                   href="#registrazione"
-                  className={`mt-6 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
+                  className={`mt-7 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary/90"
                       : "border border-primary text-primary hover:bg-primary/5"
@@ -332,8 +305,8 @@ export default function AgenziePage() {
           </div>
 
           <p className="text-center text-sm text-text-muted mt-8">
-            Il prezzo varia in base al valore di mercato della zona scelta.
-            Tutti i prezzi sono + IVA.
+            Il prezzo esatto dipende dalla zona. Zone ad alto valore di mercato hanno prezzi
+            pi&ugrave; alti rispetto a zone pi&ugrave; piccole. Tutti i prezzi sono + IVA.
           </p>
         </div>
       </section>

@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         const zoneRows = zones
           .map(
             (z) =>
-              `<li style="margin-bottom: 4px;"><strong>${z.zoneName}</strong> (${z.zoneClass}) — ${z.plan.replace(/_/g, " ")} a €${(z.priceMonthly / 100).toLocaleString("it-IT")}/mese</li>`
+              `<li style="margin-bottom: 4px;"><strong>${z.zoneName}</strong> (${z.zoneClass})${z.plan ? ` — ${z.plan.replace(/_/g, " ")}` : ""}${z.priceMonthly ? ` a €${(z.priceMonthly / 100).toLocaleString("it-IT")}/mese` : ""}</li>`
           )
           .join("");
         zonesHtml = `

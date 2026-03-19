@@ -1,11 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  PLAN_LABELS,
-  ZONE_CLASS_LABELS,
-  ZONE_CLASS_COLORS,
-} from "@/lib/zone-constants";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -30,26 +25,14 @@ export interface ZonePreference {
   zoneId: string;
   zoneName: string;
   zoneClass: string;
-  plan: string;
-  priceMonthly: number;
+  plan?: string;
+  priceMonthly?: number;
 }
 
 interface ZonePreferenceSelectorProps {
   province: string;
   selectedZones: ZonePreference[];
   onSelectionChange: (zones: ZonePreference[]) => void;
-}
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
-function formatMonthlyPrice(cents: number): string {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(cents / 100);
 }
 
 /* ------------------------------------------------------------------ */
@@ -102,52 +85,23 @@ export default function ZonePreferenceSelector({
     };
   }, [province]);
 
-  // Clear selections if province changes and previously selected zones no longer match
-  useEffect(() => {
-    if (zones.length === 0 && selectedZones.length > 0) {
-      // Don't clear immediately — only if province changed to something with no results
-      if (province.length >= 2) {
-        // Keep selections until new zones load; they'll be cleared if mismatch
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zones]);
-
-  function isSelected(zoneId: string, plan: string): boolean {
-    return selectedZones.some((z) => z.zoneId === zoneId && z.plan === plan);
+  function isZoneSelected(zoneId: string): boolean {
+    return selectedZones.some((z) => z.zoneId === zoneId);
   }
 
-  function toggleZonePlan(zone: ZoneData, plan: string, price: number) {
-    const exists = selectedZones.find(
-      (z) => z.zoneId === zone.id && z.plan === plan
-    );
-
-    if (exists) {
+  function toggleZone(zone: ZoneData) {
+    if (isZoneSelected(zone.id)) {
       // Deselect
-      onSelectionChange(
-        selectedZones.filter(
-          (z) => !(z.zoneId === zone.id && z.plan === plan)
-        )
-      );
+      onSelectionChange(selectedZones.filter((z) => z.zoneId !== zone.id));
     } else {
-      // Replace any existing selection for this zone (only 1 plan per zone)
-      const withoutThisZone = selectedZones.filter(
-        (z) => z.zoneId !== zone.id
-      );
-
-      if (withoutThisZone.length >= 3) {
-        // Max 3 zones
-        return;
-      }
-
+      // Select (max 3)
+      if (selectedZones.length >= 3) return;
       onSelectionChange([
-        ...withoutThisZone,
+        ...selectedZones,
         {
           zoneId: zone.id,
           zoneName: zone.name,
           zoneClass: zone.zoneClass,
-          plan,
-          priceMonthly: price,
         },
       ]);
     }
@@ -156,6 +110,8 @@ export default function ZonePreferenceSelector({
   // Don't render anything until province is entered
   if (!province || province.length < 2) return null;
 
+  const maxReached = selectedZones.length >= 3;
+
   return (
     <div className="space-y-4">
       <div>
@@ -163,17 +119,16 @@ export default function ZonePreferenceSelector({
           Zone disponibili nella provincia di {province.toUpperCase()}
         </h3>
         <p className="mt-1 text-xs text-text-muted">
-          Seleziona fino a 3 zone di interesse con il pacchetto preferito.
-          Potrai modificare la scelta dopo l&apos;approvazione.
+          Seleziona fino a 3 zone di interesse. Discuteremo i dettagli del piano dopo l&apos;approvazione.
         </p>
       </div>
 
       {loading && (
-        <div className="space-y-3">
-          {[1, 2].map((i) => (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-28 animate-pulse rounded-xl bg-bg-soft"
+              className="h-16 animate-pulse rounded-xl bg-bg-soft"
             />
           ))}
         </div>
@@ -195,127 +150,58 @@ export default function ZonePreferenceSelector({
       )}
 
       {!loading && zones.length > 0 && (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {zones.map((zone) => {
-            const plans = Object.keys(zone.prices);
-            const isZoneSelected = selectedZones.some(
-              (z) => z.zoneId === zone.id
-            );
+            const selected = isZoneSelected(zone.id);
+            const disabled = !selected && maxReached;
 
             return (
-              <div
+              <button
                 key={zone.id}
-                className={`rounded-xl border p-4 transition-colors ${
-                  isZoneSelected
-                    ? "border-primary/40 bg-primary/5"
-                    : "border-border bg-white"
+                type="button"
+                disabled={disabled}
+                onClick={() => toggleZone(zone)}
+                className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
+                  selected
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : disabled
+                    ? "cursor-not-allowed border-border bg-bg-soft opacity-50"
+                    : "border-border bg-white hover:border-primary/30 hover:bg-primary/[0.02]"
                 }`}
               >
-                {/* Zone header */}
-                <div className="mb-3 flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-medium text-text">
-                        {zone.name}
-                      </h4>
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                          ZONE_CLASS_COLORS[zone.zoneClass] ||
-                          "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {ZONE_CLASS_LABELS[zone.zoneClass] || zone.zoneClass}
-                      </span>
-                    </div>
-                    {zone.city && (
-                      <p className="text-xs text-text-muted mt-0.5">
-                        {zone.city}
-                      </p>
-                    )}
-                    {zone.municipalities.length > 0 && (
-                      <p className="text-[11px] text-text-muted mt-0.5">
-                        {zone.municipalities.slice(0, 4).join(", ")}
-                        {zone.municipalities.length > 4 &&
-                          ` +${zone.municipalities.length - 4}`}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-text-muted">
-                    <svg
-                      className="h-3.5 w-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                      />
+                {/* Check circle */}
+                <div
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                    selected
+                      ? "border-primary bg-primary"
+                      : "border-border bg-white"
+                  }`}
+                >
+                  {selected && (
+                    <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>{zone.marketScore}/10</span>
-                  </div>
+                  )}
                 </div>
 
-                {/* Plans */}
-                <div className="flex flex-wrap gap-2">
-                  {plans.map((plan) => {
-                    const price = zone.prices[plan];
-                    const slot = zone.slots[plan];
-                    const isFull = slot && slot.taken >= slot.max;
-                    const selected = isSelected(zone.id, plan);
-                    const maxReached =
-                      !selected &&
-                      !isZoneSelected &&
-                      selectedZones.length >= 3;
-
-                    return (
-                      <button
-                        key={plan}
-                        type="button"
-                        disabled={isFull || maxReached}
-                        onClick={() => toggleZonePlan(zone, plan, price)}
-                        className={`flex flex-col items-center rounded-lg border px-3 py-2 text-xs transition-all ${
-                          selected
-                            ? "border-primary bg-primary text-white shadow-sm"
-                            : isFull
-                            ? "cursor-not-allowed border-border bg-bg-soft text-text-muted opacity-50"
-                            : maxReached
-                            ? "cursor-not-allowed border-border bg-white text-text-muted opacity-50"
-                            : "border-border bg-white text-text hover:border-primary/40 hover:bg-primary/5"
-                        }`}
-                      >
-                        <span className="font-medium">
-                          {PLAN_LABELS[plan] || plan}
-                        </span>
-                        <span
-                          className={`mt-0.5 font-semibold ${
-                            selected ? "text-white" : "text-primary"
-                          }`}
-                        >
-                          {formatMonthlyPrice(price)}/mese
-                        </span>
-                        {slot && (
-                          <span
-                            className={`mt-0.5 ${
-                              selected
-                                ? "text-white/70"
-                                : isFull
-                                ? "text-error"
-                                : "text-text-muted"
-                            }`}
-                          >
-                            {isFull
-                              ? "Esaurito"
-                              : `${slot.taken}/${slot.max} partner`}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
+                {/* Zone info */}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-text truncate">
+                    {zone.name}
+                  </p>
+                  {zone.municipalities.length > 0 && (
+                    <p className="text-[11px] text-text-muted mt-0.5 truncate">
+                      {zone.municipalities.slice(0, 3).join(", ")}
+                      {zone.municipalities.length > 3 &&
+                        ` +${zone.municipalities.length - 3} altri`}
+                    </p>
+                  )}
+                  <p className="text-[11px] text-text-muted mt-0.5">
+                    {zone.population > 0 &&
+                      `${zone.population.toLocaleString("it-IT")} abitanti`}
+                  </p>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -323,28 +209,22 @@ export default function ZonePreferenceSelector({
 
       {/* Selection summary */}
       {selectedZones.length > 0 && (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
           <p className="text-xs font-medium text-primary-dark mb-2">
             Zone selezionate ({selectedZones.length}/3)
           </p>
           <div className="flex flex-wrap gap-2">
             {selectedZones.map((z) => (
               <span
-                key={`${z.zoneId}-${z.plan}`}
+                key={z.zoneId}
                 className="inline-flex items-center gap-1.5 rounded-full bg-white border border-primary/20 px-3 py-1 text-xs"
               >
                 <span className="font-medium text-text">{z.zoneName}</span>
-                <span className="text-text-muted">
-                  {PLAN_LABELS[z.plan]} — {formatMonthlyPrice(z.priceMonthly)}/mese
-                </span>
                 <button
                   type="button"
                   onClick={() =>
                     onSelectionChange(
-                      selectedZones.filter(
-                        (s) =>
-                          !(s.zoneId === z.zoneId && s.plan === z.plan)
-                      )
+                      selectedZones.filter((s) => s.zoneId !== z.zoneId)
                     )
                   }
                   className="ml-0.5 text-text-muted hover:text-error"

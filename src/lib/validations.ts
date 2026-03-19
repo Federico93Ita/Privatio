@@ -15,8 +15,8 @@ export const zonePreferenceSchema = z.object({
   zoneId: z.string(),
   zoneName: z.string(),
   zoneClass: z.string(),
-  plan: z.string(),
-  priceMonthly: z.number(),
+  plan: z.string().optional(),
+  priceMonthly: z.number().optional(),
 });
 
 export const agencyLeadSchema = z.object({
