@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { GoogleMap, useLoadScript, MarkerF, InfoWindowF } from "@react-google-maps/api";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { GoogleMap, useLoadScript, CircleF, InfoWindowF } from "@react-google-maps/api";
 import { PLAN_LABELS } from "@/lib/zone-constants";
 
 /* ------------------------------------------------------------------ */
@@ -52,23 +52,44 @@ function formatPrice(cents: number): string {
   }).format(cents / 100);
 }
 
-// Province capitals approximate coordinates for map centering
-const PROVINCE_CENTERS: Record<string, { lat: number; lng: number }> = {
-  TO: { lat: 45.07, lng: 7.69 }, MI: { lat: 45.46, lng: 9.19 }, RM: { lat: 41.90, lng: 12.50 },
-  NA: { lat: 40.85, lng: 14.27 }, FI: { lat: 43.77, lng: 11.25 }, BO: { lat: 44.49, lng: 11.34 },
-  GE: { lat: 44.41, lng: 8.93 }, PA: { lat: 38.12, lng: 13.36 }, BA: { lat: 41.13, lng: 16.87 },
-  VE: { lat: 45.44, lng: 12.32 }, VR: { lat: 45.44, lng: 10.99 }, PD: { lat: 45.41, lng: 11.88 },
-};
-
-function getMarkerIcon(zone: ZoneData, isSelected: boolean): string {
-  if (isSelected) return "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-  const { taken, max } = zone.slots;
-  if (taken >= max) return "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-  if (max - taken === 1) return "https://maps.google.com/mapfiles/ms/icons/orange-dot.png";
-  return "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
+/** Calculate circle radius from population. Returns meters. */
+function getZoneRadius(population: number): number {
+  if (population <= 0) return 1500;
+  // sqrt scaling: small towns ~1.5km, big cities ~8km
+  const base = Math.sqrt(population) * 8;
+  return Math.max(1500, Math.min(12000, base));
 }
 
-const mapContainerStyle = { width: "100%", height: "400px", borderRadius: "12px" };
+/** Province capitals approximate coordinates for map centering */
+const PROVINCE_CENTERS: Record<string, { lat: number; lng: number; zoom: number }> = {
+  TO: { lat: 45.07, lng: 7.69, zoom: 10 }, MI: { lat: 45.46, lng: 9.19, zoom: 10 },
+  RM: { lat: 41.90, lng: 12.50, zoom: 10 }, NA: { lat: 40.85, lng: 14.27, zoom: 10 },
+  FI: { lat: 43.77, lng: 11.25, zoom: 11 }, BO: { lat: 44.49, lng: 11.34, zoom: 10 },
+  GE: { lat: 44.41, lng: 8.93, zoom: 11 }, PA: { lat: 38.12, lng: 13.36, zoom: 10 },
+  BA: { lat: 41.13, lng: 16.87, zoom: 10 }, VE: { lat: 45.44, lng: 12.32, zoom: 10 },
+  VR: { lat: 45.44, lng: 10.99, zoom: 11 }, PD: { lat: 45.41, lng: 11.88, zoom: 11 },
+  BS: { lat: 45.54, lng: 10.22, zoom: 10 }, CT: { lat: 37.50, lng: 15.09, zoom: 11 },
+  BG: { lat: 45.70, lng: 9.67, zoom: 11 }, SA: { lat: 40.68, lng: 14.77, zoom: 11 },
+};
+
+type ZoneStatus = "available" | "lastSlot" | "full" | "selected";
+
+function getZoneStatus(zone: ZoneData, isSelected: boolean): ZoneStatus {
+  if (isSelected) return "selected";
+  const { taken, max } = zone.slots;
+  if (taken >= max) return "full";
+  if (max - taken === 1) return "lastSlot";
+  return "available";
+}
+
+const ZONE_COLORS: Record<ZoneStatus, { fill: string; stroke: string }> = {
+  available: { fill: "#22c55e40", stroke: "#22c55e" },   // green
+  lastSlot:  { fill: "#f9731640", stroke: "#f97316" },   // orange
+  full:      { fill: "#ef444430", stroke: "#ef4444" },   // red
+  selected:  { fill: "#3b82f650", stroke: "#3b82f6" },   // blue
+};
+
+const mapContainerStyle = { width: "100%", height: "450px", borderRadius: "12px" };
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -82,7 +103,7 @@ export default function ZonePreferenceSelector({
   const [zones, setZones] = useState<ZoneData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [activeMarker, setActiveMarker] = useState<string | null>(null);
+  const [activeZone, setActiveZone] = useState<ZoneData | null>(null);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
@@ -145,16 +166,24 @@ export default function ZonePreferenceSelector({
         },
       ]);
     }
-    setActiveMarker(null);
+    setActiveZone(null);
   }
 
   // Don't render anything until province is entered
   if (!province || province.length < 2) return null;
 
   const normalised = province.trim().toUpperCase();
-  const center = PROVINCE_CENTERS[normalised] || { lat: 42.5, lng: 12.5 };
+  const provCenter = PROVINCE_CENTERS[normalised] || { lat: 42.5, lng: 12.5, zoom: 9 };
   const zonesWithCoords = zones.filter((z) => z.lat && z.lng);
   const maxReached = selectedZones.length >= 3;
+
+  // Auto-center on zones if available
+  const center = useMemo(() => {
+    if (zonesWithCoords.length === 0) return { lat: provCenter.lat, lng: provCenter.lng };
+    const avgLat = zonesWithCoords.reduce((s, z) => s + z.lat!, 0) / zonesWithCoords.length;
+    const avgLng = zonesWithCoords.reduce((s, z) => s + z.lng!, 0) / zonesWithCoords.length;
+    return { lat: avgLat, lng: avgLng };
+  }, [zonesWithCoords, provCenter]);
 
   return (
     <div className="space-y-4">
@@ -163,12 +192,12 @@ export default function ZonePreferenceSelector({
           Zone disponibili — {normalised}
         </h3>
         <p className="mt-1 text-xs text-text-muted">
-          Seleziona fino a 3 zone di interesse sulla mappa. I dettagli del piano verranno discussi dopo l&apos;approvazione.
+          Clicca su una zona per vedere i dettagli e selezionarla (max 3).
         </p>
       </div>
 
       {loading && (
-        <div className="h-[400px] animate-pulse rounded-xl bg-bg-soft flex items-center justify-center">
+        <div className="h-[450px] animate-pulse rounded-xl bg-bg-soft flex items-center justify-center">
           <p className="text-sm text-text-muted">Caricamento mappa...</p>
         </div>
       )}
@@ -186,85 +215,115 @@ export default function ZonePreferenceSelector({
         </div>
       )}
 
-      {/* Map */}
+      {/* Map with zone circles */}
       {!loading && zones.length > 0 && isLoaded && zonesWithCoords.length > 0 && (
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={center}
-          zoom={10}
+          zoom={provCenter.zoom}
           options={{
             disableDefaultUI: true,
             zoomControl: true,
             mapTypeControl: false,
             streetViewControl: false,
+            fullscreenControl: true,
             styles: [
               { featureType: "poi", stylers: [{ visibility: "off" }] },
               { featureType: "transit", stylers: [{ visibility: "off" }] },
+              { featureType: "road", elementType: "labels", stylers: [{ visibility: "simplified" }] },
             ],
           }}
+          onClick={() => setActiveZone(null)}
         >
-          {zonesWithCoords.map((zone) => (
-            <MarkerF
-              key={zone.id}
-              position={{ lat: zone.lat!, lng: zone.lng! }}
-              icon={getMarkerIcon(zone, isZoneSelected(zone.id))}
-              onClick={() => setActiveMarker(zone.id)}
+          {zonesWithCoords.map((zone) => {
+            const selected = isZoneSelected(zone.id);
+            const status = getZoneStatus(zone, selected);
+            const colors = ZONE_COLORS[status];
+            const radius = getZoneRadius(zone.population);
+
+            return (
+              <CircleF
+                key={zone.id}
+                center={{ lat: zone.lat!, lng: zone.lng! }}
+                radius={radius}
+                options={{
+                  fillColor: colors.fill.slice(0, 7),
+                  fillOpacity: status === "selected" ? 0.4 : status === "full" ? 0.15 : 0.25,
+                  strokeColor: colors.stroke,
+                  strokeWeight: status === "selected" ? 3 : 2,
+                  strokeOpacity: 0.9,
+                  clickable: true,
+                  zIndex: status === "selected" ? 10 : status === "full" ? 1 : 5,
+                }}
+                onClick={() => setActiveZone(zone)}
+              />
+            );
+          })}
+
+          {/* Info window for active zone */}
+          {activeZone && activeZone.lat && activeZone.lng && (
+            <InfoWindowF
+              position={{ lat: activeZone.lat, lng: activeZone.lng }}
+              onCloseClick={() => setActiveZone(null)}
             >
-              {activeMarker === zone.id && (
-                <InfoWindowF
-                  position={{ lat: zone.lat!, lng: zone.lng! }}
-                  onCloseClick={() => setActiveMarker(null)}
-                >
-                  <div className="min-w-[200px] p-1">
-                    <h4 className="font-semibold text-sm text-gray-900">{zone.name}</h4>
-                    {zone.plan && (
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        Piano {PLAN_LABELS[zone.plan] || zone.plan}
-                      </p>
-                    )}
-                    {zone.price > 0 && (
-                      <p className="text-sm font-semibold text-blue-600 mt-1">
-                        {formatPrice(zone.price)}/mese
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500 mt-1">
-                      {zone.slots.max - zone.slots.taken} slot su {zone.slots.max} disponibili
-                    </p>
-                    {zone.population > 0 && (
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {zone.population.toLocaleString("it-IT")} abitanti
-                      </p>
-                    )}
-                    {zone.slots.taken >= zone.slots.max ? (
-                      <p className="mt-2 text-xs font-semibold text-red-600">Zona esaurita</p>
-                    ) : isZoneSelected(zone.id) ? (
-                      <button
-                        type="button"
-                        onClick={() => toggleZone(zone)}
-                        className="mt-2 w-full rounded-md bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100"
-                      >
-                        Rimuovi
-                      </button>
-                    ) : maxReached ? (
-                      <p className="mt-2 text-xs text-gray-400">Max 3 zone selezionate</p>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => toggleZone(zone)}
-                        className="mt-2 w-full rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
-                      >
-                        Seleziona zona
-                      </button>
-                    )}
-                  </div>
-                </InfoWindowF>
-              )}
-            </MarkerF>
-          ))}
+              <div className="min-w-[220px] p-1">
+                <h4 className="font-semibold text-sm text-gray-900">{activeZone.name}</h4>
+                {activeZone.plan && (
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Piano {PLAN_LABELS[activeZone.plan] || activeZone.plan}
+                  </p>
+                )}
+                {activeZone.price > 0 && (
+                  <p className="text-base font-bold text-blue-600 mt-1.5">
+                    {formatPrice(activeZone.price)}/mese
+                  </p>
+                )}
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <span className={`h-2 w-2 rounded-full ${
+                    activeZone.slots.taken >= activeZone.slots.max ? "bg-red-500" :
+                    activeZone.slots.max - activeZone.slots.taken === 1 ? "bg-orange-500" : "bg-green-500"
+                  }`} />
+                  <span className="text-xs text-gray-600">
+                    {activeZone.slots.max - activeZone.slots.taken} di {activeZone.slots.max} slot disponibili
+                  </span>
+                </div>
+                {activeZone.population > 0 && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    {activeZone.population.toLocaleString("it-IT")} abitanti
+                  </p>
+                )}
+
+                {/* Action button */}
+                <div className="mt-3">
+                  {activeZone.slots.taken >= activeZone.slots.max ? (
+                    <p className="text-xs font-semibold text-red-600 text-center py-1">Zona esaurita</p>
+                  ) : isZoneSelected(activeZone.id) ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleZone(activeZone)}
+                      className="w-full rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors"
+                    >
+                      Rimuovi dalla selezione
+                    </button>
+                  ) : maxReached ? (
+                    <p className="text-xs text-gray-400 text-center py-1">Hai gia selezionato 3 zone</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => toggleZone(activeZone)}
+                      className="w-full rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
+                    >
+                      Seleziona questa zona
+                    </button>
+                  )}
+                </div>
+              </div>
+            </InfoWindowF>
+          )}
         </GoogleMap>
       )}
 
-      {/* Fallback: list view for zones without coordinates */}
+      {/* Fallback: list view for zones without coordinates or if maps not loaded */}
       {!loading && zones.length > 0 && (zonesWithCoords.length === 0 || !isLoaded) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {zones.map((zone) => {
@@ -303,7 +362,7 @@ export default function ZonePreferenceSelector({
                     <p className="text-xs font-semibold text-primary mt-0.5">{formatPrice(zone.price)}/mese</p>
                   )}
                   <p className="text-[11px] text-text-muted mt-0.5">
-                    {zone.slots.max - zone.slots.taken}/{zone.slots.max} slot disponibili
+                    {zone.slots.max - zone.slots.taken}/{zone.slots.max} slot
                     {zone.population > 0 && ` · ${zone.population.toLocaleString("it-IT")} ab.`}
                   </p>
                   {isFull && <p className="text-[11px] font-semibold text-error mt-0.5">Esaurita</p>}
@@ -318,16 +377,16 @@ export default function ZonePreferenceSelector({
       {!loading && zones.length > 0 && (
         <div className="flex flex-wrap gap-4 text-[11px] text-text-muted">
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-green-500" /> Disponibile
+            <span className="h-3 w-3 rounded-full bg-green-500/30 border border-green-500" /> Disponibile
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-orange-500" /> Ultimo slot
+            <span className="h-3 w-3 rounded-full bg-orange-500/30 border border-orange-500" /> Ultimo slot
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-500" /> Esaurita
+            <span className="h-3 w-3 rounded-full bg-red-500/20 border border-red-500" /> Esaurita
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-blue-500" /> Selezionata
+            <span className="h-3 w-3 rounded-full bg-blue-500/40 border-2 border-blue-500" /> Selezionata
           </span>
         </div>
       )}
