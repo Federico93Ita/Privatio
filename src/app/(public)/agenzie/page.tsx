@@ -92,60 +92,68 @@ const benefits = [
 const piani = [
   {
     name: "Base",
+    subtitle: "Comuni piccoli e rurali",
     tiers: [
       { label: "Cluster rurale", price: 300, slots: 3 },
       { label: "Comune < 20.000 ab.", price: 400, slots: 4 },
     ],
     features: [
-      "1 zona operativa",
-      "Profilo agenzia sulla piattaforma",
-      "Dashboard di gestione",
-      "Notifica nuovi immobili entro 24h",
+      "1 zona operativa inclusa",
+      "Notifica nuovi immobili 24h",
+      "Profilo agenzia in piattaforma",
+      "Dashboard di gestione base",
+      "Max 3–4 agenzie per zona",
     ],
     cta: "Inizia con il Base",
     highlighted: false,
   },
   {
     name: "Locale",
+    subtitle: "Comuni medi e periferie",
     tiers: [
       { label: "Comune 20k\u201380k ab.", price: 650, slots: 5 },
       { label: "Macroquartiere periferia", price: 850, slots: 5 },
     ],
     features: [
       "Fino a 2 zone operative",
-      "Notifica rapida entro 8 ore",
-      "Dashboard avanzata",
-      "Visibilit\u00e0 locale",
+      "Notifica nuovi immobili 8h",
+      "Dashboard avanzata completa",
+      "Visibilit\u00e0 locale garantita",
+      "Max 5 agenzie per zona",
     ],
     cta: "Scegli Locale",
     highlighted: false,
   },
   {
     name: "City",
+    subtitle: "Centri urbani e zone OMI",
     tiers: [
       { label: "Macroquartiere centro", price: 1100, slots: 6 },
       { label: "Microzona OMI classe B", price: 1500, slots: 6 },
     ],
     features: [
       "Fino a 3 zone operative",
-      "Notifica rapida entro 2 ore",
-      "Alta visibilit\u00e0 con i venditori",
-      "Statistiche avanzate e reportistica",
+      "Notifica nuovi immobili 2h",
+      "Alta visibilit\u00e0 venditori",
+      "Statistiche avanzate e report",
+      "Max 6 agenzie per zona",
     ],
     cta: "Scegli City",
     highlighted: true,
   },
   {
     name: "Prime",
+    subtitle: "Top city e zone premium",
     tiers: [
       { label: "Microzona OMI classe A", price: 2200, slots: 6 },
       { label: "OMI premium", price: 3200, slots: 6 },
     ],
     features: [
       "Fino a 4 zone operative",
-      "Notifica istantanea nuovi immobili",
-      "Prima posizione nelle ricerche",
-      "Branding premium e supporto dedicato",
+      "Notifica istantanea immobili",
+      "Prima posizione ricerche",
+      "Branding premium e supporto",
+      "Max 6 agenzie per zona",
     ],
     cta: "Scegli Prime",
     highlighted: false,
@@ -235,11 +243,11 @@ export default function AgenziePage() {
           </p>
 
           {/* 4 plan cards */}
-          <div className="mx-auto mt-12 grid max-w-6xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto mt-12 grid max-w-6xl gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
             {piani.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${
+                className={`relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${
                   plan.highlighted ? "border-primary ring-2 ring-primary/20" : "border-border"
                 }`}
               >
@@ -248,41 +256,40 @@ export default function AgenziePage() {
                     Pi&ugrave; scelto
                   </span>
                 )}
-                <h3 className="text-lg font-semibold text-text">{plan.name}</h3>
+
+                {/* Header */}
+                <div>
+                  <h3 className="text-lg font-semibold text-text">{plan.name}</h3>
+                  <p className="text-xs text-text-muted mt-0.5">{plan.subtitle}</p>
+                </div>
 
                 {/* Price tiers */}
-                <div className="mt-4 space-y-2.5">
+                <div className="mt-4 space-y-2">
                   {plan.tiers.map((tier) => (
-                    <div key={tier.label} className="flex items-baseline justify-between gap-2">
-                      <span className="text-xs text-text-muted">{tier.label}</span>
-                      <span className="text-sm font-semibold text-primary-dark whitespace-nowrap">
+                    <div key={tier.label} className="rounded-lg bg-bg-soft px-3 py-2 flex items-baseline justify-between gap-2">
+                      <span className="text-[11px] text-text-muted leading-tight">{tier.label}</span>
+                      <span className="text-sm font-bold text-primary-dark whitespace-nowrap">
                         &euro;{tier.price.toLocaleString("it-IT")}
-                        <span className="text-xs font-normal text-text-muted">/mese</span>
+                        <span className="text-[10px] font-normal text-text-muted">/mese</span>
                       </span>
                     </div>
                   ))}
                 </div>
 
-                {/* Slot info */}
-                <div className="mt-3 rounded-lg bg-bg-soft px-3 py-1.5 text-center">
-                  <span className="text-xs text-text-muted">
-                    Max {plan.tiers[0].slots}–{plan.tiers[plan.tiers.length - 1].slots} agenzie/zona
-                  </span>
-                </div>
-
-                {/* Features */}
-                <ul className="mt-4 space-y-2">
+                {/* Features — flex-grow so CTA stays at bottom */}
+                <ul className="mt-5 space-y-2.5 flex-grow">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-text">
+                    <li key={f} className="flex items-start gap-2 text-[13px] leading-snug text-text">
                       <CheckIcon />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
 
+                {/* CTA — always at bottom */}
                 <a
                   href="#registrazione"
-                  className={`mt-5 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
+                  className={`mt-6 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary/90"
                       : "border border-primary text-primary hover:bg-primary/5"
