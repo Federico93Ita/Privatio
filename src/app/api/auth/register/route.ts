@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, phone, password, role, accettaTermini, accettaPrivacy, accettaMarketing, termsVersion } = parsed.data;
+    const { name, email, phone, password, role, accettaTermini, accettaPrivacy, accettaFase2, accettaClausole, accettaMarketing, termsVersion } = parsed.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
         role: role || "SELLER",
         ...(accettaTermini && { termsAcceptedAt: now }),
         ...(accettaPrivacy && { privacyAcceptedAt: now }),
+        ...(accettaFase2 && { fase2ConsentAt: now }),
+        ...(accettaClausole && { clausoleApprovedAt: now }),
         marketingConsent: accettaMarketing || false,
         termsVersion: termsVersion || null,
         termsAcceptedIp: accettaTermini ? ip : null,

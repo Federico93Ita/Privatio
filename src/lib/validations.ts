@@ -102,6 +102,8 @@ export const registerSchema = z.object({
   // Consent tracking
   accettaTermini: z.boolean().optional(),
   accettaPrivacy: z.boolean().optional(),
+  accettaFase2: z.boolean().optional(),
+  accettaClausole: z.boolean().optional(),
   accettaMarketing: z.boolean().optional(),
   termsVersion: z.string().optional(),
 });

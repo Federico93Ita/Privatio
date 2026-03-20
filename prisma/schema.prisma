@@ -33,6 +33,8 @@ model User {
   // Consent tracking
   termsAcceptedAt    DateTime?
   privacyAcceptedAt  DateTime?
+  fase2ConsentAt     DateTime?
+  clausoleApprovedAt DateTime?
   marketingConsent   Boolean   @default(false)
   termsVersion       String?
   termsAcceptedIp    String?
