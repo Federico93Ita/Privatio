@@ -5,17 +5,17 @@
 
 export const PLAN_LABELS: Record<string, string> = {
   BASE: "Base",
-  PREMIER_LOCAL: "Premier Local",
-  PREMIER_CITY: "Premier City",
-  PREMIER_PRIME: "Premier Prime",
-  PREMIER_ELITE: "Premier Elite",
+  PREMIER_LOCAL: "Locale",
+  PREMIER_CITY: "City",
+  PREMIER_PRIME: "Prime",
+  PREMIER_ELITE: "Elite", // legacy, non più usato
 };
 
 export const ZONE_CLASS_LABELS: Record<string, string> = {
-  CLUSTER_LOCAL: "Cluster",
+  CLUSTER_LOCAL: "Cluster Rurale",
   COMUNE: "Comune",
   MACROQUARTIERE: "Quartiere",
-  MICROZONA_PRIME: "Microzona Prime",
+  MICROZONA_PRIME: "Microzona",
 };
 
 export const ZONE_CLASS_COLORS: Record<string, string> = {
@@ -28,9 +28,9 @@ export const ZONE_CLASS_COLORS: Record<string, string> = {
 /** Maps zone class to available plans */
 export const ZONE_CLASS_PLANS: Record<string, string[]> = {
   CLUSTER_LOCAL: ["BASE"],
-  COMUNE: ["PREMIER_LOCAL"],
-  MACROQUARTIERE: ["PREMIER_CITY"],
-  MICROZONA_PRIME: ["PREMIER_PRIME", "PREMIER_ELITE"],
+  COMUNE: ["BASE", "PREMIER_LOCAL"],
+  MACROQUARTIERE: ["PREMIER_LOCAL", "PREMIER_CITY"],
+  MICROZONA_PRIME: ["PREMIER_CITY", "PREMIER_PRIME"],
 };
 
 /** Price field keys per plan in zone data */

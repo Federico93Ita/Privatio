@@ -59,20 +59,19 @@ export default function AgenzieRegistrationForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-xl font-medium text-primary-dark">Richiesta inviata!</h3>
+        <h3 className="text-xl font-medium text-primary-dark">Sei in lista!</h3>
         <p className="mt-2 text-text-muted">
-          La tua richiesta è stata ricevuta e verrà valutata dal nostro team.
+          La tua richiesta &egrave; stata ricevuta. Ti contatteremo per riservare la tua zona.
         </p>
         {preferredZones.length > 0 && (
           <p className="mt-2 text-sm text-text-muted">
             Hai indicato <strong>{preferredZones.length} {preferredZones.length === 1 ? "zona" : "zone"}</strong> di interesse.
-            Verranno riservate per te dopo l&apos;approvazione.
+            Verranno riservate per te all&apos;apertura delle iscrizioni.
           </p>
         )}
         <p className="mt-3 text-sm text-text-muted">
           Riceverai una <strong>email di conferma</strong> all&apos;indirizzo indicato.
-          Una volta approvata la richiesta, ti invieremo un <strong>link per completare
-          la registrazione</strong> e accedere alla tua dashboard agenzia.
+          Quando apriremo le iscrizioni nella tua zona, sarai tra i primi a essere contattato.
         </p>
         <p className="mt-2 text-sm text-text-muted">
           Tempi di risposta: entro 24 ore lavorative.
@@ -155,7 +154,7 @@ export default function AgenzieRegistrationForm() {
 
       <button type="submit" disabled={submitting}
         className="w-full rounded-lg bg-primary py-3 text-sm font-medium text-white transition-colors hover:bg-primary/85 disabled:opacity-50">
-        {submitting ? "Invio in corso..." : "Invia richiesta"}
+        {submitting ? "Invio in corso..." : "Entra in lista d'attesa"}
       </button>
     </form>
   );

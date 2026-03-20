@@ -7,7 +7,7 @@ import AgenzieFAQ from "./AgenzieFAQ";
 export const metadata: Metadata = {
   title: "Diventa Partner | Privatio",
   description:
-    "Entra nel network Privatio. I venditori nella tua zona ti trovano e ti contattano direttamente. Gestisci la tua attività in autonomia dalla dashboard.",
+    "Entra nel network Privatio. I venditori nella tua zona ti trovano e ti contattano direttamente.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -16,17 +16,7 @@ export const metadata: Metadata = {
 
 function UsersIcon() {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-primary"
-    >
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -37,17 +27,7 @@ function UsersIcon() {
 
 function DocumentIcon() {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-primary"
-    >
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
@@ -58,38 +38,16 @@ function DocumentIcon() {
 
 function DashboardIcon() {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-primary"
-    >
-      <rect x="3" y="3" width="7" height="7" />
-      <rect x="14" y="3" width="7" height="7" />
-      <rect x="3" y="14" width="7" height="7" />
-      <rect x="14" y="14" width="7" height="7" />
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
     </svg>
   );
 }
 
 function MoneyIcon() {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-primary"
-    >
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
       <line x1="12" y1="1" x2="12" y2="23" />
       <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
     </svg>
@@ -98,17 +56,7 @@ function MoneyIcon() {
 
 function CheckIcon() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-success"
-    >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-success shrink-0">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -122,68 +70,103 @@ const benefits = [
   {
     icon: <UsersIcon />,
     title: "Clienti garantiti senza ricerca",
-    description:
-      "I venditori nella tua zona ti trovano direttamente nella piattaforma. Nessun costo di acquisizione, nessuna campagna pubblicitaria necessaria.",
+    description: "I venditori nella tua zona ti trovano direttamente. Nessun costo di acquisizione.",
   },
   {
     icon: <DocumentIcon />,
     title: "Lead venditori pre-qualificati",
-    description:
-      "I venditori possono contattarti direttamente. Chi non contatta un'agenzia entro 48h viene segnalato automaticamente. Il rapporto contrattuale lo gestisci direttamente tu con il cliente, in totale autonomia.",
+    description: "I venditori ti contattano direttamente. Il rapporto contrattuale lo gestisci in totale autonomia.",
   },
   {
     icon: <DashboardIcon />,
     title: "Dashboard gestione completa",
-    description:
-      "Gestisci l'intera pipeline immobiliare da un'unica piattaforma: sopralluoghi, pubblicazione annunci, visite, trattative e chiusura vendita.",
+    description: "Gestisci l'intera pipeline immobiliare da un'unica piattaforma.",
   },
   {
     icon: <MoneyIcon />,
     title: "Guadagni direttamente dal cliente",
-    description:
-      "La tua provvigione la concordi direttamente con il cliente. Privatio non trattiene commissioni sulle vendite e non interviene nella trattativa.",
+    description: "La tua provvigione la concordi direttamente con il cliente. Privatio non trattiene commissioni.",
   },
 ];
 
 const piani = [
   {
     name: "Base",
-    priceRange: "200–300",
+    tiers: [
+      { label: "Cluster rurale", price: 300, slots: 3 },
+      { label: "Comune < 20.000 ab.", price: 400, slots: 4 },
+    ],
     features: [
       "1 zona operativa",
-      "Max 6 agenzie per zona",
-      "Notifica nuovi immobili entro 24h",
       "Profilo agenzia sulla piattaforma",
       "Dashboard di gestione",
+      "Notifica nuovi immobili entro 24h",
     ],
     cta: "Inizia con il Base",
     highlighted: false,
   },
   {
-    name: "Professional",
-    priceRange: "390–1.100",
+    name: "Locale",
+    tiers: [
+      { label: "Comune 20k\u201380k ab.", price: 650, slots: 5 },
+      { label: "Macroquartiere periferia", price: 850, slots: 5 },
+    ],
+    features: [
+      "Fino a 2 zone operative",
+      "Notifica rapida entro 8 ore",
+      "Dashboard avanzata",
+      "Visibilit\u00e0 locale",
+    ],
+    cta: "Scegli Locale",
+    highlighted: false,
+  },
+  {
+    name: "City",
+    tiers: [
+      { label: "Macroquartiere centro", price: 1100, slots: 6 },
+      { label: "Microzona OMI classe B", price: 1500, slots: 6 },
+    ],
     features: [
       "Fino a 3 zone operative",
-      "Max 4 agenzie per zona",
       "Notifica rapida entro 2 ore",
-      "Alta visibilità con i venditori",
+      "Alta visibilit\u00e0 con i venditori",
       "Statistiche avanzate e reportistica",
     ],
-    cta: "Scegli Professional",
+    cta: "Scegli City",
     highlighted: true,
   },
   {
-    name: "Premium",
-    priceRange: "1.100–3.000",
+    name: "Prime",
+    tiers: [
+      { label: "Microzona OMI classe A", price: 2200, slots: 6 },
+      { label: "OMI premium", price: 3200, slots: 6 },
+    ],
     features: [
       "Fino a 4 zone operative",
-      "Max 3 agenzie per zona",
       "Notifica istantanea nuovi immobili",
       "Prima posizione nelle ricerche",
       "Branding premium e supporto dedicato",
     ],
-    cta: "Scegli Premium",
+    cta: "Scegli Prime",
     highlighted: false,
+  },
+];
+
+const addons = [
+  {
+    name: "Slot aggiuntivo",
+    price: "\u201335% sul piano attivo",
+    description: "Acquista una seconda zona territoriale con sconto del 35%.",
+  },
+  {
+    name: "Badge \"Agenzia verificata\"",
+    price: "+\u20AC75/mese",
+    description: "Badge visibile sui listing assegnati alla tua agenzia.",
+  },
+  {
+    name: "Priority boost",
+    price: "+\u20AC100/mese",
+    description: "Appari prima nelle notifiche ai venditori della tua zona.",
   },
 ];
 
@@ -197,20 +180,23 @@ export default function AgenziePage() {
       <Header />
 
       {/* ---- Hero ---- */}
-      <section className="pt-28 pb-16 md:pt-36 md:pb-20">
+      <section className="pt-28 pb-16 md:pt-36 md:pb-20 bg-gradient-to-b from-primary/[0.03] to-transparent">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-4 py-1.5">
+            <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-sm font-medium text-accent">Posti limitati per zona</span>
+          </div>
           <h1 className="text-4xl font-light tracking-[-0.03em] text-text md:text-5xl">
-            Porta la tua agenzia nel futuro
+            Assicurati l&apos;esclusivit&agrave; nella tua zona
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-text-muted md:text-xl">
-            Entra nel network Privatio e lasciati trovare dai venditori nella
-            tua zona.
+            Solo un numero limitato di agenzie per zona. Una volta assegnata, nessun altro pu&ograve; toglierti il posto.
           </p>
           <a
             href="#registrazione"
-            className="mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-8 py-3.5 text-base font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
+            className="mt-8 inline-flex items-center justify-center rounded-xl bg-primary px-8 py-4 text-base font-medium text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:bg-primary/85 hover:-translate-y-0.5"
           >
-            Diventa Partner
+            Entra in lista d&apos;attesa
           </a>
         </div>
       </section>
@@ -219,28 +205,19 @@ export default function AgenziePage() {
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
-            Perche scegliere Privatio
+            Perch&eacute; scegliere Privatio
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
-            Tutto cio di cui la tua agenzia ha bisogno per crescere, in
-            un&apos;unica piattaforma.
+            Tutto ci&ograve; di cui la tua agenzia ha bisogno per crescere, in un&apos;unica piattaforma.
           </p>
-
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map((b) => (
-              <div
-                key={b.title}
-                className="group rounded-2xl border border-border bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/30"
-              >
+              <div key={b.title} className="group rounded-2xl border border-border bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
                   {b.icon}
                 </div>
-                <h3 className="mt-5 text-lg font-medium text-primary-dark" style={{ fontFamily: "var(--font-sans)" }}>
-                  {b.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted">
-                  {b.description}
-                </p>
+                <h3 className="mt-5 text-lg font-medium text-primary-dark">{b.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">{b.description}</p>
               </div>
             ))}
           </div>
@@ -254,35 +231,47 @@ export default function AgenziePage() {
             Scegli il tuo piano
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
-            Acquista presenza e priorita nelle zone in cui operi. Prezzi variabili
-            in base al mercato della zona.
+            Prezzi fissi per tipo di zona. Nessuna sorpresa: selezioni il territorio e vedi il prezzo esatto.
           </p>
 
-          <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* 4 plan cards */}
+          <div className="mx-auto mt-12 grid max-w-6xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {piani.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl border bg-white p-7 shadow-sm transition-shadow hover:shadow-md ${
-                  plan.highlighted
-                    ? "border-primary ring-2 ring-primary/20"
-                    : "border-border"
+                className={`relative rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:shadow-md ${
+                  plan.highlighted ? "border-primary ring-2 ring-primary/20" : "border-border"
                 }`}
               >
                 {plan.highlighted && (
                   <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-medium text-white">
-                    Consigliato
+                    Pi&ugrave; scelto
                   </span>
                 )}
-                <h3 className="text-lg font-semibold text-text">
-                  {plan.name}
-                </h3>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-2xl font-medium text-primary-dark">
-                    &euro;{plan.priceRange}
-                  </span>
-                  <span className="text-text-muted text-sm">/mese</span>
+                <h3 className="text-lg font-semibold text-text">{plan.name}</h3>
+
+                {/* Price tiers */}
+                <div className="mt-4 space-y-2.5">
+                  {plan.tiers.map((tier) => (
+                    <div key={tier.label} className="flex items-baseline justify-between gap-2">
+                      <span className="text-xs text-text-muted">{tier.label}</span>
+                      <span className="text-sm font-semibold text-primary-dark whitespace-nowrap">
+                        &euro;{tier.price.toLocaleString("it-IT")}
+                        <span className="text-xs font-normal text-text-muted">/mese</span>
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <ul className="mt-6 space-y-3">
+
+                {/* Slot info */}
+                <div className="mt-3 rounded-lg bg-bg-soft px-3 py-1.5 text-center">
+                  <span className="text-xs text-text-muted">
+                    Max {plan.tiers[0].slots}–{plan.tiers[plan.tiers.length - 1].slots} agenzie/zona
+                  </span>
+                </div>
+
+                {/* Features */}
+                <ul className="mt-4 space-y-2">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-text">
                       <CheckIcon />
@@ -290,9 +279,10 @@ export default function AgenziePage() {
                     </li>
                   ))}
                 </ul>
+
                 <a
                   href="#registrazione"
-                  className={`mt-7 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
+                  className={`mt-5 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
                     plan.highlighted
                       ? "bg-primary text-white hover:bg-primary/90"
                       : "border border-primary text-primary hover:bg-primary/5"
@@ -304,9 +294,30 @@ export default function AgenziePage() {
             ))}
           </div>
 
-          <p className="text-center text-sm text-text-muted mt-8">
-            Il prezzo esatto dipende dalla zona. Zone ad alto valore di mercato hanno prezzi
-            pi&ugrave; alti rispetto a zone pi&ugrave; piccole. Tutti i prezzi sono + IVA.
+          {/* Annual discount */}
+          <div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-success/20 bg-success/5 p-6 text-center">
+            <p className="text-sm font-semibold text-success">Abbonamento annuale: &minus;15%</p>
+            <p className="mt-1 text-xs text-text-muted">
+              Pagando in anticipo risparmi circa 2 mesi. Esempio: piano City a &euro;1.100/mese &rarr; &euro;11.220/anno (risparmi &euro;1.980).
+            </p>
+          </div>
+
+          {/* Add-ons */}
+          <div className="mx-auto mt-10 max-w-4xl">
+            <h3 className="text-center text-lg font-medium text-text mb-5">Add-on opzionali</h3>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {addons.map((addon) => (
+                <div key={addon.name} className="rounded-xl border border-border bg-white p-5">
+                  <p className="text-sm font-semibold text-text">{addon.name}</p>
+                  <p className="text-xs font-medium text-primary mt-1">{addon.price}</p>
+                  <p className="text-xs text-text-muted mt-2">{addon.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-text-muted mt-8">
+            Tutti i prezzi sono + IVA. Lo sconto annuale si applica al canone base, non agli add-on.
           </p>
         </div>
       </section>
@@ -315,10 +326,10 @@ export default function AgenziePage() {
       <section className="py-16 md:py-24" id="registrazione">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
-            Diventa partner
+            Entra in lista d&apos;attesa
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
-            Compila il modulo e ti contatteremo entro 24 ore lavorative.
+            Compila il modulo per riservare la tua zona. Ti contatteremo entro 24 ore lavorative.
           </p>
           <div className="mt-10">
             <AgenzieRegistrationForm />

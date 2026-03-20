@@ -4,24 +4,28 @@ import { useState } from "react";
 
 const faqs = [
   {
+    q: "Come funziona la lista d'attesa?",
+    a: "Compilando il modulo entri in lista d'attesa per la tua zona. Quando le iscrizioni apriranno nella tua area, sarai tra i primi a essere contattato per riservare il tuo territorio. I posti sono limitati per ogni zona.",
+  },
+  {
     q: "Come funziona il modello Privatio per le agenzie?",
-    a: "Privatio raccoglie venditori privati che vogliono vendere il proprio immobile. I venditori consultano la lista delle agenzie partner nella loro zona e possono contattarti direttamente. Se un venditore non contatta nessuna agenzia entro 48 ore, i suoi dati vengono condivisi con le agenzie della zona. Il rapporto professionale lo gestisci in totale autonomia. Privatio non interviene nella mediazione.",
+    a: "Privatio raccoglie venditori privati che vogliono vendere il proprio immobile. I venditori nella tua zona ti trovano e ti contattano direttamente dalla piattaforma. Il rapporto professionale lo gestisci in totale autonomia. Privatio non interviene nella mediazione.",
   },
   {
     q: "Quanto costa l'abbonamento?",
-    a: "Il costo dipende dal piano scelto e dalla zona in cui operi. I piani vanno da Base (a partire da €200/mese per 1 area) fino a Premier Elite (a partire da €1.800/mese per fino a 4 aree). Il prezzo varia in base al valore di mercato della zona. Nessun costo aggiuntivo sulle vendite.",
+    a: "Il prezzo dipende dalla zona. Ogni territorio ha un prezzo fisso e trasparente: da €300/mese per zone rurali fino a €3.200/mese per le microzone premium nelle grandi città. Pagando annualmente risparmi il 15%. Nessun costo aggiuntivo sulle vendite.",
   },
   {
-    q: "Come ricevo i lead?",
-    a: "I venditori nella tua zona possono trovarti e contattarti direttamente dalla piattaforma. Inoltre, se un venditore non contatta nessuna agenzia entro 48 ore dalla registrazione, i suoi dati vengono automaticamente condivisi con le agenzie partner della zona. In entrambi i casi, trovi tutto nella tua dashboard.",
+    q: "Il posto è garantito?",
+    a: "Il posto viene riservato in ordine di iscrizione. Ogni zona ha un numero massimo di agenzie (da 3 a 6 a seconda del tipo di territorio). Una volta raggiunto il limite, la zona non è più disponibile fino a eventuali disdette.",
   },
   {
     q: "Privatio è un mediatore immobiliare?",
-    a: "No. Privatio è una piattaforma tecnologica di lead generation. Non svolgiamo attività di mediazione immobiliare. Ti forniamo segnalazioni di potenziali clienti venditori; il rapporto professionale e contrattuale lo gestisci direttamente tu.",
+    a: "No. Privatio è una piattaforma tecnologica di lead generation. Non svolgiamo attività di mediazione immobiliare. Ti forniamo segnalazioni di potenziali clienti venditori; il rapporto contrattuale lo gestisci direttamente tu.",
   },
   {
     q: "Posso disdire l'abbonamento in qualsiasi momento?",
-    a: "Assolutamente sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard. I lead già ricevuti restano tuoi.",
+    a: "Sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard. I lead già ricevuti restano tuoi. Con l'abbonamento annuale risparmi il 15%.",
   },
 ];
 

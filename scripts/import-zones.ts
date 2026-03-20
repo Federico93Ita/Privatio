@@ -238,6 +238,36 @@ function generateFallbackData(): ComuneData[] {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Geocoding via Google Maps API                                      */
+/* ------------------------------------------------------------------ */
+
+const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "";
+const geocodeCache = new Map<string, { lat: number; lng: number } | null>();
+
+async function geocode(address: string): Promise<{ lat: number; lng: number } | null> {
+  if (geocodeCache.has(address)) return geocodeCache.get(address)!;
+  if (!GOOGLE_MAPS_KEY) {
+    geocodeCache.set(address, null);
+    return null;
+  }
+
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.results?.[0]?.geometry?.location) {
+      const { lat, lng } = data.results[0].geometry.location;
+      geocodeCache.set(address, { lat, lng });
+      return { lat, lng };
+    }
+  } catch {
+    // Silently fail geocoding
+  }
+  geocodeCache.set(address, null);
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Genera slug univoco                                                */
 /* ------------------------------------------------------------------ */
 
@@ -279,7 +309,8 @@ async function createZones(comuni: ComuneData[]) {
     for (const c of grandiCitta) {
       const slug = slugify(`${c.name}-${province}`);
       const score = calculateMarketScore(c.population, c.population * 0.015);
-      const pricing = calculateZonePricing("COMUNE", score);
+      const pricing = calculateZonePricing("COMUNE", score, c.population);
+      const coords = await geocode(`${c.name}, ${province}, Italia`);
 
       await upsertZone({
         name: c.name,
@@ -291,6 +322,8 @@ async function createZones(comuni: ComuneData[]) {
         municipalities: [c.name],
         population: c.population,
         marketScore: score,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
         ...pricing,
       });
       created++;
@@ -301,7 +334,8 @@ async function createZones(comuni: ComuneData[]) {
       const zoneClass = classifyZone(c.population);
       const slug = slugify(`${c.name}-${province}`);
       const score = calculateMarketScore(c.population, c.population * 0.01);
-      const pricing = calculateZonePricing(zoneClass, score);
+      const pricing = calculateZonePricing(zoneClass, score, c.population);
+      const coords = await geocode(`${c.name}, ${province}, Italia`);
 
       await upsertZone({
         name: c.name,
@@ -313,6 +347,8 @@ async function createZones(comuni: ComuneData[]) {
         municipalities: [c.name],
         population: c.population,
         marketScore: score,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
         ...pricing,
       });
       created++;
@@ -341,7 +377,9 @@ async function createZones(comuni: ComuneData[]) {
 
         const slug = slugify(`cluster-${province}-${i}`);
         const score = calculateMarketScore(totalPop, totalPop * 0.005);
-        const pricing = calculateZonePricing("CLUSTER_LOCAL", score);
+        const pricing = calculateZonePricing("CLUSTER_LOCAL", score, totalPop);
+        // Geocode primo comune del cluster
+        const coords = await geocode(`${chunk[0].name}, ${province}, Italia`);
 
         await upsertZone({
           name: clusterName,
@@ -353,6 +391,8 @@ async function createZones(comuni: ComuneData[]) {
           municipalities: names,
           population: totalPop,
           marketScore: score,
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
           ...pricing,
         });
         clustered += chunk.length;
@@ -374,6 +414,8 @@ interface ZoneInput {
   municipalities: string[];
   population: number;
   marketScore: number;
+  lat: number | null;
+  lng: number | null;
   priceBase: number | null;
   priceLocal: number | null;
   priceCity: number | null;
@@ -394,6 +436,8 @@ async function upsertZone(input: ZoneInput) {
         name: input.name,
         population: input.population,
         marketScore: input.marketScore,
+        lat: input.lat,
+        lng: input.lng,
         priceBase: input.priceBase,
         priceLocal: input.priceLocal,
         priceCity: input.priceCity,
@@ -417,6 +461,8 @@ async function upsertZone(input: ZoneInput) {
         population: input.population,
         ntn: 0,
         marketScore: input.marketScore,
+        lat: input.lat,
+        lng: input.lng,
         priceBase: input.priceBase,
         priceLocal: input.priceLocal,
         priceCity: input.priceCity,

@@ -49,13 +49,21 @@ export async function GET(req: NextRequest) {
   });
 
   const result = zones.map((z) => {
-    const activeByPlan = {
-      BASE: z.territories.filter((t) => t.plan === "BASE").length,
-      PREMIER_LOCAL: z.territories.filter((t) => t.plan === "PREMIER_LOCAL").length,
-      PREMIER_CITY: z.territories.filter((t) => t.plan === "PREMIER_CITY").length,
-      PREMIER_PRIME: z.territories.filter((t) => t.plan === "PREMIER_PRIME").length,
-      PREMIER_ELITE: z.territories.filter((t) => t.plan === "PREMIER_ELITE").length,
-    };
+    const totalTaken = z.territories.length;
+
+    // Determine the active plan and price for this zone (fixed pricing model)
+    const activePlan =
+      z.priceBase != null ? "BASE" :
+      z.priceLocal != null ? "PREMIER_LOCAL" :
+      z.priceCity != null ? "PREMIER_CITY" :
+      z.pricePrime != null ? "PREMIER_PRIME" :
+      z.priceElite != null ? "PREMIER_ELITE" : null;
+
+    const price =
+      z.priceBase ?? z.priceLocal ?? z.priceCity ?? z.pricePrime ?? z.priceElite ?? 0;
+
+    const maxSlots =
+      z.maxBase || z.maxLocal || z.maxCity || z.maxPrime || z.maxElite || 0;
 
     return {
       id: z.id,
@@ -65,10 +73,16 @@ export async function GET(req: NextRequest) {
       region: z.region,
       province: z.province,
       city: z.city,
+      lat: z.lat,
+      lng: z.lng,
       municipalities: z.municipalities,
       marketScore: z.marketScore,
       population: z.population,
-      // Prezzi (solo quelli disponibili)
+      // Fixed pricing: one plan, one price per zone
+      plan: activePlan,
+      price,
+      slots: { taken: totalTaken, max: maxSlots },
+      // Legacy: keep full prices/slots for backward compatibility
       prices: {
         ...(z.priceBase != null && { BASE: z.priceBase }),
         ...(z.priceLocal != null && { PREMIER_LOCAL: z.priceLocal }),
@@ -76,13 +90,12 @@ export async function GET(req: NextRequest) {
         ...(z.pricePrime != null && { PREMIER_PRIME: z.pricePrime }),
         ...(z.priceElite != null && { PREMIER_ELITE: z.priceElite }),
       },
-      // Slot: disponibili / massimi
-      slots: {
-        ...(z.maxBase > 0 && { BASE: { taken: activeByPlan.BASE, max: z.maxBase } }),
-        ...(z.maxLocal > 0 && { PREMIER_LOCAL: { taken: activeByPlan.PREMIER_LOCAL, max: z.maxLocal } }),
-        ...(z.maxCity > 0 && { PREMIER_CITY: { taken: activeByPlan.PREMIER_CITY, max: z.maxCity } }),
-        ...(z.maxPrime > 0 && { PREMIER_PRIME: { taken: activeByPlan.PREMIER_PRIME, max: z.maxPrime } }),
-        ...(z.maxElite > 0 && { PREMIER_ELITE: { taken: activeByPlan.PREMIER_ELITE, max: z.maxElite } }),
+      // Legacy slots
+      slots_legacy: {
+        ...(z.maxBase > 0 && { BASE: { taken: z.territories.filter((t) => t.plan === "BASE").length, max: z.maxBase } }),
+        ...(z.maxLocal > 0 && { PREMIER_LOCAL: { taken: z.territories.filter((t) => t.plan === "PREMIER_LOCAL").length, max: z.maxLocal } }),
+        ...(z.maxCity > 0 && { PREMIER_CITY: { taken: z.territories.filter((t) => t.plan === "PREMIER_CITY").length, max: z.maxCity } }),
+        ...(z.maxPrime > 0 && { PREMIER_PRIME: { taken: z.territories.filter((t) => t.plan === "PREMIER_PRIME").length, max: z.maxPrime } }),
       },
     };
   });
