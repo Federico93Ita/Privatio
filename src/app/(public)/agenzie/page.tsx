@@ -301,14 +301,6 @@ export default function AgenziePage() {
             ))}
           </div>
 
-          {/* Annual discount */}
-          <div className="mx-auto mt-10 max-w-2xl rounded-2xl border border-success/20 bg-success/5 p-6 text-center">
-            <p className="text-sm font-semibold text-success">Abbonamento annuale: &minus;15%</p>
-            <p className="mt-1 text-xs text-text-muted">
-              Pagando in anticipo risparmi circa 2 mesi. Esempio: piano City a &euro;1.100/mese &rarr; &euro;11.220/anno (risparmi &euro;1.980).
-            </p>
-          </div>
-
           {/* Add-ons */}
           <div className="mx-auto mt-10 max-w-4xl">
             <h3 className="text-center text-lg font-medium text-text mb-5">Add-on opzionali</h3>
