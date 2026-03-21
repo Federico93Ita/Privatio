@@ -95,6 +95,14 @@ model Agency {
   invoiceCity      String?
   invoiceProvince  String?
   invoiceCap       String?
+  // Accettazione contratto di convenzionamento
+  contractAcceptedAt       DateTime?
+  privacyAcceptedAt        DateTime?
+  zeroCommissionAcceptedAt DateTime?
+  clausoleAcceptedAt       DateTime?
+  registroAcceptedAt       DateTime?
+  contractVersion          String?
+  contractAcceptedIp       String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   agents           User[]

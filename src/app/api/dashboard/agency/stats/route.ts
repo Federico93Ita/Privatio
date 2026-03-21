@@ -41,6 +41,7 @@ export async function GET() {
         isActive: true,
         rating: true,
         stripeCustomerId: true,
+        contractAcceptedAt: true,
         agents: {
           select: { id: true, name: true, email: true },
         },
