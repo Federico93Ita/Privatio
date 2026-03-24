@@ -11,7 +11,7 @@ function esc(s: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = applyRateLimit(RATE_LIMITS.lead, req);
+    const limited = await applyRateLimit(RATE_LIMITS.lead, req);
     if (limited) return limited;
 
     const body = await req.json();

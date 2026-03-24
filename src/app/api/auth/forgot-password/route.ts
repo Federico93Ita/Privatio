@@ -13,7 +13,7 @@ function esc(s: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = applyRateLimit(RATE_LIMITS.passwordReset, req);
+    const limited = await applyRateLimit(RATE_LIMITS.passwordReset, req);
     if (limited) return limited;
 
     const { email } = await req.json();

@@ -20,7 +20,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const limited = applyRateLimit(RATE_LIMITS.otp, req);
+    const limited = await applyRateLimit(RATE_LIMITS.otp, req);
     if (limited) return limited;
 
     const session = await getServerSession(authOptions);

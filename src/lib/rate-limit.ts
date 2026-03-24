@@ -1,30 +1,16 @@
 /**
- * In-memory rate limiter for Next.js API routes.
- * Uses a sliding window counter approach.
+ * Rate limiter for Next.js API routes.
  *
- * ⚠️  PRODUCTION TODO: Replace with @upstash/ratelimit for serverless deployments.
- *     In-memory stores are per-instance and do NOT share state across Vercel functions.
- *     Install: npm i @upstash/ratelimit @upstash/redis
- *     Then configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars.
- *     See: https://upstash.com/docs/redis/sdks/ratelimit-ts/overview
+ * Uses @upstash/ratelimit with Redis when UPSTASH_REDIS_REST_URL is configured (production).
+ * Falls back to in-memory sliding window for local development.
  */
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-const store = new Map<string, RateLimitEntry>();
-
-// Cleanup stale entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of store) {
-    if (entry.resetAt < now) {
-      store.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
 interface RateLimitConfig {
   /** Unique identifier for this limiter (e.g., "auth", "lead", "otp") */
@@ -42,27 +28,91 @@ interface RateLimitResult {
   resetAt: number;
 }
 
-/**
- * Check rate limit for a given key (usually IP or userId).
- * Returns { success: true } if under limit, { success: false } if exceeded.
- */
-export function rateLimit(
+/* ------------------------------------------------------------------ */
+/*  Upstash Redis rate limiter (production)                            */
+/* ------------------------------------------------------------------ */
+
+const useRedis = !!(
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+);
+
+const redis = useRedis
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : null;
+
+// Cache Ratelimit instances per config id
+const redisLimiters = new Map<string, Ratelimit>();
+
+function getRedisLimiter(config: RateLimitConfig): Ratelimit {
+  const key = `${config.id}:${config.limit}:${config.windowSeconds}`;
+  let limiter = redisLimiters.get(key);
+  if (!limiter) {
+    limiter = new Ratelimit({
+      redis: redis!,
+      limiter: Ratelimit.slidingWindow(
+        config.limit,
+        `${config.windowSeconds} s`
+      ),
+      prefix: `rl:${config.id}`,
+    });
+    redisLimiters.set(key, limiter);
+  }
+  return limiter;
+}
+
+/* ------------------------------------------------------------------ */
+/*  In-memory rate limiter (development fallback)                      */
+/* ------------------------------------------------------------------ */
+
+interface MemoryEntry {
+  count: number;
+  resetAt: number;
+}
+
+const memoryStore = new Map<string, MemoryEntry>();
+
+// Cleanup stale entries every 5 minutes
+if (typeof setInterval !== "undefined") {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of memoryStore) {
+      if (entry.resetAt < now) {
+        memoryStore.delete(key);
+      }
+    }
+  }, 5 * 60 * 1000);
+}
+
+function memoryRateLimit(
   config: RateLimitConfig,
   key: string
 ): RateLimitResult {
   const storeKey = `${config.id}:${key}`;
   const now = Date.now();
-  const entry = store.get(storeKey);
+  const entry = memoryStore.get(storeKey);
 
   if (!entry || entry.resetAt < now) {
-    // First request or window expired
     const resetAt = now + config.windowSeconds * 1000;
-    store.set(storeKey, { count: 1, resetAt });
-    return { success: true, limit: config.limit, remaining: config.limit - 1, resetAt };
+    memoryStore.set(storeKey, { count: 1, resetAt });
+    return {
+      success: true,
+      limit: config.limit,
+      remaining: config.limit - 1,
+      resetAt,
+    };
   }
 
   if (entry.count >= config.limit) {
-    return { success: false, limit: config.limit, remaining: 0, resetAt: entry.resetAt };
+    return {
+      success: false,
+      limit: config.limit,
+      remaining: 0,
+      resetAt: entry.resetAt,
+    };
   }
 
   entry.count++;
@@ -72,6 +122,31 @@ export function rateLimit(
     remaining: config.limit - entry.count,
     resetAt: entry.resetAt,
   };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Public API                                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Check rate limit for a given key (usually IP or userId).
+ * Uses Upstash Redis in production, in-memory in development.
+ */
+export async function rateLimit(
+  config: RateLimitConfig,
+  key: string
+): Promise<RateLimitResult> {
+  if (useRedis) {
+    const limiter = getRedisLimiter(config);
+    const result = await limiter.limit(key);
+    return {
+      success: result.success,
+      limit: result.limit,
+      remaining: result.remaining,
+      resetAt: result.reset,
+    };
+  }
+  return memoryRateLimit(config, key);
 }
 
 /**
@@ -93,13 +168,21 @@ export const RATE_LIMITS = {
   /** Auth endpoints: 5 requests per minute */
   auth: { id: "auth", limit: 5, windowSeconds: 60 } as RateLimitConfig,
   /** Registration: 3 requests per 10 minutes */
-  register: { id: "register", limit: 3, windowSeconds: 600 } as RateLimitConfig,
+  register: {
+    id: "register",
+    limit: 3,
+    windowSeconds: 600,
+  } as RateLimitConfig,
   /** Lead submission: 3 requests per minute per IP */
   lead: { id: "lead", limit: 3, windowSeconds: 60 } as RateLimitConfig,
   /** OTP requests: 3 requests per 15 minutes */
   otp: { id: "otp", limit: 3, windowSeconds: 900 } as RateLimitConfig,
   /** Password reset: 3 requests per 15 minutes */
-  passwordReset: { id: "pwd-reset", limit: 3, windowSeconds: 900 } as RateLimitConfig,
+  passwordReset: {
+    id: "pwd-reset",
+    limit: 3,
+    windowSeconds: 900,
+  } as RateLimitConfig,
   /** API reads: 60 requests per minute */
   apiRead: { id: "api-read", limit: 60, windowSeconds: 60 } as RateLimitConfig,
   /** File uploads: 10 requests per minute */
@@ -111,15 +194,15 @@ export const RATE_LIMITS = {
 /**
  * Helper: returns a 429 response if rate limit is exceeded.
  * Usage in API routes:
- *   const limited = applyRateLimit(RATE_LIMITS.auth, req);
+ *   const limited = await applyRateLimit(RATE_LIMITS.auth, req);
  *   if (limited) return limited;
  */
-export function applyRateLimit(
+export async function applyRateLimit(
   config: RateLimitConfig,
   req: Request
-): Response | null {
+): Promise<Response | null> {
   const ip = getClientIp(req);
-  const result = rateLimit(config, ip);
+  const result = await rateLimit(config, ip);
 
   if (!result.success) {
     const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);

@@ -10,7 +10,7 @@ const VERIFY_TOKEN_EXPIRY_HOURS = 24;
 
 export async function POST(req: NextRequest) {
   try {
-    const limited = applyRateLimit(RATE_LIMITS.register, req);
+    const limited = await applyRateLimit(RATE_LIMITS.register, req);
     if (limited) return limited;
 
     const body = await req.json();
