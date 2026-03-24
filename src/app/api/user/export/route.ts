@@ -25,6 +25,13 @@ export async function GET() {
         emailVerified: true,
         createdAt: true,
         updatedAt: true,
+        // Consent tracking
+        termsAcceptedAt: true,
+        privacyAcceptedAt: true,
+        fase2ConsentAt: true,
+        clausoleApprovedAt: true,
+        marketingConsent: true,
+        termsVersion: true,
         // Properties (if seller)
         properties: {
           select: {
@@ -50,6 +57,26 @@ export async function GET() {
             createdAt: true,
             updatedAt: true,
             publishedAt: true,
+            // Visits for this property
+            visits: {
+              select: {
+                id: true,
+                buyerName: true,
+                scheduledAt: true,
+                status: true,
+                createdAt: true,
+              },
+            },
+            // Buyer leads for this property
+            leads: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                message: true,
+                createdAt: true,
+              },
+            },
           },
         },
         // Messages sent
@@ -61,6 +88,42 @@ export async function GET() {
             read: true,
           },
           orderBy: { createdAt: "desc" },
+        },
+        // Messages received
+        receivedMessages: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            read: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
+        // Favorites
+        favorites: {
+          select: {
+            id: true,
+            propertyId: true,
+            createdAt: true,
+          },
+        },
+        // Saved searches
+        savedSearches: {
+          select: {
+            id: true,
+            name: true,
+            filters: true,
+            createdAt: true,
+          },
+        },
+        // Reviews
+        reviews: {
+          select: {
+            id: true,
+            rating: true,
+            comment: true,
+            createdAt: true,
+          },
         },
         // Documents uploaded
         uploadedDocuments: {

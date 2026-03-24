@@ -24,7 +24,7 @@ export default function NotFound() {
           Pagina non trovata
         </h2>
         <p className="text-text-muted mb-8">
-          La pagina che stai cercando non esiste o e stata spostata.
+          La pagina che stai cercando non esiste o è stata spostata.
         </p>
         <div className="flex gap-3 justify-center">
           <Link

@@ -402,7 +402,7 @@ export default function AdminDashboard() {
                     <thead>
                       <tr className="border-b border-border">
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Agenzia</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Citta</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Città</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Piano</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Immobili</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-text-muted">Stato</th>

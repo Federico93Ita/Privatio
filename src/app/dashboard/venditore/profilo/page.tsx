@@ -124,7 +124,7 @@ export default function SellerProfilePage() {
                     disabled
                     className="w-full px-4 py-2.5 border border-border rounded-lg bg-bg-soft text-text-muted cursor-not-allowed"
                   />
-                  <p className="text-xs text-text-muted mt-1">L&apos;email non puo essere modificata.</p>
+                  <p className="text-xs text-text-muted mt-1">L&apos;email non può essere modificata.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-text mb-1">Telefono</label>

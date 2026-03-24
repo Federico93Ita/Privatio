@@ -217,13 +217,16 @@ model PropertyPhoto {
 
 model PropertyAssignment {
   id         String           @id @default(cuid())
-  property   Property         @relation(fields: [propertyId], references: [id])
+  property   Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String           @unique
-  agency     Agency           @relation(fields: [agencyId], references: [id])
+  agency     Agency           @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   agencyId   String
   assignedAt DateTime         @default(now())
   status     AssignmentStatus @default(ACTIVE)
   notes      String?          @db.Text
+
+  @@index([agencyId])
+  @@index([status])
 }
 
 enum AssignmentStatus {
@@ -244,6 +247,8 @@ model Contract {
   agencySigned Boolean  @default(false)
   documentUrl  String?
   createdAt    DateTime @default(now())
+
+  @@index([expiresAt])
 }
 
 model Visit {
@@ -257,6 +262,9 @@ model Visit {
   status      VisitStatus @default(PENDING)
   notes       String?     @db.Text
   createdAt   DateTime    @default(now())
+
+  @@index([propertyId])
+  @@index([status])
 }
 
 enum VisitStatus {
@@ -275,6 +283,9 @@ model BuyerLead {
   phone      String?
   message    String?  @db.Text
   createdAt  DateTime @default(now())
+
+  @@index([propertyId])
+  @@index([email])
 }
 
 model SellerLead {
@@ -289,6 +300,9 @@ model SellerLead {
   source         String?
   status         LeadStatus    @default(NEW)
   createdAt      DateTime      @default(now())
+
+  @@index([status])
+  @@index([email])
 }
 
 enum LeadStatus {

@@ -306,7 +306,7 @@ export default function ZonePreferenceSelector({
                       Rimuovi dalla selezione
                     </button>
                   ) : maxReached ? (
-                    <p className="text-xs text-gray-400 text-center py-1">Hai gia selezionato 3 zone</p>
+                    <p className="text-xs text-gray-400 text-center py-1">Hai già selezionato 3 zone</p>
                   ) : (
                     <button
                       type="button"

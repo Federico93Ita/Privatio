@@ -181,7 +181,7 @@ export default function BuyerDashboardPage() {
                 <p className="mt-1 text-xs text-text-muted sm:text-sm">Ricerche Salvate</p>
               </div>
               <Link
-                href="/ricerca"
+                href="/cerca"
                 className="flex items-center gap-4 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 shadow-sm transition-colors hover:bg-primary/10 sm:p-5"
               >
                 <div className="text-primary"><SearchIcon /></div>
@@ -215,7 +215,7 @@ export default function BuyerDashboardPage() {
                     Non hai ancora salvato nessun immobile.
                   </p>
                   <Link
-                    href="/ricerca"
+                    href="/cerca"
                     className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90"
                   >
                     Esplora Immobili

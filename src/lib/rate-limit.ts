@@ -1,7 +1,12 @@
 /**
  * In-memory rate limiter for Next.js API routes.
  * Uses a sliding window counter approach.
- * Note: In a multi-instance deployment, replace with Redis-based solution.
+ *
+ * ⚠️  PRODUCTION TODO: Replace with @upstash/ratelimit for serverless deployments.
+ *     In-memory stores are per-instance and do NOT share state across Vercel functions.
+ *     Install: npm i @upstash/ratelimit @upstash/redis
+ *     Then configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars.
+ *     See: https://upstash.com/docs/redis/sdks/ratelimit-ts/overview
  */
 
 interface RateLimitEntry {

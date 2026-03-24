@@ -172,7 +172,8 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-4">
             <p className="text-xs text-text-muted">
-              &copy; {new Date().getFullYear()} Privatio S.r.l. &mdash; P.IVA 12345678901
+              {/* TODO: Sostituire con dati reali quando la società sarà costituita */}
+              &copy; {new Date().getFullYear()} Privatio S.r.l. &mdash; P.IVA da definire
             </p>
             <button
               onClick={resetConsent}

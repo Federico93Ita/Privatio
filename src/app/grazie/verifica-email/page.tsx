@@ -61,7 +61,7 @@ function VerifyEmailContent() {
         </div>
         <h2 className="text-xl font-medium text-primary-dark mb-3">Email verificata!</h2>
         <p className="text-text-muted mb-6">
-          Il tuo indirizzo email e stato verificato con successo.
+          Il tuo indirizzo email è stato verificato con successo.
         </p>
         <Link
           href="/accedi"

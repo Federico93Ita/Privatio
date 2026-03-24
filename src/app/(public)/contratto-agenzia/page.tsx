@@ -105,8 +105,10 @@ export default function ContrattoAgenziaPage() {
               in qualit&agrave; di agenzia convenzionata (di seguito &ldquo;l&rsquo;Agenzia&rdquo;).
             </p>
             <p>
-              La Piattaforma &egrave; gestita da [RAGIONE SOCIALE], con sede legale in [INDIRIZZO], C.F./P.IVA [PARTITA IVA],
-              iscritta al Registro delle Imprese di [CITT&Agrave;] al n. [NUMERO REA] (di seguito &ldquo;Privatio&rdquo; o &ldquo;il Fornitore&rdquo;).
+{/* TODO: Inserire dati reali quando la società sarà costituita */}
+              La Piattaforma &egrave; gestita da Privatio S.r.l., con sede legale in Torino,
+              iscritta al Registro delle Imprese di Torino (di seguito &ldquo;Privatio&rdquo; o &ldquo;il Fornitore&rdquo;).
+              I dati societari completi (C.F./P.IVA, numero REA) saranno indicati a seguito della costituzione della societ&agrave;.
             </p>
             <p>
               L&rsquo;Agenzia dichiara di essere regolarmente iscritta al Registro degli Agenti di Affari in Mediazione
@@ -324,7 +326,8 @@ export default function ContrattoAgenziaPage() {
           <Section title="Art. 14 – Legge Applicabile e Foro Competente">
             <p><strong>14.1.</strong> Contratto regolato dalla legge italiana.</p>
             <p><strong>14.2.</strong> Tentativo obbligatorio di mediazione (D.Lgs. 28/2010) entro 60 giorni.</p>
-            <p><strong>14.3.</strong> Foro esclusivo di [CITT&Agrave; SEDE LEGALE].</p>
+            <p><strong>14.3.</strong> {/* TODO: Inserire foro competente quando la società sarà costituita */}
+              Foro esclusivo di Torino.</p>
             <p><strong>14.4.</strong> Salvi i provvedimenti cautelari e d&rsquo;urgenza.</p>
           </Section>
 

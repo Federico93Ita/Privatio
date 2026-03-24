@@ -85,7 +85,7 @@ const ROOM_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: "newest", label: "Piu recenti" },
+  { value: "newest", label: "Più recenti" },
   { value: "price_asc", label: "Prezzo crescente" },
   { value: "price_desc", label: "Prezzo decrescente" },
   { value: "surface_desc", label: "Superficie" },
@@ -228,10 +228,10 @@ function CercaPageInner() {
 
   const filtersContent = (
     <div className="space-y-5">
-      {/* Citta */}
+      {/* Città */}
       <div className="space-y-1.5">
         <label htmlFor="filter-city" className="block text-sm font-medium text-text">
-          Citta
+          Città
         </label>
         <input
           id="filter-city"

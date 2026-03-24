@@ -75,7 +75,7 @@ export default function PropertyContactForm({ slug }: PropertyContactFormProps) 
         throw new Error(data.error || "Errore durante l'invio");
       }
 
-      setSuccess("Richiesta inviata con successo! Ti contatteremo al piu presto.");
+      setSuccess("Richiesta inviata con successo! Ti contatteremo al più presto.");
       setInfoName("");
       setInfoEmail("");
       setInfoPhone("");

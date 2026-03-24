@@ -276,7 +276,7 @@ export default function PropertyEditModal({
               <input className={inputClass} value={form.address || ""} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             </div>
             <div>
-              <label className={labelClass}>Citta</label>
+              <label className={labelClass}>Città</label>
               <input className={inputClass} value={form.city || ""} onChange={(e) => setForm({ ...form, city: e.target.value })} />
             </div>
             <div>

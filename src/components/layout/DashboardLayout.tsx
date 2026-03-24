@@ -203,9 +203,11 @@ function SearchIcon() {
 const sidebarConfig: Record<Role, SidebarItem[]> = {
   seller: [
     { href: "/dashboard/venditore", label: "Dashboard", icon: <HomeIcon /> },
+    { href: "/dashboard/venditore/immobile", label: "Immobile", icon: <Icon d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10" /> },
     { href: "/dashboard/venditore/contratto", label: "Contratto", icon: <FileTextIcon /> },
     { href: "/dashboard/venditore/visite", label: "Visite", icon: <CalendarIcon /> },
     { href: "/dashboard/venditore/messaggi", label: "Messaggi", icon: <MessageIcon /> },
+    { href: "/dashboard/venditore/recensione", label: "Recensione", icon: <Icon d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /> },
     { href: "/dashboard/venditore/documenti", label: "Documenti", icon: <FolderIcon /> },
     { href: "/dashboard/venditore/profilo", label: "Profilo", icon: <UserIcon /> },
   ],

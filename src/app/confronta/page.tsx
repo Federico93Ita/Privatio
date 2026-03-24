@@ -146,7 +146,7 @@ export default function ConfrontaPage() {
           <h1 className="text-2xl font-medium text-text mb-4">Confronta Immobili</h1>
           <p className="text-sm text-text-muted mb-6">{error || "Seleziona almeno 2 immobili da confrontare."}</p>
           <Link
-            href="/ricerca"
+            href="/cerca"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white hover:bg-primary/85 transition-colors"
           >
             Cerca Immobili
@@ -198,7 +198,7 @@ export default function ConfrontaPage() {
             </p>
           </div>
           <Link
-            href="/ricerca"
+            href="/cerca"
             className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-primary-dark hover:bg-bg-soft transition-colors"
           >
             Torna alla Ricerca

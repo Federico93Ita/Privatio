@@ -11,6 +11,8 @@ export default function RegistratiPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [accettaTermini, setAccettaTermini] = useState(false);
+  const [accettaPrivacy, setAccettaPrivacy] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -19,12 +21,32 @@ export default function RegistratiPage() {
     e.preventDefault();
     setError("");
 
+    if (!accettaTermini) {
+      setError("Devi accettare i Termini e Condizioni del Servizio.");
+      return;
+    }
+    if (!accettaPrivacy) {
+      setError("Devi accettare l'Informativa sulla Privacy.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Le password non corrispondono.");
       return;
     }
     if (password.length < 8) {
       setError("La password deve avere almeno 8 caratteri.");
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError("La password deve contenere almeno una lettera maiuscola.");
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError("La password deve contenere almeno un numero.");
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      setError("La password deve contenere almeno un carattere speciale.");
       return;
     }
 
@@ -34,7 +56,7 @@ export default function RegistratiPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, password, role: "BUYER" }),
+        body: JSON.stringify({ name, email, phone, password, role: "BUYER", accettaTermini, accettaPrivacy }),
       });
 
       const data = await res.json();
@@ -129,7 +151,7 @@ export default function RegistratiPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Minimo 8 caratteri"
+                placeholder="Min. 8 caratteri, 1 maiuscola, 1 numero, 1 speciale"
                 className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
             </div>
@@ -147,6 +169,40 @@ export default function RegistratiPage() {
               />
             </div>
 
+            {/* Checkbox consensi */}
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={accettaTermini}
+                  onChange={(e) => setAccettaTermini(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                />
+                <span className="text-sm text-text">
+                  Ho letto e accetto i{" "}
+                  <Link href="/termini-di-servizio" className="text-primary underline font-medium" target="_blank">
+                    Termini e Condizioni del Servizio
+                  </Link>
+                  <span className="ml-0.5 text-error">*</span>
+                </span>
+              </label>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={accettaPrivacy}
+                  onChange={(e) => setAccettaPrivacy(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                />
+                <span className="text-sm text-text">
+                  Ho letto e accetto l&apos;
+                  <Link href="/privacy-policy" className="text-primary underline font-medium" target="_blank">
+                    Informativa sulla Privacy
+                  </Link>
+                  <span className="ml-0.5 text-error">*</span>
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -157,15 +213,7 @@ export default function RegistratiPage() {
           </form>
 
           <p className="text-xs text-text-muted mt-4 text-center">
-            Registrandoti accetti i{" "}
-            <Link href="/termini" className="text-primary hover:underline">
-              Termini di Servizio
-            </Link>{" "}
-            e la{" "}
-            <Link href="/privacy" className="text-primary hover:underline">
-              Privacy Policy
-            </Link>
-            .
+            <span className="text-error">*</span> Obbligatorio
           </p>
         </div>
 

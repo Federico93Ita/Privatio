@@ -334,7 +334,7 @@ export default function VendiPage() {
       if (!form.prezzo || rawPrice(form.prezzo) === 0)
         errs.prezzo = "Inserisci il prezzo richiesto";
       if (form.descrizione.length > 2000)
-        errs.descrizione = "La descrizione non puo superare i 2000 caratteri";
+        errs.descrizione = "La descrizione non può superare i 2000 caratteri";
     }
 
     if (s === 3) {
@@ -500,7 +500,7 @@ export default function VendiPage() {
       router.push("/grazie");
     } catch (err: unknown) {
       setSubmitError(
-        err instanceof Error ? err.message : "Si e verificato un errore. Riprova.",
+        err instanceof Error ? err.message : "Si è verificato un errore. Riprova.",
       );
     } finally {
       setSubmitting(false);
@@ -599,11 +599,11 @@ export default function VendiPage() {
           <FieldError field="indirizzo" />
         </div>
 
-        {/* Citta / Provincia / CAP */}
+        {/* Città / Provincia / CAP */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <Label htmlFor="citta" required>
-              Citta
+              Città
             </Label>
             <input
               id="citta"

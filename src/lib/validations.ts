@@ -97,7 +97,12 @@ export const registerSchema = z.object({
   name: z.string().min(2, "Nome richiesto"),
   email: z.string().email("Email non valida"),
   phone: z.string().min(8, "Telefono richiesto"),
-  password: z.string().min(8, "Password minimo 8 caratteri"),
+  password: z
+    .string()
+    .min(8, "Password minimo 8 caratteri")
+    .regex(/[A-Z]/, "La password deve contenere almeno una lettera maiuscola")
+    .regex(/[0-9]/, "La password deve contenere almeno un numero")
+    .regex(/[^A-Za-z0-9]/, "La password deve contenere almeno un carattere speciale"),
   role: z.enum(["SELLER", "BUYER"]).optional(),
   // Consent tracking
   accettaTermini: z.boolean().optional(),

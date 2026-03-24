@@ -107,9 +107,11 @@ export default function AgencyMessagesPage() {
       if (res.ok) {
         setNewMessage("");
         fetchMessages();
+      } else {
+        alert("Errore nell'invio del messaggio. Riprova.");
       }
     } catch {
-      // silent
+      alert("Errore di connessione. Riprova.");
     } finally {
       setSending(false);
     }
