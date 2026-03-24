@@ -139,6 +139,20 @@ function CercaPageInner() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
+  const [saveSearchMsg, setSaveSearchMsg] = useState<string | null>(null);
+
+  /* ---- Fetch city suggestions for autocomplete ---- */
+  useEffect(() => {
+    fetch("/api/properties/cities")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.cities) {
+          setCitySuggestions(data.cities.map((c: { label: string }) => c.label));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   /* ---- Build query string from filters ---- */
   const buildQueryString = useCallback((f: Filters): string => {
@@ -236,11 +250,18 @@ function CercaPageInner() {
         <input
           id="filter-city"
           type="text"
+          list="city-suggestions"
           placeholder="Es. Milano, Roma..."
           value={filters.city}
           onChange={(e) => updateFilter("city", e.target.value)}
           className={inputClass}
+          autoComplete="off"
         />
+        <datalist id="city-suggestions">
+          {citySuggestions.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
       </div>
 
       {/* Tipo immobile */}
@@ -533,7 +554,63 @@ function CercaPageInner() {
                   )}
                 </p>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  {/* Save search button */}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setSaveSearchMsg(null);
+                      const activeFilters: Record<string, unknown> = {};
+                      if (filters.city) activeFilters.city = filters.city;
+                      if (filters.type) activeFilters.type = filters.type;
+                      if (filters.minPrice) activeFilters.minPrice = filters.minPrice;
+                      if (filters.maxPrice) activeFilters.maxPrice = filters.maxPrice;
+                      if (filters.minSurface) activeFilters.minSurface = filters.minSurface;
+                      if (filters.maxSurface) activeFilters.maxSurface = filters.maxSurface;
+                      if (filters.rooms) activeFilters.rooms = filters.rooms;
+                      if (filters.hasGarage) activeFilters.hasGarage = true;
+                      if (filters.hasGarden) activeFilters.hasGarden = true;
+                      if (filters.hasBalcony) activeFilters.hasBalcony = true;
+                      if (filters.hasElevator) activeFilters.hasElevator = true;
+
+                      const name = filters.city
+                        ? `Ricerca ${filters.city}${filters.type ? ` — ${filters.type}` : ""}`
+                        : `Ricerca ${new Date().toLocaleDateString("it-IT")}`;
+
+                      try {
+                        const res = await fetch("/api/saved-searches", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ name, filters: activeFilters }),
+                        });
+                        if (res.ok) {
+                          setSaveSearchMsg("Ricerca salvata!");
+                          setTimeout(() => setSaveSearchMsg(null), 3000);
+                        } else if (res.status === 401) {
+                          setSaveSearchMsg("Accedi per salvare le ricerche");
+                          setTimeout(() => setSaveSearchMsg(null), 3000);
+                        } else {
+                          const data = await res.json();
+                          setSaveSearchMsg(data.error || "Errore");
+                          setTimeout(() => setSaveSearchMsg(null), 3000);
+                        }
+                      } catch {
+                        setSaveSearchMsg("Errore di connessione");
+                        setTimeout(() => setSaveSearchMsg(null), 3000);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm text-text-muted hover:bg-bg-soft hover:text-primary transition-colors"
+                    title="Salva questa ricerca"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    <span className="hidden sm:inline">Salva ricerca</span>
+                  </button>
+                  {saveSearchMsg && (
+                    <span className="text-xs text-primary font-medium">{saveSearchMsg}</span>
+                  )}
+
                   <label htmlFor="sort-select" className="text-sm text-text-muted whitespace-nowrap">
                     Ordina per:
                   </label>

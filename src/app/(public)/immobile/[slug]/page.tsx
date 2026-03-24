@@ -9,6 +9,7 @@ import PropertyContactForm from "@/components/forms/PropertyContactForm";
 import FavoriteButton from "@/components/property/FavoriteButton";
 import { formatPrice, getPropertyTypeLabel } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
+import PropertyCard from "@/components/property/PropertyCard";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -45,6 +46,33 @@ async function getProperty(slug: string) {
   } catch (error) {
     console.error("Error fetching property:", error);
     return null;
+  }
+}
+
+async function getSimilarProperties(property: { id: string; city: string; type: string; price: number }) {
+  try {
+    const priceMin = Math.round(property.price * 0.7);
+    const priceMax = Math.round(property.price * 1.3);
+
+    const similar = await prisma.property.findMany({
+      where: {
+        id: { not: property.id },
+        status: "PUBLISHED",
+        OR: [
+          { city: property.city },
+          { type: property.type as never, price: { gte: priceMin, lte: priceMax } },
+        ],
+      },
+      include: {
+        photos: { where: { isCover: true }, take: 1 },
+      },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+    });
+
+    return similar;
+  } catch {
+    return [];
   }
 }
 
@@ -137,6 +165,14 @@ const ALL_FEATURES = [
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
   const property = await getProperty(slug);
+  const similarProperties = property
+    ? await getSimilarProperties({
+        id: property.id,
+        city: property.city,
+        type: property.type,
+        price: property.price,
+      })
+    : [];
 
   if (!property) {
     return (
@@ -381,6 +417,55 @@ export default async function PropertyDetailPage({ params }: Props) {
               <MortgageCalc defaultPrice={property.price} />
             </div>
           </div>
+
+          {/* ── Similar Properties ── */}
+          {similarProperties.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-border">
+              <div className="text-center mb-8">
+                <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
+                  Immobili simili
+                </h2>
+                <p className="text-text-muted text-sm mt-2">
+                  Altri immobili che potrebbero interessarti
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {similarProperties.map((sp) => (
+                  <PropertyCard
+                    key={sp.id}
+                    property={{
+                      id: sp.id,
+                      slug: sp.slug,
+                      title: sp.title,
+                      city: sp.city,
+                      province: sp.province,
+                      price: sp.price,
+                      surface: sp.surface,
+                      rooms: sp.rooms,
+                      bathrooms: sp.bathrooms ?? 0,
+                      type: sp.type,
+                      hasGarage: sp.hasGarage,
+                      hasGarden: sp.hasGarden,
+                      hasBalcony: sp.hasBalcony,
+                      hasElevator: sp.hasElevator,
+                      photos: sp.photos.map((p) => ({ url: p.url, isCover: p.isCover })),
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="text-center mt-8">
+                <Link
+                  href={`/cerca?city=${encodeURIComponent(property.city)}`}
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-border rounded-lg text-sm font-medium text-primary-dark hover:bg-bg-soft transition-colors"
+                >
+                  Vedi tutti gli immobili a {property.city}
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </main>
       <Footer />

@@ -175,17 +175,16 @@ function ProgressBar({ currentStage }: { currentStage: string }) {
   const currentIndex = STAGES.findIndex((s) => s.key === currentStage);
 
   return (
-    <div className="flex items-center gap-0">
-      {STAGES.map((stage, idx) => {
-        const isCompleted = idx < currentIndex;
-        const isCurrent = idx === currentIndex;
-        const isLast = idx === STAGES.length - 1;
-
-        return (
-          <div key={stage.key} className="flex items-center">
-            <div className="flex flex-col items-center">
+    <div className="w-full">
+      {/* Mobile: vertical list */}
+      <div className="sm:hidden space-y-3">
+        {STAGES.map((stage, idx) => {
+          const isCompleted = idx < currentIndex;
+          const isCurrent = idx === currentIndex;
+          return (
+            <div key={stage.key} className="flex items-center gap-3">
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors sm:h-10 sm:w-10 sm:text-sm ${
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                   isCompleted
                     ? "bg-success text-white"
                     : isCurrent
@@ -202,23 +201,63 @@ function ProgressBar({ currentStage }: { currentStage: string }) {
                 )}
               </div>
               <span
-                className={`mt-1.5 text-center text-[10px] leading-tight sm:text-xs ${
-                  isCurrent ? "font-medium text-primary" : "text-text-muted"
+                className={`text-sm ${
+                  isCurrent ? "font-medium text-primary" : isCompleted ? "text-text" : "text-text-muted"
                 }`}
               >
                 {stage.label}
               </span>
             </div>
-            {!isLast && (
-              <div
-                className={`mx-1 h-0.5 w-4 sm:mx-2 sm:w-8 lg:w-12 ${
-                  isCompleted ? "bg-success" : "bg-border"
-                }`}
-              />
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* Desktop: horizontal */}
+      <div className="hidden sm:flex items-center gap-0">
+        {STAGES.map((stage, idx) => {
+          const isCompleted = idx < currentIndex;
+          const isCurrent = idx === currentIndex;
+          const isLast = idx === STAGES.length - 1;
+
+          return (
+            <div key={stage.key} className="flex items-center">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+                    isCompleted
+                      ? "bg-success text-white"
+                      : isCurrent
+                      ? "bg-primary text-white ring-4 ring-primary/20"
+                      : "bg-border text-text-muted"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    idx + 1
+                  )}
+                </div>
+                <span
+                  className={`mt-1.5 text-center text-xs leading-tight ${
+                    isCurrent ? "font-medium text-primary" : "text-text-muted"
+                  }`}
+                >
+                  {stage.label}
+                </span>
+              </div>
+              {!isLast && (
+                <div
+                  className={`mx-2 h-0.5 w-8 lg:w-12 ${
+                    isCompleted ? "bg-success" : "bg-border"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
