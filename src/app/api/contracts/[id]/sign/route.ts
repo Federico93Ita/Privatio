@@ -3,12 +3,17 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { sendEmail } from "@/lib/email";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Rate limit OTP verification to prevent brute-force (3 attempts per 15 min)
+    const limited = await applyRateLimit(RATE_LIMITS.otp, req);
+    if (limited) return limited;
+
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });

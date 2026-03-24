@@ -7,13 +7,13 @@ import type { PlanKey } from "./stripe";
 /**
  * Assegna un immobile all'agenzia migliore basandosi sul sistema territoriale.
  *
- * TODO: Aggiornare per il nuovo flusso di contatto:
- *   1. Il venditore vede la lista delle agenzie nella sua zona e le contatta direttamente.
- *   2. Solo se il venditore non contatta nessuna agenzia entro 48 ore,
+ * Flusso di contatto (Fase 2 — dopo 48 ore):
+ *   1. Il venditore pubblica l'immobile e vede la lista delle agenzie nella sua zona.
+ *   2. Se il venditore non contatta nessuna agenzia entro 48 ore,
  *      i suoi dati vengono condivisi automaticamente con le agenzie della zona.
- *   Attualmente questa funzione viene usata come fallback per il caso 48h.
+ *   3. Questa funzione gestisce l'assegnazione automatica del caso 48h.
  *
- * Logica attuale:
+ * Logica di assegnazione:
  * 1. Risolve la zona dell'immobile (auto-detect se non assegnata)
  * 2. Trova tutte le agenzie con territorio attivo in quella zona
  * 3. Ordina per: priorità piano (Elite > Prime > City > Local > Base)

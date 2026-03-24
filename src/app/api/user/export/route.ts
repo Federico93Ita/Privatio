@@ -1,14 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
  * GET /api/user/export — Export all personal data (GDPR Art. 20 - Data Portability)
  * Returns a JSON file with all user data.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    // Rate limit: max 3 exports per 15 minutes
+    const limited = await applyRateLimit(RATE_LIMITS.passwordReset, req);
+    if (limited) return limited;
+
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
