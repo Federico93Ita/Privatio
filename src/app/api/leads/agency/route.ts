@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { agencyLeadSchema } from "@/lib/validations";
 import { sendEmail } from "@/lib/email";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(RATE_LIMITS.lead, req);
+    if (limited) return limited;
+
     const body = await req.json();
     const parsed = agencyLeadSchema.safeParse(body);
 

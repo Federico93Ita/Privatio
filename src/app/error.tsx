@@ -26,10 +26,10 @@ export default function GlobalError({
           </svg>
         </div>
         <h1 className="text-2xl font-light tracking-[-0.03em] text-text mb-3">
-          Qualcosa e andato storto
+          Qualcosa è andato storto
         </h1>
         <p className="text-text-muted mb-8">
-          Si e verificato un errore imprevisto. Prova a ricaricare la pagina.
+          Si è verificato un errore imprevisto. Prova a ricaricare la pagina.
         </p>
         <div className="flex gap-3 justify-center">
           <button

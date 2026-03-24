@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendEmail } from "@/lib/email";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Nome troppo corto").max(100),
@@ -28,6 +29,9 @@ function esc(str: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(RATE_LIMITS.lead, req);
+    if (limited) return limited;
+
     const body = await req.json();
     const parsed = contactSchema.safeParse(body);
 
