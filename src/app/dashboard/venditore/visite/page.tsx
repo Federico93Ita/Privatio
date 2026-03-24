@@ -4,6 +4,19 @@ import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatDateTime } from "@/lib/utils";
 
+function buildCalendarUrl(visit: { scheduledAt: string; property: { title: string }; buyerName: string }) {
+  const start = new Date(visit.scheduledAt);
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `Visita: ${visit.property.title}`,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: `Visita immobile con ${visit.buyerName}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 interface Visit {
   id: string;
   buyerName: string;
@@ -103,9 +116,23 @@ export default function SellerVisitsPage() {
                       Acquirente: {visit.buyerName} — {visit.buyerPhone}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium self-start ${statusColors[visit.status] || "bg-bg-soft text-text-muted"}`}>
-                    {statusLabels[visit.status] || visit.status}
-                  </span>
+                  <div className="flex items-center gap-2 self-start">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[visit.status] || "bg-bg-soft text-text-muted"}`}>
+                      {statusLabels[visit.status] || visit.status}
+                    </span>
+                    <a
+                      href={buildCalendarUrl(visit)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs text-text-muted border border-border rounded-lg hover:bg-bg-soft transition-colors"
+                      title="Aggiungi a Google Calendar"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      Calendario
+                    </a>
+                  </div>
                 </div>
                 {visit.notes && <p className="text-sm text-text-muted mt-2 italic">{visit.notes}</p>}
               </div>

@@ -217,24 +217,20 @@ export default function AgencyDashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="relative rounded-xl border border-border bg-white p-6 overflow-hidden">
-                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                  <p className="text-sm font-medium text-text-muted mb-2">Riepilogo Pipeline</p>
-                  <p className="text-xs text-text-muted mb-3">Disponibile dal piano Premier Local</p>
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h3 className="font-medium text-primary-dark">Riepilogo Pipeline</h3>
+                    <p className="text-sm text-text-muted mt-1">
+                      Monitora lo stato di tutti i tuoi immobili in un colpo d&apos;occhio. Disponibile dal piano Premier Local.
+                    </p>
+                  </div>
                   <Link
                     href="/dashboard/agenzia/territori"
-                    className="px-4 py-2 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/85 transition-colors"
+                    className="shrink-0 px-5 py-2.5 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/85 transition-colors"
                   >
                     Upgrade Piano
                   </Link>
-                </div>
-                <div className="grid grid-cols-5 gap-3 opacity-30">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="bg-bg-soft rounded-lg p-4">
-                      <div className="h-3 w-16 bg-border rounded mb-2" />
-                      <div className="h-6 w-8 bg-border rounded" />
-                    </div>
-                  ))}
                 </div>
               </div>
             )}
@@ -277,24 +273,20 @@ export default function AgencyDashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="relative rounded-xl border border-border bg-white p-6 overflow-hidden">
-                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                  <p className="text-sm font-medium text-text-muted mb-2">Statistiche Avanzate</p>
-                  <p className="text-xs text-text-muted mb-3">Disponibile dal piano Premier City</p>
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h3 className="font-medium text-primary-dark">Statistiche Avanzate</h3>
+                    <p className="text-sm text-text-muted mt-1">
+                      Tasso di conversione, tempo medio vendita e metriche dettagliate. Disponibile dal piano Premier City.
+                    </p>
+                  </div>
                   <Link
                     href="/dashboard/agenzia/territori"
-                    className="px-4 py-2 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/85 transition-colors"
+                    className="shrink-0 px-5 py-2.5 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/85 transition-colors"
                   >
                     Upgrade Piano
                   </Link>
-                </div>
-                <div className="grid grid-cols-4 gap-4 opacity-30">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-bg-soft rounded-xl p-5">
-                      <div className="h-3 w-20 bg-border rounded mb-2" />
-                      <div className="h-8 w-12 bg-border rounded" />
-                    </div>
-                  ))}
                 </div>
               </div>
             )}

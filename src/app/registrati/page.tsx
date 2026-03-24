@@ -154,6 +154,30 @@ export default function RegistratiPage() {
                 placeholder="Min. 8 caratteri, 1 maiuscola, 1 numero, 1 speciale"
                 className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
               />
+              {/* Real-time password validation */}
+              {password.length > 0 && (
+                <div className="mt-2 grid grid-cols-2 gap-1">
+                  {[
+                    { ok: password.length >= 8, label: "8+ caratteri" },
+                    { ok: /[A-Z]/.test(password), label: "1 maiuscola" },
+                    { ok: /[0-9]/.test(password), label: "1 numero" },
+                    { ok: /[^A-Za-z0-9]/.test(password), label: "1 speciale" },
+                  ].map((rule) => (
+                    <span key={rule.label} className={`flex items-center gap-1 text-xs ${rule.ok ? "text-success" : "text-text-muted"}`}>
+                      {rule.ok ? (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <circle cx="12" cy="12" r="10" />
+                        </svg>
+                      )}
+                      {rule.label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-text mb-1">
