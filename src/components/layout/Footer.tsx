@@ -27,6 +27,8 @@ const footerColumns = [
       { href: "/privacy-policy", label: "Privacy Policy" },
       { href: "/cookie-policy", label: "Cookie Policy" },
       { href: "/termini-di-servizio", label: "Termini di Servizio" },
+      { href: "/responsabili-trattamento", label: "Responsabili Trattamento" },
+      { href: "/reclami", label: "Reclami" },
     ],
   },
 ];

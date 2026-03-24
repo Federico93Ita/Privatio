@@ -478,3 +478,26 @@ model TerritoryAssignment {
   @@index([zoneId, isActive])
   @@index([agencyId, isActive])
 }
+
+model Complaint {
+  id              String          @id @default(cuid())
+  referenceNumber String          @unique
+  name            String
+  email           String
+  userType        String          // "venditore" | "agenzia" | "acquirente"
+  subject         String
+  description     String          @db.Text
+  status          ComplaintStatus @default(RECEIVED)
+  createdAt       DateTime        @default(now())
+  resolvedAt      DateTime?
+
+  @@index([status])
+  @@index([email])
+}
+
+enum ComplaintStatus {
+  RECEIVED
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}

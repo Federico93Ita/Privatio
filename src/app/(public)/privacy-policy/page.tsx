@@ -148,8 +148,86 @@ export default function PrivacyPolicyPage() {
               tra cui: cifratura dei dati in transito e a riposo, controllo degli accessi, backup periodici, monitoraggio delle intrusioni.
             </p>
 
+            {/* 9. SUB-PROCESSORI */}
+            <h2 className="text-lg font-medium text-text mt-8">9. Responsabili del trattamento (sub-processori)</h2>
+            <p className="text-text-muted">
+              Il Titolare si avvale dei seguenti fornitori tecnologici, nominati Responsabili del trattamento ai sensi dell&apos;Art. 28 GDPR:
+            </p>
+            <div className="overflow-x-auto mt-3">
+              <table className="w-full text-sm border border-border rounded-lg">
+                <thead>
+                  <tr className="bg-bg-soft">
+                    <th className="p-2 text-left border-b border-border">Fornitore</th>
+                    <th className="p-2 text-left border-b border-border">Servizio</th>
+                    <th className="p-2 text-left border-b border-border">Sede</th>
+                    <th className="p-2 text-left border-b border-border">Trasferimento</th>
+                  </tr>
+                </thead>
+                <tbody className="text-text-muted">
+                  <tr><td className="p-2 border-b border-border">Supabase Inc.</td><td className="p-2 border-b border-border">Database e storage</td><td className="p-2 border-b border-border">USA</td><td className="p-2 border-b border-border">SCCs</td></tr>
+                  <tr><td className="p-2 border-b border-border">Vercel Inc.</td><td className="p-2 border-b border-border">Hosting e CDN</td><td className="p-2 border-b border-border">USA</td><td className="p-2 border-b border-border">SCCs</td></tr>
+                  <tr><td className="p-2 border-b border-border">Stripe Inc.</td><td className="p-2 border-b border-border">Pagamenti</td><td className="p-2 border-b border-border">USA</td><td className="p-2 border-b border-border">SCCs</td></tr>
+                  <tr><td className="p-2 border-b border-border">Resend Inc.</td><td className="p-2 border-b border-border">Email transazionali</td><td className="p-2 border-b border-border">USA</td><td className="p-2 border-b border-border">SCCs</td></tr>
+                  <tr><td className="p-2">Google LLC</td><td className="p-2">Analytics, Maps, OAuth</td><td className="p-2">USA</td><td className="p-2">SCCs</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-text-muted mt-2">
+              L&apos;elenco completo con i link alle DPA di ciascun fornitore &egrave; disponibile alla pagina{" "}
+              <a href="/responsabili-trattamento" className="text-primary hover:underline font-medium">Responsabili del Trattamento</a>.
+            </p>
+
+            {/* 10. DATA BREACH */}
+            <h2 className="text-lg font-medium text-text mt-8">10. Procedura in caso di violazione dei dati (Data Breach)</h2>
+            <p className="text-text-muted">
+              In caso di violazione dei dati personali che presenti un rischio per i diritti e le libert&agrave; delle persone fisiche,
+              il Titolare notificher&agrave; la violazione al Garante per la Protezione dei Dati Personali entro 72 ore dalla scoperta
+              (Art. 33 GDPR). Qualora la violazione comporti un rischio elevato, il Titolare informer&agrave; anche gli interessati
+              senza ingiustificato ritardo (Art. 34 GDPR).
+            </p>
+            <p className="text-text-muted mt-2">
+              Per segnalare un incidente di sicurezza: <strong>privacy@privatio.it</strong>.
+            </p>
+
+            {/* 11. DPIA */}
+            <h2 className="text-lg font-medium text-text mt-8">11. Valutazione d&apos;impatto (DPIA)</h2>
+            <p className="text-text-muted">
+              Il Titolare ha condotto una Valutazione d&apos;Impatto sulla Protezione dei Dati (Art. 35 GDPR) per il meccanismo
+              di trasmissione automatica dei dati ai sensi della &ldquo;Fase 2&rdquo; (trasmissione automatica alle agenzie dopo 48 ore).
+              La valutazione ha confermato l&apos;adeguatezza delle misure di sicurezza adottate e il rispetto del principio di minimizzazione.
+            </p>
+
+            {/* 12. REFERENTE PRIVACY */}
+            <h2 className="text-lg font-medium text-text mt-8">12. Referente per la protezione dei dati</h2>
+            <p className="text-text-muted">
+              Per qualsiasi richiesta relativa al trattamento dei dati personali, &egrave; possibile contattare il Referente Privacy
+              all&apos;indirizzo: <strong>privacy@privatio.it</strong>.
+            </p>
+
+            {/* 13. CONSERVAZIONE PER TIPOLOGIA */}
+            <h2 className="text-lg font-medium text-text mt-8">13. Periodi di conservazione per tipologia di dato</h2>
+            <div className="overflow-x-auto mt-3">
+              <table className="w-full text-sm border border-border rounded-lg">
+                <thead>
+                  <tr className="bg-bg-soft">
+                    <th className="p-2 text-left border-b border-border">Tipologia</th>
+                    <th className="p-2 text-left border-b border-border">Periodo</th>
+                  </tr>
+                </thead>
+                <tbody className="text-text-muted">
+                  <tr><td className="p-2 border-b border-border">Dati dell&apos;account</td><td className="p-2 border-b border-border">Durata del contratto + 30 giorni</td></tr>
+                  <tr><td className="p-2 border-b border-border">Dati immobiliari</td><td className="p-2 border-b border-border">Durata pubblicazione + 30 giorni</td></tr>
+                  <tr><td className="p-2 border-b border-border">Dati di fatturazione</td><td className="p-2 border-b border-border">10 anni (obblighi fiscali)</td></tr>
+                  <tr><td className="p-2 border-b border-border">Dati di navigazione/log</td><td className="p-2 border-b border-border">12 mesi</td></tr>
+                  <tr><td className="p-2 border-b border-border">Cookie analitici (GA4)</td><td className="p-2 border-b border-border">14 mesi (Google default)</td></tr>
+                  <tr><td className="p-2 border-b border-border">Consensi prestati</td><td className="p-2 border-b border-border">5 anni dalla revoca/scadenza</td></tr>
+                  <tr><td className="p-2">Reclami</td><td className="p-2">5 anni dalla chiusura</td></tr>
+                </tbody>
+              </table>
+            </div>
+
             <p className="text-sm text-text-muted mt-8 pt-4 border-t border-border">
-              Per informazioni: privacy@privatio.it
+              Ultimo aggiornamento: Marzo 2026 — Per informazioni: privacy@privatio.it
             </p>
           </div>
         </div>

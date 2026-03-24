@@ -185,6 +185,7 @@ export default function ContrattoAgenziaPage() {
             <p><strong>3.4.</strong> Il piano complessivo corrisponde al piano di livello pi&ugrave; elevato tra quelli attivi sui propri territori.</p>
             <p><strong>3.5.</strong> Ciascuna zona territoriale prevede un numero massimo di agenzie convenzionate (slot).</p>
             <p><strong>3.6.</strong> Privatio si riserva il diritto di modificare il listino prezzi con un preavviso di almeno 30 giorni. Le modifiche si applicano al rinnovo successivo.</p>
+            <p className="mt-3"><strong>3.7. Criteri di classificazione (Art. 5 Reg. UE 2019/1150).</strong> Le agenzie vengono presentate ai venditori nella propria zona secondo i seguenti criteri, in ordine di priorit&agrave;: (a) piano di abbonamento sottoscritto; (b) carico di lavoro corrente (agenzie con meno incarichi attivi vengono favorite); (c) valutazione media degli utenti. Nessun pagamento diretto influenza il posizionamento oltre il piano sottoscritto.</p>
           </Section>
 
           {/* Art. 4 */}
@@ -289,6 +290,8 @@ export default function ContrattoAgenziaPage() {
             <p><strong>9.4.</strong> Recesso di Privatio con preavviso di 30 giorni.</p>
             <p><strong>9.5.</strong> Risoluzione immediata di Privatio per: mancato pagamento oltre 30 giorni, perdita iscrizione al Registro, violazione riservatezza, violazione Art. 5-bis, utilizzo improprio dei Lead, comportamento lesivo.</p>
             <p><strong>9.6.</strong> In caso di risoluzione per inadempimento, Privatio ha diritto al risarcimento del danno.</p>
+            <p><strong>9.7. Diritto di appello (Art. 4 Reg. UE 2019/1150).</strong> Prima dell&rsquo;applicazione di qualsiasi misura restrittiva (sospensione, limitazione, risoluzione), Privatio comunicher&agrave; le motivazioni specifiche via e-mail. L&rsquo;Agenzia dispone di 10 (dieci) giorni per presentare controdeduzioni scritte all&rsquo;indirizzo reclami@privatio.it. La misura non sar&agrave; applicata prima della scadenza di tale termine, fatti salvi i casi di obbligo di legge o gravi violazioni.</p>
+            <p><strong>9.8.</strong> Per qualsiasi contestazione, l&rsquo;Agenzia pu&ograve; utilizzare la procedura interna di reclamo (<a href="/reclami" className="text-primary hover:underline">reclami@privatio.it</a>), ai sensi dell&rsquo;Art. 11 del Regolamento UE 2019/1150.</p>
           </Section>
 
           {/* Art. 10 */}

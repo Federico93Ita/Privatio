@@ -136,6 +136,22 @@ export default function TerminiPage() {
               obblighi contrattuali di riservatezza e di utilizzo conforme alle finalit&agrave; della Piattaforma.
             </p>
 
+            {/* ART. 3-bis: RANKING TRANSPARENCY (Reg. UE 2019/1150, Art. 5) */}
+            <h2 className="text-lg font-medium text-text mt-8">Art. 3-bis &mdash; Criteri di classificazione delle agenzie</h2>
+            <p className="text-text-muted">
+              <strong>3-bis.1.</strong> Le agenzie partner vengono presentate al Venditore nella propria zona secondo i seguenti criteri,
+              in ordine di priorit&agrave;: (a) piano di abbonamento sottoscritto dall&apos;agenzia; (b) carico di lavoro corrente
+              (vengono favorite le agenzie con meno incarichi attivi); (c) valutazione media degli utenti.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>3-bis.2.</strong> Nessun pagamento diretto influenza il posizionamento delle agenzie oltre il piano di abbonamento
+              sottoscritto. Non esistono inserzioni a pagamento, risultati sponsorizzati o trattamenti preferenziali non trasparenti.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>3-bis.3.</strong> La presente informativa &egrave; fornita ai sensi dell&apos;Art. 5 del Regolamento UE 2019/1150
+              relativo alla promozione di equit&agrave; e trasparenza per gli utenti commerciali dei servizi di intermediazione online.
+            </p>
+
             {/* ART. 4 */}
             <h2 className="text-lg font-medium text-text mt-8">Art. 4 &mdash; Diritto di rimozione</h2>
             <p className="text-text-muted">
@@ -291,6 +307,18 @@ export default function TerminiPage() {
               <strong>8.3.</strong> Privatio si riserva il diritto di sospendere o chiudere l&apos;account del Venditore in caso di
               violazione dei presenti Termini, previa comunicazione via e-mail con un preavviso di almeno 15 giorni, salvo i casi
               di gravi violazioni che richiedano la sospensione immediata.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>8.4.</strong> <em>(Diritto di appello &mdash; Art. 4 Reg. UE 2019/1150)</em> Prima dell&apos;applicazione di qualsiasi
+              misura restrittiva (sospensione, limitazione di visibilit&agrave;, chiusura dell&apos;account), Privatio comunicher&agrave;
+              le motivazioni specifiche via e-mail. Il Venditore dispone di 10 (dieci) giorni per presentare controdeduzioni scritte
+              all&apos;indirizzo reclami@privatio.it. La misura non sar&agrave; applicata prima della scadenza di tale termine,
+              fatti salvi i casi di obbligo di legge o gravi violazioni che comportino un rischio immediato per la sicurezza della Piattaforma.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>8.5.</strong> Per qualsiasi contestazione relativa a sospensioni, limitazioni o chiusure dell&apos;account, il Venditore pu&ograve;
+              utilizzare la procedura interna di reclamo disponibile alla pagina{" "}
+              <a href="/reclami" className="text-primary hover:underline font-medium">Reclami</a>.
             </p>
 
             {/* ART. 9 */}
