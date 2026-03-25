@@ -87,9 +87,10 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Properties list error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Properties list error msg:", msg);
     return NextResponse.json(
-      { error: "Errore nel caricamento immobili" },
+      { error: "Errore nel caricamento immobili", detail: msg },
       { status: 500 }
     );
   }
