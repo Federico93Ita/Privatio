@@ -7,10 +7,14 @@ import { propertySchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { geocodeAddress } from "@/lib/geocode";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 // GET /api/properties — Public listing with filters
 export async function GET(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(RATE_LIMITS.apiRead, req);
+    if (limited) return limited;
+
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "12")));
