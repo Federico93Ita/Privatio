@@ -105,7 +105,7 @@ export default function ZonePreferenceSelector({
   const [error, setError] = useState("");
   const [activeZone, setActiveZone] = useState<ZoneData | null>(null);
 
-  const { isLoaded } = useLoadScript({
+  const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
   });
 
@@ -149,6 +149,19 @@ export default function ZonePreferenceSelector({
     [selectedZones]
   );
 
+  const normalised = province ? province.trim().toUpperCase() : "";
+  const provCenter = PROVINCE_CENTERS[normalised] || { lat: 42.5, lng: 12.5, zoom: 9 };
+  const zonesWithCoords = zones.filter((z) => z.lat && z.lng);
+  const maxReached = selectedZones.length >= 3;
+
+  // Auto-center on zones if available (must be before early return — Rules of Hooks)
+  const center = useMemo(() => {
+    if (zonesWithCoords.length === 0) return { lat: provCenter.lat, lng: provCenter.lng };
+    const avgLat = zonesWithCoords.reduce((s, z) => s + z.lat!, 0) / zonesWithCoords.length;
+    const avgLng = zonesWithCoords.reduce((s, z) => s + z.lng!, 0) / zonesWithCoords.length;
+    return { lat: avgLat, lng: avgLng };
+  }, [zonesWithCoords.length, provCenter.lat, provCenter.lng, zones]);
+
   function toggleZone(zone: ZoneData) {
     if (isZoneSelected(zone.id)) {
       onSelectionChange(selectedZones.filter((z) => z.zoneId !== zone.id));
@@ -171,19 +184,6 @@ export default function ZonePreferenceSelector({
 
   // Don't render anything until province is entered
   if (!province || province.length < 2) return null;
-
-  const normalised = province.trim().toUpperCase();
-  const provCenter = PROVINCE_CENTERS[normalised] || { lat: 42.5, lng: 12.5, zoom: 9 };
-  const zonesWithCoords = zones.filter((z) => z.lat && z.lng);
-  const maxReached = selectedZones.length >= 3;
-
-  // Auto-center on zones if available
-  const center = useMemo(() => {
-    if (zonesWithCoords.length === 0) return { lat: provCenter.lat, lng: provCenter.lng };
-    const avgLat = zonesWithCoords.reduce((s, z) => s + z.lat!, 0) / zonesWithCoords.length;
-    const avgLng = zonesWithCoords.reduce((s, z) => s + z.lng!, 0) / zonesWithCoords.length;
-    return { lat: avgLat, lng: avgLng };
-  }, [zonesWithCoords, provCenter]);
 
   return (
     <div className="space-y-4">
@@ -216,7 +216,7 @@ export default function ZonePreferenceSelector({
       )}
 
       {/* Map with zone circles */}
-      {!loading && zones.length > 0 && isLoaded && zonesWithCoords.length > 0 && (
+      {!loading && zones.length > 0 && isLoaded && !loadError && zonesWithCoords.length > 0 && (
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={center}
@@ -324,7 +324,7 @@ export default function ZonePreferenceSelector({
       )}
 
       {/* Fallback: list view for zones without coordinates or if maps not loaded */}
-      {!loading && zones.length > 0 && (zonesWithCoords.length === 0 || !isLoaded) && (
+      {!loading && zones.length > 0 && (zonesWithCoords.length === 0 || !isLoaded || loadError) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {zones.map((zone) => {
             const selected = isZoneSelected(zone.id);

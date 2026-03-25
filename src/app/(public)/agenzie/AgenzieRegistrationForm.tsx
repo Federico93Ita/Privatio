@@ -1,9 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Component, type ReactNode } from "react";
 import ZonePreferenceSelector, {
   type ZonePreference,
 } from "@/components/agency/ZonePreferenceSelector";
+
+/** Catches render errors in ZonePreferenceSelector so the form stays usable */
+class ZoneSelectorErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <p className="text-sm text-text-muted">
+          Impossibile caricare il selettore zone. Puoi comunque inviare la richiesta.
+        </p>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function AgenzieRegistrationForm() {
   const [form, setForm] = useState({
@@ -154,11 +178,13 @@ export default function AgenzieRegistrationForm() {
       </div>
 
       {/* Zone preference selector — appears when province is filled */}
-      <ZonePreferenceSelector
-        province={form.province}
-        selectedZones={preferredZones}
-        onSelectionChange={setPreferredZones}
-      />
+      <ZoneSelectorErrorBoundary>
+        <ZonePreferenceSelector
+          province={form.province}
+          selectedZones={preferredZones}
+          onSelectionChange={setPreferredZones}
+        />
+      </ZoneSelectorErrorBoundary>
 
       <div>
         <label className="mb-1 block text-sm font-medium text-text">Messaggio</label>

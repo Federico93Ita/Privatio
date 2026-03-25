@@ -38,7 +38,7 @@ export default function ComeFunzionaPage() {
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content">
         {/* Hero */}
         <section className="pt-32 pb-16 md:pt-40 md:pb-20">
           <div className="max-w-4xl mx-auto px-4 text-center">

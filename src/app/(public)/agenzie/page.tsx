@@ -187,6 +187,7 @@ export default function AgenziePage() {
     <>
       <Header />
 
+      <main id="main-content">
       {/* ---- Hero ---- */}
       <section className="pt-28 pb-16 md:pt-36 md:pb-20 bg-gradient-to-b from-primary/[0.03] to-transparent">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
@@ -347,6 +348,8 @@ export default function AgenziePage() {
           </div>
         </div>
       </section>
+
+      </main>
 
       <Footer />
     </>
