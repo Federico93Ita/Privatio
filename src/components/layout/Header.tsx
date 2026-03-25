@@ -46,6 +46,13 @@ export default function Header() {
 
   return (
     <>
+      {/* Skip to content — accessibility (WCAG 2.1 AA) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-white focus:text-sm focus:font-medium focus:shadow-lg"
+      >
+        Vai al contenuto principale
+      </a>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled

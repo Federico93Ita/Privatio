@@ -266,7 +266,7 @@ export default function HomePage() {
     <>
       <Header />
 
-      <main className="overflow-hidden">
+      <main id="main-content" className="overflow-hidden">
         {/* ============================================================ */}
         {/*  1. HERO                                                      */}
         {/* ============================================================ */}

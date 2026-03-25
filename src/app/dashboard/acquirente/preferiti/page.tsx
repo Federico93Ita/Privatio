@@ -131,6 +131,23 @@ export default function BuyerFavoritesPage() {
           </div>
         )}
 
+        {!loading && favorites.length >= 2 && (
+          <div className="flex items-center gap-3 rounded-xl bg-primary/5 border border-primary/15 p-4">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary shrink-0" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+            <p className="text-sm text-text-muted flex-1">
+              Hai {favorites.length} immobili salvati. Confrontali fianco a fianco per scegliere meglio.
+            </p>
+            <Link
+              href={`/confronta?ids=${favorites.slice(0, 3).map((f) => f.property.slug).join(",")}`}
+              className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/85 transition-colors"
+            >
+              Confronta
+            </Link>
+          </div>
+        )}
+
         {!loading && favorites.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav) => (
