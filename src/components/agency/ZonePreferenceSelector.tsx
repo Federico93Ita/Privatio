@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { GoogleMap, useLoadScript, CircleF, InfoWindowF } from "@react-google-maps/api";
 import { PLAN_LABELS } from "@/lib/zone-constants";
 
@@ -154,6 +154,8 @@ export default function ZonePreferenceSelector({
   const zonesWithCoords = zones.filter((z) => z.lat && z.lng);
   const maxReached = selectedZones.length >= 3;
 
+  const mapRef = useRef<google.maps.Map | null>(null);
+
   // Auto-center on zones if available (must be before early return — Rules of Hooks)
   const center = useMemo(() => {
     if (zonesWithCoords.length === 0) return { lat: provCenter.lat, lng: provCenter.lng };
@@ -161,6 +163,25 @@ export default function ZonePreferenceSelector({
     const avgLng = zonesWithCoords.reduce((s, z) => s + z.lng!, 0) / zonesWithCoords.length;
     return { lat: avgLat, lng: avgLng };
   }, [zonesWithCoords.length, provCenter.lat, provCenter.lng, zones]);
+
+  // Fit map bounds to all zones so there's no wasted space
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+    if (zonesWithCoords.length > 1) {
+      const bounds = new google.maps.LatLngBounds();
+      zonesWithCoords.forEach((z) => bounds.extend({ lat: z.lat!, lng: z.lng! }));
+      map.fitBounds(bounds, 40); // 40px padding
+    }
+  }, [zonesWithCoords]);
+
+  // Re-fit bounds when zones change
+  useEffect(() => {
+    if (mapRef.current && zonesWithCoords.length > 1) {
+      const bounds = new google.maps.LatLngBounds();
+      zonesWithCoords.forEach((z) => bounds.extend({ lat: z.lat!, lng: z.lng! }));
+      mapRef.current.fitBounds(bounds, 40);
+    }
+  }, [zonesWithCoords]);
 
   function toggleZone(zone: ZoneData) {
     if (isZoneSelected(zone.id)) {
@@ -220,7 +241,8 @@ export default function ZonePreferenceSelector({
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={center}
-          zoom={provCenter.zoom}
+          zoom={zonesWithCoords.length > 1 ? undefined : provCenter.zoom}
+          onLoad={onMapLoad}
           options={{
             disableDefaultUI: true,
             zoomControl: true,

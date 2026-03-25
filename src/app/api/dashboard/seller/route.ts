@@ -24,6 +24,12 @@ export async function GET() {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
     }
 
+    const userId = (session.user as { id?: string }).id;
+    if (!userId) {
+      console.error("Seller dashboard: session.user.id is missing", JSON.stringify(session.user));
+      return NextResponse.json({ error: "Sessione non valida" }, { status: 401 });
+    }
+
     // Include block reused for both queries
     const propertyInclude = {
       photos: { orderBy: { order: "asc" as const }, take: 1 },
@@ -60,7 +66,7 @@ export async function GET() {
     // Prefer a property with an active agency assignment (most advanced in pipeline)
     let property = await prisma.property.findFirst({
       where: {
-        sellerId: session.user.id,
+        sellerId: userId,
         assignment: { isNot: null },
       },
       orderBy: { createdAt: "desc" },
@@ -70,7 +76,7 @@ export async function GET() {
     // Fallback: most recent property regardless of assignment
     if (!property) {
       property = await prisma.property.findFirst({
-        where: { sellerId: session.user.id },
+        where: { sellerId: userId },
         orderBy: { createdAt: "desc" },
         include: propertyInclude,
       });
@@ -113,7 +119,7 @@ export async function GET() {
       recentLeads: property.leads.map((lead) => ({
         id: lead.id,
         name: lead.name,
-        date: formatDateTime(lead.createdAt),
+        date: lead.createdAt ? formatDateTime(lead.createdAt) : "",
         message: lead.message ?? "Richiesta informazioni",
       })),
       upcomingVisits: property.visits
@@ -121,7 +127,7 @@ export async function GET() {
         .slice(0, 5)
         .map((visit) => ({
           id: visit.id,
-          date: formatDateTime(visit.scheduledAt),
+          date: visit.scheduledAt ? formatDateTime(visit.scheduledAt) : "",
           buyerName: visit.buyerName,
           status: visit.status.toLowerCase() as "pending" | "confirmed",
         })),
@@ -136,9 +142,12 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    console.error("Seller dashboard error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack?.slice(0, 500) : undefined;
+    console.error("Seller dashboard error msg:", msg);
+    if (stack) console.error("Seller dashboard stack:", stack);
     return NextResponse.json(
-      { error: "Errore nel caricamento dashboard" },
+      { error: "Errore nel caricamento dashboard", detail: msg },
       { status: 500 }
     );
   }
