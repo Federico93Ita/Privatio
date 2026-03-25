@@ -81,6 +81,8 @@ model Agency {
   isActive         Boolean   @default(false)
   stripeCustomerId String?
   stripeSubId      String?
+  trialEndsAt      DateTime?  // Free trial expiry date
+  trialUsed        Boolean   @default(false)
   logoUrl          String?
   description      String?   @db.Text
   rating           Float?    @default(0)
@@ -157,6 +159,8 @@ model Property {
   extraCosts         String?  @db.Text
   condition          String?
   heatingType        String?
+  videoUrl           String?  // YouTube or Vimeo embed URL
+  virtualTourUrl     String?  // Matterport, 3DVista, etc.
   address       String
   city          String
   province      String

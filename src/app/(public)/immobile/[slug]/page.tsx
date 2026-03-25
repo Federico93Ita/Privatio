@@ -8,6 +8,8 @@ import Footer from "@/components/layout/Footer";
 import PropertyGallery from "@/components/property/PropertyGallery";
 import MortgageCalc from "@/components/property/MortgageCalc";
 import PropertyMap from "@/components/property/PropertyMap";
+import NearbyPOI from "@/components/property/NearbyPOI";
+import PropertyValuation from "@/components/property/PropertyValuation";
 import PropertyContactForm from "@/components/forms/PropertyContactForm";
 import FavoriteButton from "@/components/property/FavoriteButton";
 import { formatPrice, getPropertyTypeLabel } from "@/lib/utils";
@@ -231,6 +233,50 @@ export default async function PropertyDetailPage({ params }: Props) {
         {/* Gallery (placeholder shown when no photos) */}
         <div className="max-w-7xl mx-auto px-4 pt-6">
           <PropertyGallery photos={property.photos ?? []} />
+
+          {/* Video tour / Virtual tour */}
+          {(property.videoUrl || property.virtualTourUrl) && (
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {property.videoUrl && (
+                <div className="bg-white rounded-xl p-4 border border-border">
+                  <h3 className="font-medium text-text mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                    Video tour
+                  </h3>
+                  <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                    <iframe
+                      src={property.videoUrl}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="Video tour dell'immobile"
+                    />
+                  </div>
+                </div>
+              )}
+              {property.virtualTourUrl && (
+                <div className="bg-white rounded-xl p-4 border border-border">
+                  <h3 className="font-medium text-text mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    Virtual tour 360°
+                  </h3>
+                  <div className="aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      src={property.virtualTourUrl}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Virtual tour 360° dell'immobile"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-8">
@@ -373,6 +419,12 @@ export default async function PropertyDetailPage({ params }: Props) {
                 <h2 className="font-medium text-xl text-text mb-4">Posizione</h2>
                 <PropertyMap lat={property.lat} lng={property.lng} city={property.city} />
               </div>
+
+              {/* Nearby POI */}
+              <div className="bg-white rounded-xl p-6 border border-border">
+                <h2 className="font-medium text-xl text-text mb-4">Nelle vicinanze</h2>
+                <NearbyPOI lat={property.lat} lng={property.lng} />
+              </div>
             </div>
 
             {/* Sidebar */}
@@ -418,6 +470,25 @@ export default async function PropertyDetailPage({ params }: Props) {
             </div>
             <div className="lg:max-w-4xl mx-auto">
               <MortgageCalc defaultPrice={property.price} />
+            </div>
+          </div>
+
+          {/* ── Property Valuation ── */}
+          <div className="bg-white rounded-2xl p-8 border border-border">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-medium text-text">Analisi di mercato</h2>
+              <p className="text-text-muted text-sm mt-2">
+                Come si posiziona questo immobile rispetto al mercato di {property.city}
+              </p>
+            </div>
+            <div className="lg:max-w-2xl mx-auto">
+              <PropertyValuation
+                city={property.city}
+                surface={property.surface}
+                rooms={property.rooms}
+                price={property.price}
+                type={property.type}
+              />
             </div>
           </div>
 
