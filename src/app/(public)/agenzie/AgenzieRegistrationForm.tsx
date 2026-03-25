@@ -118,7 +118,7 @@ export default function AgenzieRegistrationForm() {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Telefono *</label>
-          <input type="tel" required minLength={8} value={form.phone} onChange={(e) => { setForm({ ...form, phone: e.target.value }); setFieldErrors((p) => ({ ...p, phone: "" })); }}
+          <input type="tel" required value={form.phone} onChange={(e) => { setForm({ ...form, phone: e.target.value }); setFieldErrors((p) => ({ ...p, phone: "" })); }}
             className={`w-full rounded-lg border ${fieldErrors.phone ? "border-error" : "border-border"} px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30`} />
           {fieldErrors.phone && <p className="mt-1 text-xs text-error">{fieldErrors.phone}</p>}
         </div>
@@ -141,7 +141,7 @@ export default function AgenzieRegistrationForm() {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Provincia *</label>
-          <input type="text" required maxLength={2} minLength={2} value={form.province} onChange={(e) => { setForm({ ...form, province: e.target.value.toUpperCase() }); setFieldErrors((p) => ({ ...p, province: "" })); }}
+          <input type="text" required maxLength={2} value={form.province} onChange={(e) => { setForm({ ...form, province: e.target.value.toUpperCase() }); setFieldErrors((p) => ({ ...p, province: "" })); }}
             placeholder="MI"
             className={`w-full rounded-lg border ${fieldErrors.province ? "border-error" : "border-border"} px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30`} />
           {fieldErrors.province && <p className="mt-1 text-xs text-error">{fieldErrors.province}</p>}
