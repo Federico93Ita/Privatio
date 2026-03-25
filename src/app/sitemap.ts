@@ -37,5 +37,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Silently skip if DB is not available at build time
   }
 
-  return [...staticPages, ...propertyPages];
+  // Dynamic city pages for SEO (e.g. /cerca?city=Torino)
+  let cityPages: MetadataRoute.Sitemap = [];
+  try {
+    const cities = await prisma.property.groupBy({
+      by: ["city"],
+      where: { status: "PUBLISHED" },
+      _count: true,
+      orderBy: { _count: { city: "desc" } },
+      take: 100,
+    });
+
+    cityPages = cities.map((c) => ({
+      url: `${BASE_URL}/cerca?city=${encodeURIComponent(c.city)}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    }));
+  } catch {
+    // skip
+  }
+
+  return [...staticPages, ...propertyPages, ...cityPages];
 }

@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/layout/Header";
+
+/** ISR: revalidate property pages every 60 minutes */
+export const revalidate = 3600;
 import Footer from "@/components/layout/Footer";
 import PropertyGallery from "@/components/property/PropertyGallery";
 import MortgageCalc from "@/components/property/MortgageCalc";

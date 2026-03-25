@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -18,6 +18,11 @@ export async function GET() {
     if (!user?.agencyId) {
       return NextResponse.json({ error: "Non sei associato a un'agenzia" }, { status: 403 });
     }
+
+    // Pagination for assignments
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
 
     const agency = await prisma.agency.findUnique({
       where: { id: user.agencyId },
@@ -44,9 +49,14 @@ export async function GET() {
             },
           },
           orderBy: { assignedAt: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
         },
         agents: {
           select: { id: true, name: true, email: true },
+        },
+        _count: {
+          select: { assignments: true },
         },
       },
     });
@@ -110,7 +120,17 @@ export async function GET() {
       totalVisits,
     };
 
-    return NextResponse.json({ agency, stats });
+    const totalAssignments = agency._count?.assignments || 0;
+    return NextResponse.json({
+      agency,
+      stats,
+      pagination: {
+        page,
+        limit,
+        total: totalAssignments,
+        totalPages: Math.ceil(totalAssignments / limit),
+      },
+    });
   } catch (error) {
     console.error("Agency dashboard error:", error);
     return NextResponse.json(

@@ -186,6 +186,7 @@ export default function PropertyGallery({ photos }: PropertyGalleryProps) {
                   alt={`Miniatura ${idx + 1}`}
                   fill
                   sizes="80px"
+                  loading="lazy"
                   className="object-cover"
                 />
               </button>

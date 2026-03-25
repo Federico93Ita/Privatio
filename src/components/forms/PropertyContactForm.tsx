@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { trackLeadSubmit } from "@/lib/analytics";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -76,6 +77,7 @@ export default function PropertyContactForm({ slug }: PropertyContactFormProps) 
       }
 
       setSuccess("Richiesta inviata con successo! Ti contatteremo al più presto.");
+      trackLeadSubmit(slug, "info_request");
       setInfoName("");
       setInfoEmail("");
       setInfoPhone("");
@@ -112,6 +114,7 @@ export default function PropertyContactForm({ slug }: PropertyContactFormProps) 
       }
 
       setSuccess("Visita prenotata con successo! Riceverai una conferma via email.");
+      trackLeadSubmit(slug, "visit_request");
       setVisitName("");
       setVisitEmail("");
       setVisitPhone("");

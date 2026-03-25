@@ -504,3 +504,17 @@ enum ComplaintStatus {
   RESOLVED
   CLOSED
 }
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String   // e.g. "property.publish", "agency.approve", "user.delete"
+  userId    String?  // who performed the action
+  targetId  String?  // entity affected
+  details   Json?    // additional context
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([userId])
+  @@index([createdAt])
+}

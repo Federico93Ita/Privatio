@@ -241,6 +241,23 @@ export async function POST(req: NextRequest) {
 
     const data = parsed.data;
 
+    // Check for duplicate property at same address by same seller
+    const existing = await prisma.property.findFirst({
+      where: {
+        sellerId: session.user.id,
+        address: data.address,
+        city: { equals: data.city, mode: "insensitive" },
+        status: { notIn: ["WITHDRAWN", "SOLD"] },
+      },
+      select: { id: true, slug: true },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Hai già un immobile pubblicato a questo indirizzo. Modifica quello esistente o rimuovilo prima di crearne uno nuovo." },
+        { status: 409 }
+      );
+    }
+
     // Create property in a transaction
     const property = await prisma.$transaction(async (tx) => {
       const created = await tx.property.create({
