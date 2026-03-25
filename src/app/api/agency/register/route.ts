@@ -3,14 +3,23 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { geocodeAddress } from "@/lib/geocode";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { z } from "zod";
+
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const agencyRegisterSchema = z.object({
   agencyName: z.string().min(2, "Nome agenzia richiesto"),
   name: z.string().min(2, "Nome contatto richiesto"),
   email: z.string().email("Email non valida"),
   phone: z.string().min(8, "Telefono richiesto"),
-  password: z.string().min(8, "Password minimo 8 caratteri"),
+  password: z
+    .string()
+    .min(8, "Password minimo 8 caratteri")
+    .regex(/[A-Z]/, "La password deve contenere almeno una lettera maiuscola")
+    .regex(/[0-9]/, "La password deve contenere almeno un numero")
+    .regex(/[^A-Za-z0-9]/, "La password deve contenere almeno un carattere speciale"),
   address: z.string().min(5, "Indirizzo richiesto"),
   city: z.string().min(2, "Città richiesta"),
   province: z.string().min(2, "Provincia richiesta"),
@@ -20,6 +29,8 @@ const agencyRegisterSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(RATE_LIMITS.register, req);
+    if (limited) return limited;
     const body = await req.json();
     const parsed = agencyRegisterSchema.safeParse(body);
 
@@ -113,7 +124,7 @@ export async function POST(req: NextRequest) {
       try {
         await sendEmail({
           to: adminEmail,
-          subject: `Nuova agenzia registrata: ${data.agencyName} — ${data.city}`,
+          subject: `Nuova agenzia registrata: ${esc(data.agencyName)} — ${esc(data.city)}`,
           html: `
             <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: #0f172a; padding: 30px; text-align: center;">
@@ -121,11 +132,11 @@ export async function POST(req: NextRequest) {
               </div>
               <div style="padding: 30px; background: white;">
                 <table style="width: 100%; border-collapse: collapse;">
-                  <tr><td style="padding: 8px 0; color: #6b7280;">Agenzia</td><td style="padding: 8px 0; font-weight: 600;">${data.agencyName}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #6b7280;">Contatto</td><td style="padding: 8px 0; font-weight: 600;">${data.name}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #6b7280;">Email</td><td style="padding: 8px 0; font-weight: 600;">${data.email}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #6b7280;">Telefono</td><td style="padding: 8px 0; font-weight: 600;">${data.phone}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #6b7280;">Indirizzo</td><td style="padding: 8px 0; font-weight: 600;">${data.address}, ${data.city} (${data.province})</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Agenzia</td><td style="padding: 8px 0; font-weight: 600;">${esc(data.agencyName)}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Contatto</td><td style="padding: 8px 0; font-weight: 600;">${esc(data.name)}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Email</td><td style="padding: 8px 0; font-weight: 600;">${esc(data.email)}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Telefono</td><td style="padding: 8px 0; font-weight: 600;">${esc(data.phone)}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280;">Indirizzo</td><td style="padding: 8px 0; font-weight: 600;">${esc(data.address)}, ${esc(data.city)} (${esc(data.province)})</td></tr>
                   <tr><td style="padding: 8px 0; color: #6b7280;">Da lead approvato</td><td style="padding: 8px 0; font-weight: 600;">${approvedLead ? "Sì" : "No (registrazione diretta)"}</td></tr>
                   <tr><td style="padding: 8px 0; color: #6b7280;">Data</td><td style="padding: 8px 0; font-weight: 600;">${new Date().toLocaleString("it-IT", { timeZone: "Europe/Rome" })}</td></tr>
                 </table>
@@ -149,9 +160,9 @@ export async function POST(req: NextRequest) {
             <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio Partner</h1>
           </div>
           <div style="padding: 30px; background: white;">
-            <h2 style="color: #0f172a;">Benvenuto ${data.name}!</h2>
+            <h2 style="color: #0f172a;">Benvenuto ${esc(data.name)}!</h2>
             <p style="color: #6b7280; line-height: 1.6;">
-              La registrazione di <strong>${data.agencyName}</strong> è stata completata.
+              La registrazione di <strong>${esc(data.agencyName)}</strong> è stata completata.
               Per attivare il tuo profilo e iniziare a ricevere immobili, sottoscrivi un piano.
             </p>
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia"

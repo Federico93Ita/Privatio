@@ -44,6 +44,9 @@ export default function RegistraAgenziaPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [accettaTermini, setAccettaTermini] = useState(false);
+  const [accettaPrivacy, setAccettaPrivacy] = useState(false);
+  const [accettaContratto, setAccettaContratto] = useState(false);
   const [error, setError] = useState("");
 
   /* ---- Validate token on mount ---- */
@@ -85,6 +88,18 @@ export default function RegistraAgenziaPage() {
 
     if (password.length < 8) {
       setError("La password deve avere almeno 8 caratteri.");
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError("La password deve contenere almeno una lettera maiuscola.");
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError("La password deve contenere almeno un numero.");
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      setError("La password deve contenere almeno un carattere speciale.");
       return;
     }
     if (password !== confirmPassword) {
@@ -410,10 +425,61 @@ export default function RegistraAgenziaPage() {
               />
             </div>
 
+            {/* Consensi GDPR */}
+            <div className="space-y-3 pt-2">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={accettaTermini}
+                  onChange={(e) => setAccettaTermini(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary/30"
+                />
+                <span className="text-sm text-text">
+                  Ho letto e accetto i{" "}
+                  <Link href="/termini-di-servizio" target="_blank" className="text-primary hover:underline">
+                    Termini di Servizio
+                  </Link>{" "}
+                  <span className="text-error">*</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={accettaPrivacy}
+                  onChange={(e) => setAccettaPrivacy(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary/30"
+                />
+                <span className="text-sm text-text">
+                  Ho letto e accetto l&apos;
+                  <Link href="/privacy-policy" target="_blank" className="text-primary hover:underline">
+                    Informativa sulla Privacy
+                  </Link>{" "}
+                  <span className="text-error">*</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={accettaContratto}
+                  onChange={(e) => setAccettaContratto(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary/30"
+                />
+                <span className="text-sm text-text">
+                  Ho letto e accetto il{" "}
+                  <Link href="/contratto-agenzia" target="_blank" className="text-primary hover:underline">
+                    Contratto di Convenzionamento
+                  </Link>{" "}
+                  <span className="text-error">*</span>
+                </span>
+              </label>
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
-              disabled={pageState === "submitting"}
+              disabled={pageState === "submitting" || !accettaTermini || !accettaPrivacy || !accettaContratto}
               className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors flex items-center justify-center gap-2"
             >
               {pageState === "submitting" && (
@@ -425,18 +491,6 @@ export default function RegistraAgenziaPage() {
               {pageState === "submitting" ? "Registrazione in corso..." : "Completa Registrazione"}
             </button>
           </form>
-
-          <p className="text-xs text-text-muted mt-4 text-center">
-            Registrandoti accetti i{" "}
-            <Link href="/termini-di-servizio" className="text-primary hover:underline">
-              Termini di Servizio
-            </Link>{" "}
-            e la{" "}
-            <Link href="/privacy-policy" className="text-primary hover:underline">
-              Privacy Policy
-            </Link>
-            .
-          </p>
         </div>
 
         <p className="text-center text-sm text-text-muted mt-6">

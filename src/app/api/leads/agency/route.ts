@@ -4,6 +4,9 @@ import { agencyLeadSchema } from "@/lib/validations";
 import { sendEmail } from "@/lib/email";
 import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
 export async function POST(req: NextRequest) {
   try {
     const limited = await applyRateLimit(RATE_LIMITS.lead, req);
@@ -16,6 +19,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Dati non validi", details: parsed.error.flatten() },
         { status: 400 }
+      );
+    }
+
+    // Prevent duplicate submissions
+    const existingLead = await prisma.agencyLead.findFirst({
+      where: { email: parsed.data.email, status: { not: "LOST" } },
+    });
+    if (existingLead) {
+      return NextResponse.json(
+        { error: "Esiste già una richiesta per questa email. Ti contatteremo al più presto." },
+        { status: 409 }
       );
     }
 
@@ -34,10 +48,10 @@ export async function POST(req: NextRequest) {
             <p style="color: rgba(255,255,255,0.9); margin-top: 8px;">Network Agenzie Partner</p>
           </div>
           <div style="padding: 30px; background: white;">
-            <h2 style="color: #0f172a;">Ciao ${parsed.data.contactName}!</h2>
+            <h2 style="color: #0f172a;">Ciao ${esc(parsed.data.contactName)}!</h2>
             <p style="color: #64748b; line-height: 1.6;">
               Grazie per l'interesse nel diventare agenzia partner Privatio.
-              Abbiamo ricevuto la richiesta di <strong>${parsed.data.agencyName}</strong>
+              Abbiamo ricevuto la richiesta di <strong>${esc(parsed.data.agencyName)}</strong>
               e ti contatteremo al più presto per procedere con l'attivazione.
             </p>
           </div>
@@ -73,18 +87,18 @@ export async function POST(req: NextRequest) {
 
       const adminResult = await sendEmail({
         to: adminEmail,
-        subject: `Nuovo lead agenzia: ${parsed.data.agencyName} — ${parsed.data.city}${zones && zones.length > 0 ? ` (${zones.length} zone)` : ""}`,
+        subject: `Nuovo lead agenzia: ${esc(parsed.data.agencyName)} — ${esc(parsed.data.city)}${zones && zones.length > 0 ? ` (${zones.length} zone)` : ""}`,
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h2>Nuovo lead agenzia</h2>
-            <p><strong>Agenzia:</strong> ${parsed.data.agencyName}</p>
-            <p><strong>Contatto:</strong> ${parsed.data.contactName}</p>
-            <p><strong>Email:</strong> ${parsed.data.email}</p>
-            <p><strong>Telefono:</strong> ${parsed.data.phone}</p>
-            ${parsed.data.address ? `<p><strong>Indirizzo sede:</strong> ${parsed.data.address}</p>` : ""}
-            <p><strong>Città:</strong> ${parsed.data.city} (${parsed.data.province})</p>
+            <p><strong>Agenzia:</strong> ${esc(parsed.data.agencyName)}</p>
+            <p><strong>Contatto:</strong> ${esc(parsed.data.contactName)}</p>
+            <p><strong>Email:</strong> ${esc(parsed.data.email)}</p>
+            <p><strong>Telefono:</strong> ${esc(parsed.data.phone)}</p>
+            ${parsed.data.address ? `<p><strong>Indirizzo sede:</strong> ${esc(parsed.data.address)}</p>` : ""}
+            <p><strong>Città:</strong> ${esc(parsed.data.city)} (${esc(parsed.data.province)})</p>
             ${parsed.data.agentCount ? `<p><strong>Agenti:</strong> ${parsed.data.agentCount}</p>` : ""}
-            ${parsed.data.message ? `<p><strong>Messaggio:</strong> ${parsed.data.message}</p>` : ""}
+            ${parsed.data.message ? `<p><strong>Messaggio:</strong> ${esc(parsed.data.message)}</p>` : ""}
             ${zonesHtml}
             <p style="margin-top: 20px;">
               <a href="${appUrl}/admin?tab=leads" style="display: inline-block; padding: 10px 20px; background: #0f172a; color: white; text-decoration: none; border-radius: 6px;">Gestisci Lead</a>

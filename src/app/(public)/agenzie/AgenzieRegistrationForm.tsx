@@ -21,9 +21,20 @@ export default function AgenzieRegistrationForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  function validateFields(): boolean {
+    const errors: Record<string, string> = {};
+    if (form.phone && form.phone.length < 8) errors.phone = "Il telefono deve avere almeno 8 cifre";
+    if (form.province && form.province.length !== 2) errors.province = "Inserisci la sigla provincia (es. MI, TO)";
+    if (form.city && form.city.length < 2) errors.city = "Inserisci il nome della città";
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!validateFields()) return;
     setSubmitting(true);
     setError("");
 
@@ -107,8 +118,9 @@ export default function AgenzieRegistrationForm() {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Telefono *</label>
-          <input type="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
+          <input type="tel" required minLength={8} value={form.phone} onChange={(e) => { setForm({ ...form, phone: e.target.value }); setFieldErrors((p) => ({ ...p, phone: "" })); }}
+            className={`w-full rounded-lg border ${fieldErrors.phone ? "border-error" : "border-border"} px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30`} />
+          {fieldErrors.phone && <p className="mt-1 text-xs text-error">{fieldErrors.phone}</p>}
         </div>
       </div>
 
@@ -123,14 +135,16 @@ export default function AgenzieRegistrationForm() {
       <div className="grid gap-5 sm:grid-cols-3">
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Città *</label>
-          <input type="text" required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })}
-            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
+          <input type="text" required value={form.city} onChange={(e) => { setForm({ ...form, city: e.target.value }); setFieldErrors((p) => ({ ...p, city: "" })); }}
+            className={`w-full rounded-lg border ${fieldErrors.city ? "border-error" : "border-border"} px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30`} />
+          {fieldErrors.city && <p className="mt-1 text-xs text-error">{fieldErrors.city}</p>}
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-text">Provincia *</label>
-          <input type="text" required maxLength={2} value={form.province} onChange={(e) => setForm({ ...form, province: e.target.value.toUpperCase() })}
+          <input type="text" required maxLength={2} minLength={2} value={form.province} onChange={(e) => { setForm({ ...form, province: e.target.value.toUpperCase() }); setFieldErrors((p) => ({ ...p, province: "" })); }}
             placeholder="MI"
-            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
+            className={`w-full rounded-lg border ${fieldErrors.province ? "border-error" : "border-border"} px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30`} />
+          {fieldErrors.province && <p className="mt-1 text-xs text-error">{fieldErrors.province}</p>}
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-text">N. agenti</label>

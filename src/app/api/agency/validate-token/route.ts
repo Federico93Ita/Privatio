@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
         phone: true,
         city: true,
         province: true,
+        approvedAt: true,
       },
     });
 
@@ -36,7 +37,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ lead });
+    // Token expires 7 days after approval
+    if (lead.approvedAt) {
+      const expiresAt = new Date(lead.approvedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+      if (new Date() > expiresAt) {
+        return NextResponse.json(
+          { error: "Il link di registrazione è scaduto. Contatta il supporto per riceverne uno nuovo." },
+          { status: 410 }
+        );
+      }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { approvedAt: _, ...leadData } = lead;
+    return NextResponse.json({ lead: leadData });
   } catch (error) {
     console.error("Validate token error:", error);
     return NextResponse.json(
