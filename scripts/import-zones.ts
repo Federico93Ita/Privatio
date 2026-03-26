@@ -260,6 +260,98 @@ async function geocode(address: string): Promise<{ lat: number; lng: number } | 
 }
 
 /* ------------------------------------------------------------------ */
+/*  Clustering geografico per micro comuni                             */
+/* ------------------------------------------------------------------ */
+
+type GeoComune = ComuneData & { lat: number; lng: number };
+
+/**
+ * Haversine distance in meters between two lat/lng points.
+ */
+function haversineMeters(
+  lat1: number, lng1: number,
+  lat2: number, lng2: number
+): number {
+  const R = 6371000;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Greedy nearest-neighbor clustering.
+ *
+ * Starts from the largest unassigned comune, adds neighbors within
+ * `maxDistanceMeters` until the cluster reaches `targetPopulation`.
+ * Then starts a new cluster.
+ */
+function clusterByProximity(
+  comuni: GeoComune[],
+  targetPopulation: number,
+  maxPopulation: number,
+  maxDistanceMeters: number = 15000 // 15 km
+): GeoComune[][] {
+  if (comuni.length === 0) return [];
+
+  // Sort by population desc — start clusters from the biggest
+  const remaining = [...comuni].sort((a, b) => b.population - a.population);
+  const used = new Set<string>();
+  const clusters: GeoComune[][] = [];
+
+  while (used.size < comuni.length) {
+    // Pick the largest unused comune as seed
+    const seed = remaining.find((c) => !used.has(c.name));
+    if (!seed) break;
+
+    const cluster: GeoComune[] = [seed];
+    used.add(seed.name);
+    let totalPop = seed.population;
+
+    // Center of current cluster (updated as we add members)
+    let centerLat = seed.lat;
+    let centerLng = seed.lng;
+
+    // Find nearby unassigned comuni
+    let changed = true;
+    while (changed && totalPop < maxPopulation) {
+      changed = false;
+
+      // Sort remaining by distance to cluster center
+      const candidates = remaining
+        .filter((c) => !used.has(c.name))
+        .map((c) => ({
+          comune: c,
+          dist: haversineMeters(centerLat, centerLng, c.lat, c.lng),
+        }))
+        .filter((c) => c.dist <= maxDistanceMeters)
+        .sort((a, b) => a.dist - b.dist);
+
+      for (const { comune } of candidates) {
+        if (totalPop + comune.population > maxPopulation) continue;
+        cluster.push(comune);
+        used.add(comune.name);
+        totalPop += comune.population;
+        changed = true;
+
+        // Recalculate center
+        centerLat = cluster.reduce((s, c) => s + c.lat, 0) / cluster.length;
+        centerLng = cluster.reduce((s, c) => s + c.lng, 0) / cluster.length;
+
+        if (totalPop >= targetPopulation) break;
+      }
+    }
+
+    clusters.push(cluster);
+  }
+
+  return clusters;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Genera slug univoco                                                */
 /* ------------------------------------------------------------------ */
 
@@ -371,29 +463,58 @@ async function createZones(comuni: ComuneData[]) {
       created++;
     }
 
-    // Comuni micro (<5k): BASE cluster
+    // Comuni micro (<5k): BASE cluster — raggruppamento GEOGRAFICO
     if (comuniMicro.length > 0) {
-      comuniMicro.sort((a, b) => a.name.localeCompare(b.name));
+      // Step 1: Geocodifica tutti i micro comuni per avere coordinate
+      const geoComuni: Array<ComuneData & { lat: number; lng: number }> = [];
+      const noGeoComuni: ComuneData[] = [];
 
-      const clusterSize = Math.min(
-        15,
-        Math.max(5, Math.ceil(comuniMicro.length / Math.ceil(comuniMicro.length / 10)))
-      );
+      for (const c of comuniMicro) {
+        const coords = await geocode(`${c.name}, ${province}, Italia`);
+        if (coords) {
+          geoComuni.push({ ...c, ...coords });
+        } else {
+          noGeoComuni.push(c);
+        }
+      }
 
-      for (let i = 0; i < comuniMicro.length; i += clusterSize) {
-        const chunk = comuniMicro.slice(i, i + clusterSize);
+      // Step 2: Clustering geografico (greedy nearest-neighbor)
+      const clusters = clusterByProximity(geoComuni, 5000, 20000);
+
+      // Aggiungi comuni senza coordinate al cluster piu vicino o creane uno nuovo
+      if (noGeoComuni.length > 0) {
+        if (clusters.length > 0) {
+          // Aggiungi al primo cluster della provincia
+          for (const c of noGeoComuni) {
+            clusters[0].push({ ...c, lat: clusters[0][0].lat, lng: clusters[0][0].lng });
+          }
+        } else {
+          // Nessun cluster geocodificato — crea un cluster unico
+          const fallbackCluster = noGeoComuni.map((c) => ({ ...c, lat: 0, lng: 0 }));
+          clusters.push(fallbackCluster);
+        }
+      }
+
+      // Step 3: Crea zone per ogni cluster
+      for (let i = 0; i < clusters.length; i++) {
+        const chunk = clusters[i];
         const totalPop = chunk.reduce((s, c) => s + c.population, 0);
         const names = chunk.map((c) => c.name);
 
+        // Trova il comune piu grande del cluster per il nome
+        const biggest = chunk.reduce((a, b) => (a.population > b.population ? a : b));
         const clusterName =
           chunk.length === 1
-            ? `${chunk[0].name}`
-            : `Area ${chunk[0].name} - ${chunk[chunk.length - 1].name}`;
+            ? chunk[0].name
+            : `Area ${biggest.name}`;
 
-        const slug = slugify(`cluster-${province}-${i}`);
+        const slug = slugify(`area-${biggest.name}-${province}`);
         const score = calculateMarketScore(totalPop, totalPop * 0.005);
         const pricing = calculateZonePrice("BASE", totalPop, totalPop * 0.005);
-        const coords = await geocode(`${chunk[0].name}, ${province}, Italia`);
+
+        // Centro del cluster (media coordinate)
+        const avgLat = chunk.reduce((s, c) => s + c.lat, 0) / chunk.length;
+        const avgLng = chunk.reduce((s, c) => s + c.lng, 0) / chunk.length;
 
         await upsertZone({
           name: clusterName,
@@ -405,8 +526,8 @@ async function createZones(comuni: ComuneData[]) {
           municipalities: names,
           population: totalPop,
           marketScore: score,
-          lat: coords?.lat ?? null,
-          lng: coords?.lng ?? null,
+          lat: avgLat || null,
+          lng: avgLng || null,
           monthlyPrice: pricing.monthlyPrice,
           maxAgencies: pricing.maxAgencies,
         });
