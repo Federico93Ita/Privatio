@@ -5,90 +5,56 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 /* ------------------------------------------------------------------ */
-/*  Piani                                                              */
+/*  Fasce zona (sostituiscono i vecchi "piani" agenzia)                */
 /* ------------------------------------------------------------------ */
 
 export const PLANS = {
   BASE: {
-    name: "Base",
-    maxZones: 1,
+    name: "Zona Base",
+    maxZones: 3,
     priority: 1,
     features: [
-      "1 area operativa",
-      "Max 6 competitor/zona",
+      "Comuni < 20k abitanti",
+      "Max 3-4 agenzie per zona",
       "Notifica nuovi immobili 24h",
-      "Profilo agenzia",
-      "Dashboard base",
+      "Profilo agenzia completo",
+      "Dashboard gestione",
     ],
   },
-  PREMIER_LOCAL: {
-    name: "Premier Local",
-    maxZones: 2,
+  URBANA: {
+    name: "Zona Urbana",
+    maxZones: 3,
     priority: 2,
     features: [
-      "2 aree operative",
-      "Max 5 competitor/zona",
-      "Notifica 8h",
-      "Priorità su Base",
-      "Dashboard avanzata",
-    ],
-  },
-  PREMIER_CITY: {
-    name: "Premier City",
-    maxZones: 3,
-    priority: 3,
-    features: [
-      "3 aree operative",
-      "Max 4 competitor/zona",
-      "Notifica 2h",
-      "Alta visibilità venditore",
+      "Comuni 20k-100k o quartieri periferici",
+      "Max 4-6 agenzie per zona",
+      "Notifica nuovi immobili 8h",
+      "Visibilita locale garantita",
       "Statistiche avanzate",
     ],
   },
-  PREMIER_PRIME: {
-    name: "Premier Prime",
+  PREMIUM: {
+    name: "Zona Premium",
     maxZones: 3,
-    priority: 4,
+    priority: 3,
     features: [
-      "3 aree operative",
-      "Max 3 competitor/zona",
-      "Notifica 30 min",
-      "Accesso zone top",
-      "Supporto prioritario",
-    ],
-  },
-  PREMIER_ELITE: {
-    name: "Premier Elite",
-    maxZones: 4,
-    priority: 5,
-    features: [
-      "4 aree operative",
-      "Max 3 competitor/zona",
-      "Notifica istantanea",
-      "Prima posizione con venditore",
-      "Branding premium",
+      "Centri storici e quartieri pregiati",
+      "Max 4-7 agenzie per zona",
+      "Notifica istantanea immobili",
+      "Prima posizione ricerche",
+      "Branding premium e supporto",
     ],
   },
 } as const;
 
 export type PlanKey = keyof typeof PLANS;
 
-export const PLAN_KEYS: PlanKey[] = [
-  "BASE",
-  "PREMIER_LOCAL",
-  "PREMIER_CITY",
-  "PREMIER_PRIME",
-  "PREMIER_ELITE",
-];
+export const PLAN_KEYS: PlanKey[] = ["BASE", "URBANA", "PREMIUM"];
 
 /* ------------------------------------------------------------------ */
-/*  Stripe Price per zona — crea on-the-fly                            */
+/*  Stripe Price per zona                                              */
 /* ------------------------------------------------------------------ */
 
-/**
- * Crea un Stripe Price ricorrente mensile per una combinazione zona+piano.
- * Ritorna il priceId.
- */
 export async function createZoneStripePrice(
   zoneName: string,
   zoneId: string,
@@ -108,7 +74,7 @@ export async function createZoneStripePrice(
 }
 
 /* ------------------------------------------------------------------ */
-/*  Helper: determina piano massimo dai territori attivi               */
+/*  Helper: determina fascia massima dai territori attivi              */
 /* ------------------------------------------------------------------ */
 
 export function highestPlan(plans: PlanKey[]): PlanKey {

@@ -9,8 +9,9 @@ import { prisma } from "@/lib/prisma";
  * POST /api/stripe/checkout
  *
  * Crea una sessione Stripe Checkout per acquistare il primo territorio.
- * Body: { plan: PlanKey, zoneId: string }
+ * Body: { zoneId: string }
  *
+ * Il piano viene determinato dalla zoneClass della zona.
  * Se l'agenzia ha già una subscription attiva, usa l'API territori
  * per aggiungere line items (non questo endpoint).
  */
@@ -22,11 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { plan, zoneId } = body as { plan: PlanKey; zoneId: string };
-
-    if (!plan || !PLANS[plan]) {
-      return NextResponse.json({ error: "Piano non valido" }, { status: 400 });
-    }
+    const { zoneId } = body as { zoneId: string };
 
     if (!zoneId) {
       return NextResponse.json({ error: "Zona non specificata" }, { status: 400 });
@@ -47,27 +44,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Zona non disponibile" }, { status: 404 });
     }
 
-    // Verifica prezzo disponibile per il piano
-    const priceField = `price${plan === "BASE" ? "Base" : plan === "PREMIER_LOCAL" ? "Local" : plan === "PREMIER_CITY" ? "City" : plan === "PREMIER_PRIME" ? "Prime" : "Elite"}` as keyof typeof zone;
-    const zonePrice = zone[priceField] as number | null;
-
-    if (zonePrice == null) {
+    // Verifica prezzo configurato
+    if (zone.monthlyPrice <= 0) {
       return NextResponse.json(
-        { error: "Questo piano non è disponibile per questa zona" },
+        { error: "Prezzo zona non configurato" },
         { status: 400 }
       );
     }
 
     // Verifica slot disponibili
-    const maxField = `max${plan === "BASE" ? "Base" : plan === "PREMIER_LOCAL" ? "Local" : plan === "PREMIER_CITY" ? "City" : plan === "PREMIER_PRIME" ? "Prime" : "Elite"}` as keyof typeof zone;
-    const maxSlots = zone[maxField] as number;
     const currentCount = await prisma.territoryAssignment.count({
-      where: { zoneId, plan, isActive: true },
+      where: { zoneId, isActive: true },
     });
 
-    if (currentCount >= maxSlots) {
+    if (currentCount >= zone.maxAgencies) {
       return NextResponse.json(
-        { error: "Nessuno slot disponibile per questo piano in questa zona" },
+        { error: "Nessuno slot disponibile per questa zona" },
         { status: 409 }
       );
     }
@@ -83,16 +75,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica limiti zone del piano
+    // Verifica limiti zone (max 3)
     const activeZones = await prisma.territoryAssignment.count({
       where: { agencyId: user.agency.id, isActive: true },
     });
-    if (activeZones >= PLANS[plan].maxZones) {
+    if (activeZones >= 3) {
       return NextResponse.json(
-        { error: `Il piano ${PLANS[plan].name} consente massimo ${PLANS[plan].maxZones} zone` },
+        { error: "Limite di 3 zone raggiunto" },
         { status: 400 }
       );
     }
+
+    // Plan = zona's zoneClass
+    const plan = zone.zoneClass as PlanKey;
 
     // Crea/recupera Stripe customer
     let customerId = user.agency.stripeCustomerId;
@@ -114,7 +109,7 @@ export async function POST(req: NextRequest) {
       zone.name,
       zone.id,
       plan,
-      zonePrice
+      zone.monthlyPrice
     );
 
     // Crea checkout session
@@ -128,7 +123,7 @@ export async function POST(req: NextRequest) {
         agencyId: user.agency.id,
         plan,
         zoneId,
-        monthlyPrice: String(zonePrice),
+        monthlyPrice: String(zone.monthlyPrice),
       },
     });
 

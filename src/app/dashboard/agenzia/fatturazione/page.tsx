@@ -171,10 +171,8 @@ export default function AgencyBillingPage() {
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="px-3 py-1 rounded-full text-sm font-semibold bg-primary/10 text-primary">
-                    {agency?.plan === "PREMIER_ELITE" ? "Premier Elite" :
-                     agency?.plan === "PREMIER_PRIME" ? "Premier Prime" :
-                     agency?.plan === "PREMIER_CITY" ? "Premier City" :
-                     agency?.plan === "PREMIER_LOCAL" ? "Premier Local" : "Base"}
+                    {agency?.plan === "PREMIUM" ? "Zona Premium" :
+                     agency?.plan === "URBANA" ? "Zona Urbana" : "Zona Base"}
                   </span>
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${

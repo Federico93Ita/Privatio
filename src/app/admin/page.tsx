@@ -770,19 +770,17 @@ export default function AdminDashboard() {
                       <tbody>
                         {zones.map((zone: any) => {
                           const classLabels: Record<string, string> = {
-                            CLUSTER_LOCAL: "Cluster",
-                            COMUNE: "Comune",
-                            MACROQUARTIERE: "Macroquartiere",
-                            MICROZONA_PRIME: "Microzona Prime",
+                            BASE: "Base",
+                            URBANA: "Urbana",
+                            PREMIUM: "Premium",
                           };
                           const classColors: Record<string, string> = {
-                            CLUSTER_LOCAL: "bg-bg-soft text-text-muted",
-                            COMUNE: "bg-primary/10 text-primary",
-                            MACROQUARTIERE: "bg-accent/10 text-accent",
-                            MICROZONA_PRIME: "bg-success/10 text-success",
+                            BASE: "bg-indigo-50 text-indigo-700",
+                            URBANA: "bg-cyan-50 text-cyan-700",
+                            PREMIUM: "bg-rose-50 text-rose-700",
                           };
                           const activePartners = zone._count?.territories || 0;
-                          const lowestPrice = zone.priceBase || zone.priceLocal || zone.priceCity || zone.pricePrime || zone.priceElite;
+                          const lowestPrice = zone.monthlyPrice;
                           return (
                             <tr key={zone.id} className="border-b border-border hover:bg-bg-soft">
                               <td className="py-3 px-4">

@@ -6,32 +6,6 @@ import { stripe, PLANS, createZoneStripePrice, highestPlan } from "@/lib/stripe"
 import type { PlanKey } from "@/lib/stripe";
 
 /* ------------------------------------------------------------------ */
-/*  Helper: campo prezzo per piano                                     */
-/* ------------------------------------------------------------------ */
-
-function priceFieldForPlan(plan: PlanKey): string {
-  const map: Record<PlanKey, string> = {
-    BASE: "priceBase",
-    PREMIER_LOCAL: "priceLocal",
-    PREMIER_CITY: "priceCity",
-    PREMIER_PRIME: "pricePrime",
-    PREMIER_ELITE: "priceElite",
-  };
-  return map[plan];
-}
-
-function maxFieldForPlan(plan: PlanKey): string {
-  const map: Record<PlanKey, string> = {
-    BASE: "maxBase",
-    PREMIER_LOCAL: "maxLocal",
-    PREMIER_CITY: "maxCity",
-    PREMIER_PRIME: "maxPrime",
-    PREMIER_ELITE: "maxElite",
-  };
-  return map[plan];
-}
-
-/* ------------------------------------------------------------------ */
 /*  GET /api/dashboard/agency/territories                              */
 /* ------------------------------------------------------------------ */
 
@@ -63,6 +37,8 @@ export async function GET() {
           province: true,
           city: true,
           marketScore: true,
+          monthlyPrice: true,
+          maxAgencies: true,
         },
       },
     },
@@ -71,14 +47,14 @@ export async function GET() {
 
   return NextResponse.json({
     plan: user.agency.plan,
-    maxZones: PLANS[user.agency.plan as PlanKey]?.maxZones || 1,
+    maxZones: 3, // max zones per agency in new model
     territories,
   });
 }
 
 /* ------------------------------------------------------------------ */
-/*  POST /api/dashboard/agency/territories — aggiungi zona              */
-/*  Body: { plan: PlanKey, zoneId: string }                            */
+/*  POST /api/dashboard/agency/territories — aggiungi zona             */
+/*  Body: { zoneId: string }                                           */
 /* ------------------------------------------------------------------ */
 
 export async function POST(req: NextRequest) {
@@ -88,10 +64,10 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { plan, zoneId } = body as { plan: PlanKey; zoneId: string };
+  const { zoneId } = body as { zoneId: string };
 
-  if (!plan || !PLANS[plan] || !zoneId) {
-    return NextResponse.json({ error: "Parametri non validi" }, { status: 400 });
+  if (!zoneId) {
+    return NextResponse.json({ error: "ID zona mancante" }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
@@ -119,21 +95,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Zona non disponibile" }, { status: 404 });
   }
 
-  // Verifica prezzo
-  const zonePrice = zone[priceFieldForPlan(plan) as keyof typeof zone] as number | null;
-  if (zonePrice == null) {
-    return NextResponse.json(
-      { error: "Piano non disponibile per questa zona" },
-      { status: 400 }
-    );
+  if (zone.monthlyPrice <= 0) {
+    return NextResponse.json({ error: "Prezzo zona non configurato" }, { status: 400 });
   }
 
   // Verifica slot
-  const maxSlots = zone[maxFieldForPlan(plan) as keyof typeof zone] as number;
   const currentCount = await prisma.territoryAssignment.count({
-    where: { zoneId, plan, isActive: true },
+    where: { zoneId, isActive: true },
   });
-  if (currentCount >= maxSlots) {
+  if (currentCount >= zone.maxAgencies) {
     return NextResponse.json({ error: "Nessuno slot disponibile" }, { status: 409 });
   }
 
@@ -145,23 +115,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Zona già attiva" }, { status: 409 });
   }
 
-  // Verifica limiti zone piano
+  // Verifica limiti zone (max 3)
   const activeCount = await prisma.territoryAssignment.count({
     where: { agencyId: agency.id, isActive: true },
   });
-  if (activeCount >= PLANS[plan].maxZones) {
+  if (activeCount >= 3) {
     return NextResponse.json(
-      { error: `Limite zone raggiunto per il piano ${PLANS[plan].name}` },
+      { error: "Limite di 3 zone raggiunto" },
       { status: 400 }
     );
   }
+
+  // Plan = zona's zoneClass
+  const plan = zone.zoneClass as PlanKey;
 
   // Crea Stripe Price e aggiungi line item alla subscription
   const stripePriceId = await createZoneStripePrice(
     zone.name,
     zone.id,
     plan,
-    zonePrice
+    zone.monthlyPrice
   );
 
   const subItem = await stripe.subscriptionItems.create({
@@ -175,7 +148,7 @@ export async function POST(req: NextRequest) {
     where: { agencyId_zoneId: { agencyId: agency.id, zoneId } },
     update: {
       plan,
-      monthlyPrice: zonePrice,
+      monthlyPrice: zone.monthlyPrice,
       isActive: true,
       stripeItemId: subItem.id,
     },
@@ -183,7 +156,7 @@ export async function POST(req: NextRequest) {
       agencyId: agency.id,
       zoneId,
       plan,
-      monthlyPrice: zonePrice,
+      monthlyPrice: zone.monthlyPrice,
       isActive: true,
       stripeItemId: subItem.id,
     },

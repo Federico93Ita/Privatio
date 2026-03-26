@@ -10,6 +10,27 @@ export async function GET(req: NextRequest) {
   const province = searchParams.get("province");
   const region = searchParams.get("region");
   const city = searchParams.get("city");
+  const adjacentTo = searchParams.get("adjacentTo");
+
+  // Zone adiacenti a una zona specifica
+  if (adjacentTo) {
+    const zone = await prisma.zone.findUnique({
+      where: { id: adjacentTo },
+      select: { adjacentZoneIds: true },
+    });
+    if (!zone) {
+      return NextResponse.json({ error: "Zona non trovata" }, { status: 404 });
+    }
+    if (zone.adjacentZoneIds.length === 0) {
+      return NextResponse.json([]);
+    }
+    const adjacent = await prisma.zone.findMany({
+      where: { id: { in: zone.adjacentZoneIds }, isActive: true },
+      include: { territories: { where: { isActive: true }, select: { id: true } } },
+      orderBy: { name: "asc" },
+    });
+    return NextResponse.json(adjacent.map(formatZone));
+  }
 
   if (!province && !region) {
     // Restituisci lista province/regioni disponibili
@@ -27,12 +48,10 @@ export async function GET(req: NextRequest) {
       regions.set(z.region, list);
     }
 
-    return NextResponse.json({
-      regions: Object.fromEntries(regions),
-    });
+    return NextResponse.json({ regions: Object.fromEntries(regions) });
   }
 
-  const where: any = { isActive: true };
+  const where: Record<string, unknown> = { isActive: true };
   if (province) where.province = province;
   if (region) where.region = region;
   if (city) where.city = city;
@@ -42,63 +61,54 @@ export async function GET(req: NextRequest) {
     include: {
       territories: {
         where: { isActive: true },
-        select: { plan: true },
+        select: { id: true },
       },
     },
     orderBy: [{ zoneClass: "asc" }, { name: "asc" }],
   });
 
-  const result = zones.map((z) => {
-    const totalTaken = z.territories.length;
+  return NextResponse.json(zones.map(formatZone));
+}
 
-    // Determine the active plan and price for this zone (fixed pricing model)
-    const activePlan =
-      z.priceBase != null ? "BASE" :
-      z.priceLocal != null ? "PREMIER_LOCAL" :
-      z.priceCity != null ? "PREMIER_CITY" :
-      z.pricePrime != null ? "PREMIER_PRIME" :
-      z.priceElite != null ? "PREMIER_ELITE" : null;
+/* ------------------------------------------------------------------ */
+/*  Helper                                                             */
+/* ------------------------------------------------------------------ */
 
-    const price =
-      z.priceBase ?? z.priceLocal ?? z.priceCity ?? z.pricePrime ?? z.priceElite ?? 0;
-
-    const maxSlots =
-      z.maxBase || z.maxLocal || z.maxCity || z.maxPrime || z.maxElite || 0;
-
-    return {
-      id: z.id,
-      name: z.name,
-      slug: z.slug,
-      zoneClass: z.zoneClass,
-      region: z.region,
-      province: z.province,
-      city: z.city,
-      lat: z.lat,
-      lng: z.lng,
-      municipalities: z.municipalities,
-      marketScore: z.marketScore,
-      population: z.population,
-      // Fixed pricing: one plan, one price per zone
-      plan: activePlan,
-      price,
-      slots: { taken: totalTaken, max: maxSlots },
-      // Legacy: keep full prices/slots for backward compatibility
-      prices: {
-        ...(z.priceBase != null && { BASE: z.priceBase }),
-        ...(z.priceLocal != null && { PREMIER_LOCAL: z.priceLocal }),
-        ...(z.priceCity != null && { PREMIER_CITY: z.priceCity }),
-        ...(z.pricePrime != null && { PREMIER_PRIME: z.pricePrime }),
-        ...(z.priceElite != null && { PREMIER_ELITE: z.priceElite }),
-      },
-      // Legacy slots
-      slots_legacy: {
-        ...(z.maxBase > 0 && { BASE: { taken: z.territories.filter((t) => t.plan === "BASE").length, max: z.maxBase } }),
-        ...(z.maxLocal > 0 && { PREMIER_LOCAL: { taken: z.territories.filter((t) => t.plan === "PREMIER_LOCAL").length, max: z.maxLocal } }),
-        ...(z.maxCity > 0 && { PREMIER_CITY: { taken: z.territories.filter((t) => t.plan === "PREMIER_CITY").length, max: z.maxCity } }),
-        ...(z.maxPrime > 0 && { PREMIER_PRIME: { taken: z.territories.filter((t) => t.plan === "PREMIER_PRIME").length, max: z.maxPrime } }),
-      },
-    };
-  });
-
-  return NextResponse.json(result);
+function formatZone(z: {
+  id: string;
+  name: string;
+  slug: string;
+  zoneClass: string;
+  region: string;
+  province: string;
+  city: string | null;
+  lat: number | null;
+  lng: number | null;
+  municipalities: string[];
+  marketScore: number;
+  population: number;
+  monthlyPrice: number;
+  maxAgencies: number;
+  adjacentZoneIds: string[];
+  territories: { id: string }[];
+}) {
+  return {
+    id: z.id,
+    name: z.name,
+    slug: z.slug,
+    zoneClass: z.zoneClass,
+    region: z.region,
+    province: z.province,
+    city: z.city,
+    lat: z.lat,
+    lng: z.lng,
+    municipalities: z.municipalities,
+    marketScore: z.marketScore,
+    population: z.population,
+    // Simplified pricing: one price per zone
+    plan: z.zoneClass,
+    price: z.monthlyPrice,
+    slots: { taken: z.territories.length, max: z.maxAgencies },
+    adjacentZoneIds: z.adjacentZoneIds,
+  };
 }

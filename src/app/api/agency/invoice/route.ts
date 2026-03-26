@@ -39,11 +39,9 @@ export async function GET(req: NextRequest) {
   const invoiceNumber = `INV-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}-${agency.id.slice(-6).toUpperCase()}`;
 
   const planLabels: Record<string, string> = {
-    BASE: "Piano Base",
-    PREMIER_LOCAL: "Piano Premier Local",
-    PREMIER_CITY: "Piano Premier City",
-    PREMIER_PRIME: "Piano Premier Prime",
-    PREMIER_ELITE: "Piano Premier Elite",
+    BASE: "Zona Base",
+    URBANA: "Zona Urbana",
+    PREMIUM: "Zona Premium",
   };
   const planLabel = planLabels[agency.plan] || agency.plan;
 

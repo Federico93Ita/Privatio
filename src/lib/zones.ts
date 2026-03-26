@@ -3,90 +3,56 @@ import { prisma } from "./prisma";
 /**
  * Risolve la zona per un immobile basandosi su CAP, città e provincia.
  *
- * Ordine di priorità:
- * 1. Match esatto per CAP (il CAP dell'immobile è in zone.capCodes)
- * 2. Match per città + provincia
- * 3. Match per comune nel cluster (municipalities contiene la città)
- * 4. Nessuna zona trovata
+ * Con il nuovo modello, ogni comune è in ESATTAMENTE una zona.
+ * Non ci sono più sovrapposizioni tra classi diverse.
  *
- * Tra match multipli, preferisce la zona più specifica:
- * MICROZONA_PRIME > MACROQUARTIERE > COMUNE > CLUSTER_LOCAL
+ * Ordine di priorità:
+ * 1. Match esatto per CAP
+ * 2. Match per città + provincia
+ * 3. Match per comune nel cluster (municipalities)
+ * 4. Fallback: prima zona della provincia
  */
 export async function resolveZoneForProperty(
   city: string,
   province: string,
   cap: string
 ): Promise<string | null> {
-  const ZONE_CLASS_PRIORITY = {
-    MICROZONA_PRIME: 4,
-    MACROQUARTIERE: 3,
-    COMUNE: 2,
-    CLUSTER_LOCAL: 1,
-  } as const;
-
   // 1. Match per CAP
-  const capMatches = await prisma.zone.findMany({
-    where: {
-      isActive: true,
-      capCodes: { has: cap },
-    },
-    select: { id: true, zoneClass: true },
+  const capMatch = await prisma.zone.findFirst({
+    where: { isActive: true, capCodes: { has: cap } },
+    select: { id: true },
   });
-
-  if (capMatches.length > 0) {
-    capMatches.sort(
-      (a, b) =>
-        (ZONE_CLASS_PRIORITY[b.zoneClass] || 0) -
-        (ZONE_CLASS_PRIORITY[a.zoneClass] || 0)
-    );
-    return capMatches[0].id;
-  }
+  if (capMatch) return capMatch.id;
 
   // 2. Match per città + provincia (case-insensitive)
   const cityNorm = city.trim();
-  const cityMatches = await prisma.zone.findMany({
+  const cityMatch = await prisma.zone.findFirst({
     where: {
       isActive: true,
       province: province.toUpperCase(),
       city: { equals: cityNorm, mode: "insensitive" },
     },
-    select: { id: true, zoneClass: true },
+    select: { id: true },
   });
-
-  if (cityMatches.length > 0) {
-    cityMatches.sort(
-      (a, b) =>
-        (ZONE_CLASS_PRIORITY[b.zoneClass] || 0) -
-        (ZONE_CLASS_PRIORITY[a.zoneClass] || 0)
-    );
-    return cityMatches[0].id;
-  }
+  if (cityMatch) return cityMatch.id;
 
   // 3. Match per municipalities (cluster)
-  const clusterMatches = await prisma.zone.findMany({
+  const clusterMatch = await prisma.zone.findFirst({
     where: {
       isActive: true,
       province: province.toUpperCase(),
       municipalities: { has: cityNorm },
     },
-    select: { id: true, zoneClass: true },
+    select: { id: true },
   });
+  if (clusterMatch) return clusterMatch.id;
 
-  if (clusterMatches.length > 0) {
-    return clusterMatches[0].id;
-  }
-
-  // 4. Fallback: match solo per provincia (primo COMUNE disponibile)
+  // 4. Fallback: prima zona della provincia per marketScore
   const provinceMatch = await prisma.zone.findFirst({
-    where: {
-      isActive: true,
-      province: province.toUpperCase(),
-      zoneClass: "COMUNE",
-    },
+    where: { isActive: true, province: province.toUpperCase() },
     select: { id: true },
     orderBy: { marketScore: "desc" },
   });
-
   return provinceMatch?.id || null;
 }
 

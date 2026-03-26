@@ -7,17 +7,17 @@
  *
  * Uso: npx tsx scripts/import-zones.ts
  *
- * Logica:
- * - Comuni < 5.000 abitanti → raggruppati in CLUSTER_LOCAL per provincia
- * - Comuni 5.000–50.000 → COMUNE singolo
- * - Comuni 50.000–250.000 → COMUNE (da suddividere manualmente in MACROQUARTIERE)
- * - Comuni > 250.000 → saltati (gestiti da import-omi.ts per microzone)
+ * Logica (nuovo modello 3 fasce):
+ * - Comuni < 20.000 abitanti → BASE (raggruppati in cluster se < 5.000)
+ * - Comuni 20.000–100.000 → URBANA
+ * - Comuni > 100.000 → PREMIUM (da suddividere manualmente in quartieri)
  */
 
 import { PrismaClient } from "@prisma/client";
+import type { ZoneClass } from "@prisma/client";
 import {
   calculateMarketScore,
-  calculateZonePricing,
+  calculateZonePrice,
   classifyZone,
 } from "../src/lib/zone-pricing";
 
@@ -71,11 +71,8 @@ interface ComuneData {
 }
 
 async function fetchIstatData(): Promise<ComuneData[]> {
-  // Usa l'API ISTAT SDMX per i dati popolazione
-  // Fallback: dati sintetici per i comuni principali se API non disponibile
   console.log("Scaricamento dati ISTAT...");
 
-  // Tentiamo di scaricare il CSV dal portale ISTAT
   const url =
     "https://demo.istat.it/app/assets/data/comuni/pop_res_gen_2024.csv";
 
@@ -89,21 +86,18 @@ async function fetchIstatData(): Promise<ComuneData[]> {
     console.log("API ISTAT non raggiungibile, uso dati embedded...");
   }
 
-  // Fallback: genera dati sintetici da province note
   return generateFallbackData();
 }
 
 function parseIstatCsv(csv: string): ComuneData[] {
-  const lines = csv.split("\n").slice(1); // skip header
+  const lines = csv.split("\n").slice(1);
   const comuni: ComuneData[] = [];
 
   for (const line of lines) {
     if (!line.trim()) continue;
-    // Il formato CSV ISTAT varia, adattiamo il parsing
     const parts = line.split(",");
     if (parts.length < 4) continue;
 
-    // Tenta parsing generico: nome, provincia, regione, popolazione
     const name = parts[0]?.trim().replace(/"/g, "");
     const province = parts[1]?.trim().replace(/"/g, "");
     const population = parseInt(parts[parts.length - 1]?.trim() || "0", 10);
@@ -128,7 +122,6 @@ function parseIstatCsv(csv: string): ComuneData[] {
 function generateFallbackData(): ComuneData[] {
   const data: ComuneData[] = [];
 
-  // Capoluoghi e città principali per ogni provincia
   const cities: Array<[string, string, number]> = [
     // Piemonte
     ["Torino", "TO", 848885], ["Novara", "NO", 104268], ["Alessandria", "AL", 92204],
@@ -196,7 +189,6 @@ function generateFallbackData(): ComuneData[] {
     });
   }
 
-  // Aggiungi comuni medi/piccoli per province principali (campione)
   const smallCities: Array<[string, string, number]> = [
     // Piemonte - AT
     ["Nizza Monferrato", "AT", 10178], ["Canelli", "AT", 10260],
@@ -285,7 +277,6 @@ function slugify(text: string): string {
 /* ------------------------------------------------------------------ */
 
 async function createZones(comuni: ComuneData[]) {
-  // Raggruppa per provincia
   const byProvince = new Map<string, ComuneData[]>();
   for (const c of comuni) {
     const list = byProvince.get(c.province) || [];
@@ -299,23 +290,23 @@ async function createZones(comuni: ComuneData[]) {
   for (const [province, provinceComuni] of byProvince) {
     const region = PROVINCE_TO_REGION[province] || "Sconosciuta";
 
-    // Separa grandi città (>250k, gestite da import-omi) da comuni normali
-    const grandiCitta = provinceComuni.filter((c) => c.population > 250000);
-    const comuniNormali = provinceComuni.filter((c) => c.population <= 250000);
-    const comuniMedi = comuniNormali.filter((c) => c.population >= 5000);
-    const comuniPiccoli = comuniNormali.filter((c) => c.population < 5000);
+    // Separa per fascia
+    const comuniGrandi = provinceComuni.filter((c) => c.population >= 100000);  // PREMIUM
+    const comuniMedi = provinceComuni.filter((c) => c.population >= 20000 && c.population < 100000);  // URBANA
+    const comuniPiccoli5k = provinceComuni.filter((c) => c.population >= 5000 && c.population < 20000);  // BASE singolo
+    const comuniMicro = provinceComuni.filter((c) => c.population < 5000);  // BASE cluster
 
-    // Grandi città: crea come COMUNE (le microzone vengono da import-omi)
-    for (const c of grandiCitta) {
+    // Grandi città (>100k): PREMIUM
+    for (const c of comuniGrandi) {
       const slug = slugify(`${c.name}-${province}`);
       const score = calculateMarketScore(c.population, c.population * 0.015);
-      const pricing = calculateZonePricing("COMUNE", score, c.population);
+      const pricing = calculateZonePrice("PREMIUM", c.population, c.population * 0.015);
       const coords = await geocode(`${c.name}, ${province}, Italia`);
 
       await upsertZone({
         name: c.name,
         slug,
-        zoneClass: "COMUNE",
+        zoneClass: "PREMIUM",
         region,
         province,
         city: c.name,
@@ -324,23 +315,23 @@ async function createZones(comuni: ComuneData[]) {
         marketScore: score,
         lat: coords?.lat ?? null,
         lng: coords?.lng ?? null,
-        ...pricing,
+        monthlyPrice: pricing.monthlyPrice,
+        maxAgencies: pricing.maxAgencies,
       });
       created++;
     }
 
-    // Comuni medi (5k-250k): una zona per comune
+    // Comuni medi (20k-100k): URBANA
     for (const c of comuniMedi) {
-      const zoneClass = classifyZone(c.population);
       const slug = slugify(`${c.name}-${province}`);
       const score = calculateMarketScore(c.population, c.population * 0.01);
-      const pricing = calculateZonePricing(zoneClass, score, c.population);
+      const pricing = calculateZonePrice("URBANA", c.population, c.population * 0.01);
       const coords = await geocode(`${c.name}, ${province}, Italia`);
 
       await upsertZone({
         name: c.name,
         slug,
-        zoneClass,
+        zoneClass: "URBANA",
         region,
         province,
         city: c.name,
@@ -349,27 +340,51 @@ async function createZones(comuni: ComuneData[]) {
         marketScore: score,
         lat: coords?.lat ?? null,
         lng: coords?.lng ?? null,
-        ...pricing,
+        monthlyPrice: pricing.monthlyPrice,
+        maxAgencies: pricing.maxAgencies,
       });
       created++;
     }
 
-    // Comuni piccoli (<5k): raggruppa in cluster da 5-15 comuni
-    if (comuniPiccoli.length > 0) {
-      // Ordina per nome per raggruppamento stabile
-      comuniPiccoli.sort((a, b) => a.name.localeCompare(b.name));
+    // Comuni piccoli (5k-20k): BASE singolo
+    for (const c of comuniPiccoli5k) {
+      const slug = slugify(`${c.name}-${province}`);
+      const score = calculateMarketScore(c.population, c.population * 0.01);
+      const pricing = calculateZonePrice("BASE", c.population, c.population * 0.01);
+      const coords = await geocode(`${c.name}, ${province}, Italia`);
+
+      await upsertZone({
+        name: c.name,
+        slug,
+        zoneClass: "BASE",
+        region,
+        province,
+        city: c.name,
+        municipalities: [c.name],
+        population: c.population,
+        marketScore: score,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
+        monthlyPrice: pricing.monthlyPrice,
+        maxAgencies: pricing.maxAgencies,
+      });
+      created++;
+    }
+
+    // Comuni micro (<5k): BASE cluster
+    if (comuniMicro.length > 0) {
+      comuniMicro.sort((a, b) => a.name.localeCompare(b.name));
 
       const clusterSize = Math.min(
         15,
-        Math.max(5, Math.ceil(comuniPiccoli.length / Math.ceil(comuniPiccoli.length / 10)))
+        Math.max(5, Math.ceil(comuniMicro.length / Math.ceil(comuniMicro.length / 10)))
       );
 
-      for (let i = 0; i < comuniPiccoli.length; i += clusterSize) {
-        const chunk = comuniPiccoli.slice(i, i + clusterSize);
+      for (let i = 0; i < comuniMicro.length; i += clusterSize) {
+        const chunk = comuniMicro.slice(i, i + clusterSize);
         const totalPop = chunk.reduce((s, c) => s + c.population, 0);
         const names = chunk.map((c) => c.name);
 
-        // Nome cluster: "Area [primo comune] - [ultimo comune]"
         const clusterName =
           chunk.length === 1
             ? `${chunk[0].name}`
@@ -377,14 +392,13 @@ async function createZones(comuni: ComuneData[]) {
 
         const slug = slugify(`cluster-${province}-${i}`);
         const score = calculateMarketScore(totalPop, totalPop * 0.005);
-        const pricing = calculateZonePricing("CLUSTER_LOCAL", score, totalPop);
-        // Geocode primo comune del cluster
+        const pricing = calculateZonePrice("BASE", totalPop, totalPop * 0.005);
         const coords = await geocode(`${chunk[0].name}, ${province}, Italia`);
 
         await upsertZone({
           name: clusterName,
           slug,
-          zoneClass: "CLUSTER_LOCAL",
+          zoneClass: "BASE",
           region,
           province,
           city: null,
@@ -393,7 +407,8 @@ async function createZones(comuni: ComuneData[]) {
           marketScore: score,
           lat: coords?.lat ?? null,
           lng: coords?.lng ?? null,
-          ...pricing,
+          monthlyPrice: pricing.monthlyPrice,
+          maxAgencies: pricing.maxAgencies,
         });
         clustered += chunk.length;
         created++;
@@ -407,7 +422,7 @@ async function createZones(comuni: ComuneData[]) {
 interface ZoneInput {
   name: string;
   slug: string;
-  zoneClass: "CLUSTER_LOCAL" | "COMUNE" | "MACROQUARTIERE" | "MICROZONA_PRIME";
+  zoneClass: ZoneClass;
   region: string;
   province: string;
   city: string | null;
@@ -416,16 +431,8 @@ interface ZoneInput {
   marketScore: number;
   lat: number | null;
   lng: number | null;
-  priceBase: number | null;
-  priceLocal: number | null;
-  priceCity: number | null;
-  pricePrime: number | null;
-  priceElite: number | null;
-  maxBase: number;
-  maxLocal: number;
-  maxCity: number;
-  maxPrime: number;
-  maxElite: number;
+  monthlyPrice: number;
+  maxAgencies: number;
 }
 
 async function upsertZone(input: ZoneInput) {
@@ -438,16 +445,8 @@ async function upsertZone(input: ZoneInput) {
         marketScore: input.marketScore,
         lat: input.lat,
         lng: input.lng,
-        priceBase: input.priceBase,
-        priceLocal: input.priceLocal,
-        priceCity: input.priceCity,
-        pricePrime: input.pricePrime,
-        priceElite: input.priceElite,
-        maxBase: input.maxBase,
-        maxLocal: input.maxLocal,
-        maxCity: input.maxCity,
-        maxPrime: input.maxPrime,
-        maxElite: input.maxElite,
+        monthlyPrice: input.monthlyPrice,
+        maxAgencies: input.maxAgencies,
       },
       create: {
         name: input.name,
@@ -463,16 +462,8 @@ async function upsertZone(input: ZoneInput) {
         marketScore: input.marketScore,
         lat: input.lat,
         lng: input.lng,
-        priceBase: input.priceBase,
-        priceLocal: input.priceLocal,
-        priceCity: input.priceCity,
-        pricePrime: input.pricePrime,
-        priceElite: input.priceElite,
-        maxBase: input.maxBase,
-        maxLocal: input.maxLocal,
-        maxCity: input.maxCity,
-        maxPrime: input.maxPrime,
-        maxElite: input.maxElite,
+        monthlyPrice: input.monthlyPrice,
+        maxAgencies: input.maxAgencies,
       },
     });
   } catch (err) {

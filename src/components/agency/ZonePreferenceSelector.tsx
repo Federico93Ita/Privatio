@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { GoogleMap, useLoadScript, CircleF, InfoWindowF } from "@react-google-maps/api";
-import { PLAN_LABELS } from "@/lib/zone-constants";
+import { ZONE_TIER_SHORT } from "@/lib/zone-constants";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -311,7 +311,7 @@ export default function ZonePreferenceSelector({
                 <h4 className="font-semibold text-sm text-gray-900">{activeZone.name}</h4>
                 {activeZone.plan && (
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Piano {PLAN_LABELS[activeZone.plan] || activeZone.plan}
+                    Piano {ZONE_TIER_SHORT[activeZone.plan] || activeZone.plan}
                   </p>
                 )}
                 {activeZone.price > 0 && (

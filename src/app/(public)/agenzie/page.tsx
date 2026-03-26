@@ -91,80 +91,66 @@ const benefits = [
 
 const piani = [
   {
-    name: "Base",
+    name: "Zona Base",
     subtitle: "Comuni piccoli e rurali",
     tiers: [
-      { label: "Cluster rurale", price: 300, slots: 3 },
-      { label: "Comune < 20.000 ab.", price: 400, slots: 4 },
-    ],
-    features: [
-      "1 zona operativa inclusa",
-      "Notifica nuovi immobili 24h",
-      "Profilo agenzia in piattaforma",
-      "Dashboard di gestione base",
-      "Max 3–4 agenzie per zona",
-    ],
-    cta: "Inizia con il Base",
-    highlighted: false,
-  },
-  {
-    name: "Locale",
-    subtitle: "Comuni medi e periferie",
-    tiers: [
-      { label: "Comune 20k\u201380k ab.", price: 650, slots: 5 },
-      { label: "Macroquartiere periferia", price: 850, slots: 5 },
-    ],
-    features: [
-      "Fino a 2 zone operative",
-      "Notifica nuovi immobili 8h",
-      "Dashboard avanzata completa",
-      "Visibilit\u00e0 locale garantita",
-      "Max 5 agenzie per zona",
-    ],
-    cta: "Scegli Locale",
-    highlighted: false,
-  },
-  {
-    name: "City",
-    subtitle: "Centri urbani e zone OMI",
-    tiers: [
-      { label: "Macroquartiere centro", price: 1100, slots: 6 },
-      { label: "Microzona OMI classe B", price: 1500, slots: 6 },
+      { label: "Cluster rurale (< 5.000 ab.)", price: 249, example: "Area Monferrato Nord" },
+      { label: "Comune singolo (5k\u201320k ab.)", price: 499, example: "Nizza Monferrato" },
     ],
     features: [
       "Fino a 3 zone operative",
-      "Notifica nuovi immobili 2h",
-      "Alta visibilit\u00e0 venditori",
-      "Statistiche avanzate e report",
-      "Max 6 agenzie per zona",
+      "Notifica nuovi immobili 24h",
+      "Profilo agenzia in piattaforma",
+      "Dashboard di gestione completa",
+      "Max 3\u20134 agenzie per zona",
     ],
-    cta: "Scegli City",
-    highlighted: true,
+    cta: "Inizia con Zona Base",
+    highlighted: false,
+    color: "indigo",
   },
   {
-    name: "Prime",
-    subtitle: "Top city e zone premium",
+    name: "Zona Urbana",
+    subtitle: "Centri medi e periferie citt\u00e0",
     tiers: [
-      { label: "Microzona OMI classe A", price: 2200, slots: 6 },
-      { label: "OMI premium", price: 3200, slots: 6 },
+      { label: "Comune 20k\u2013100k ab.", price: 499, example: "Asti, Moncalieri" },
+      { label: "Quartiere periferico citt\u00e0", price: 999, example: "Torino \u2014 Mirafiori Sud" },
     ],
     features: [
-      "Fino a 4 zone operative",
-      "Notifica istantanea immobili",
-      "Prima posizione ricerche",
-      "Branding premium e supporto",
-      "Max 6 agenzie per zona",
+      "Fino a 3 zone operative",
+      "Notifica nuovi immobili 8h",
+      "Visibilit\u00e0 locale garantita",
+      "Statistiche avanzate e report",
+      "Max 4\u20136 agenzie per zona",
     ],
-    cta: "Scegli Prime",
+    cta: "Scegli Zona Urbana",
+    highlighted: true,
+    color: "cyan",
+  },
+  {
+    name: "Zona Premium",
+    subtitle: "Centri storici e zone pregio",
+    tiers: [
+      { label: "Quartiere semicentrale", price: 999, example: "Torino \u2014 San Salvario" },
+      { label: "Centro storico / zona top", price: 2600, example: "Torino \u2014 Centro / Crocetta" },
+    ],
+    features: [
+      "Fino a 3 zone operative",
+      "Notifica istantanea immobili",
+      "Prima posizione nelle ricerche",
+      "Branding premium e supporto",
+      "Max 4\u20137 agenzie per zona",
+    ],
+    cta: "Scegli Zona Premium",
     highlighted: false,
+    color: "rose",
   },
 ];
 
 const addons = [
   {
-    name: "Slot aggiuntivo",
-    price: "\u201335% sul piano attivo",
-    description: "Acquista una seconda zona territoriale con sconto del 35%.",
+    name: "Zona aggiuntiva",
+    price: "\u201315% sulla seconda zona",
+    description: "Espandi il tuo territorio su una zona limitrofa con sconto del 15%.",
   },
   {
     name: "Badge \"Agenzia verificata\"",
@@ -237,14 +223,14 @@ export default function AgenziePage() {
       <section className="bg-bg-soft py-16 md:py-24" id="piani">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-3xl font-light tracking-[-0.03em] text-primary-dark md:text-4xl">
-            Scegli il tuo piano
+            Scegli la tua zona
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-text-muted">
-            Prezzi fissi per tipo di zona. Nessuna sorpresa: selezioni il territorio e vedi il prezzo esatto.
+            Un prezzo per zona, nessuna sorpresa. Selezioni il territorio e vedi il prezzo esatto.
           </p>
 
           {/* 4 plan cards */}
-          <div className="mx-auto mt-12 grid max-w-6xl gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
+          <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
             {piani.map((plan) => (
               <div
                 key={plan.name}
@@ -254,7 +240,7 @@ export default function AgenziePage() {
               >
                 {plan.highlighted && (
                   <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-medium text-white">
-                    Pi&ugrave; scelto
+                    Consigliato
                   </span>
                 )}
 

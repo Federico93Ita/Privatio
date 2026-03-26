@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { calculateMarketScore, calculateZonePricing } from "@/lib/zone-pricing";
+import { calculateMarketScore, calculateZonePrice } from "@/lib/zone-pricing";
 import type { ZoneClass } from "@prisma/client";
 
 /* ------------------------------------------------------------------ */
@@ -60,7 +60,6 @@ export async function PUT(
     return NextResponse.json({ error: "Zona non trovata" }, { status: 404 });
   }
 
-  // Se population o ntn cambiano, ricalcola pricing (a meno di override manuale)
   const population = body.population ?? existing.population;
   const ntn = body.ntn ?? existing.ntn;
   const zoneClass = (body.zoneClass ?? existing.zoneClass) as ZoneClass;
@@ -68,8 +67,12 @@ export async function PUT(
   let pricingUpdate = {};
   if (body.recalculatePricing) {
     const score = calculateMarketScore(population, ntn);
-    const pricing = calculateZonePricing(zoneClass, score);
-    pricingUpdate = { marketScore: score, ...pricing };
+    const pricing = calculateZonePrice(zoneClass, population, ntn, body.avgPricePerSqm ?? existing.avgPricePerSqm ?? 0);
+    pricingUpdate = {
+      marketScore: score,
+      monthlyPrice: pricing.monthlyPrice,
+      maxAgencies: pricing.maxAgencies,
+    };
   }
 
   const zone = await prisma.zone.update({
@@ -83,18 +86,11 @@ export async function PUT(
       ...(body.ntn !== undefined && { ntn }),
       ...(body.zoneClass && { zoneClass }),
       ...(body.isActive !== undefined && { isActive: body.isActive }),
+      ...(body.avgPricePerSqm !== undefined && { avgPricePerSqm: body.avgPricePerSqm }),
+      ...(body.adjacentZoneIds && { adjacentZoneIds: body.adjacentZoneIds }),
       // Override prezzi manuali
-      ...(body.priceBase !== undefined && { priceBase: body.priceBase }),
-      ...(body.priceLocal !== undefined && { priceLocal: body.priceLocal }),
-      ...(body.priceCity !== undefined && { priceCity: body.priceCity }),
-      ...(body.pricePrime !== undefined && { pricePrime: body.pricePrime }),
-      ...(body.priceElite !== undefined && { priceElite: body.priceElite }),
-      // Override slot manuali
-      ...(body.maxBase !== undefined && { maxBase: body.maxBase }),
-      ...(body.maxLocal !== undefined && { maxLocal: body.maxLocal }),
-      ...(body.maxCity !== undefined && { maxCity: body.maxCity }),
-      ...(body.maxPrime !== undefined && { maxPrime: body.maxPrime }),
-      ...(body.maxElite !== undefined && { maxElite: body.maxElite }),
+      ...(body.monthlyPrice !== undefined && { monthlyPrice: body.monthlyPrice }),
+      ...(body.maxAgencies !== undefined && { maxAgencies: body.maxAgencies }),
       ...pricingUpdate,
     },
   });

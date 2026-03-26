@@ -115,17 +115,14 @@ model Agency {
 
 enum AgencyPlan {
   BASE
-  PREMIER_LOCAL
-  PREMIER_CITY
-  PREMIER_PRIME
-  PREMIER_ELITE
+  URBANA
+  PREMIUM
 }
 
 enum ZoneClass {
-  CLUSTER_LOCAL
-  COMUNE
-  MACROQUARTIERE
-  MICROZONA_PRIME
+  BASE
+  URBANA
+  PREMIUM
 }
 
 model Property {
@@ -439,20 +436,14 @@ model Zone {
   population     Int        @default(0)
   ntn            Float      @default(0)
   marketScore    Int        @default(1)
+  avgPricePerSqm Float?
 
-  // Prezzi mensili per piano (centesimi). null = non disponibile
-  priceBase      Int?
-  priceLocal     Int?
-  priceCity      Int?
-  pricePrime     Int?
-  priceElite     Int?
+  // Pricing semplificato: 1 prezzo, 1 limite per zona
+  monthlyPrice   Int        @default(0)   // centesimi EUR
+  maxAgencies    Int        @default(4)
 
-  // Limiti partner per piano. 0 = non disponibile
-  maxBase        Int        @default(0)
-  maxLocal       Int        @default(0)
-  maxCity        Int        @default(0)
-  maxPrime       Int        @default(0)
-  maxElite       Int        @default(0)
+  // Zone adiacenti per espansione territoriale
+  adjacentZoneIds String[]
 
   lat            Float?
   lng            Float?

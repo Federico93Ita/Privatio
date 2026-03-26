@@ -11,11 +11,9 @@ interface AgencyEditModalProps {
 }
 
 const PLAN_OPTIONS = [
-  { value: "BASE", label: "Base" },
-  { value: "PREMIER_LOCAL", label: "Premier Local" },
-  { value: "PREMIER_CITY", label: "Premier City" },
-  { value: "PREMIER_PRIME", label: "Premier Prime" },
-  { value: "PREMIER_ELITE", label: "Premier Elite" },
+  { value: "BASE", label: "Zona Base" },
+  { value: "URBANA", label: "Zona Urbana" },
+  { value: "PREMIUM", label: "Zona Premium" },
 ];
 
 export default function AgencyEditModal({

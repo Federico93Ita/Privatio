@@ -12,26 +12,20 @@ import { formatPrice, formatDate } from "@/lib/utils";
 
 const PLAN_PRIORITY: Record<string, number> = {
   BASE: 1,
-  PREMIER_LOCAL: 2,
-  PREMIER_CITY: 3,
-  PREMIER_PRIME: 4,
-  PREMIER_ELITE: 5,
+  URBANA: 2,
+  PREMIUM: 3,
 };
 
 const PLAN_LABELS: Record<string, string> = {
-  BASE: "Base",
-  PREMIER_LOCAL: "Premier Local",
-  PREMIER_CITY: "Premier City",
-  PREMIER_PRIME: "Premier Prime",
-  PREMIER_ELITE: "Premier Elite",
+  BASE: "Zona Base",
+  URBANA: "Zona Urbana",
+  PREMIUM: "Zona Premium",
 };
 
 const PLAN_COLORS: Record<string, string> = {
-  BASE: "bg-bg-soft text-text-muted border-border",
-  PREMIER_LOCAL: "bg-primary/5 text-primary border-primary/20",
-  PREMIER_CITY: "bg-primary/10 text-primary border-primary/30",
-  PREMIER_PRIME: "bg-accent/10 text-accent border-accent/30",
-  PREMIER_ELITE: "bg-accent/15 text-accent border-accent/40",
+  BASE: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  URBANA: "bg-cyan-50 text-cyan-700 border-cyan-200",
+  PREMIUM: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 function hasPlan(agencyPlan: string, minPlan: string): boolean {
@@ -191,9 +185,9 @@ export default function AgencyDashboardPage() {
             )}
 
             {/* ============================================================ */}
-            {/*  Pipeline Stats — PREMIER_LOCAL+ only                        */}
+            {/*  Pipeline Stats — URBANA+ only                                */}
             {/* ============================================================ */}
-            {hasPlan(plan, "PREMIER_LOCAL") ? (
+            {hasPlan(plan, "URBANA") ? (
               <div>
                 <h2 className="text-lg font-medium text-primary-dark mb-3">Riepilogo Pipeline</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -222,7 +216,7 @@ export default function AgencyDashboardPage() {
                   <div>
                     <h3 className="font-medium text-primary-dark">Riepilogo Pipeline</h3>
                     <p className="text-sm text-text-muted mt-1">
-                      Monitora lo stato di tutti i tuoi immobili in un colpo d&apos;occhio. Disponibile dal piano Premier Local.
+                      Monitora lo stato di tutti i tuoi immobili in un colpo d&apos;occhio. Disponibile dalla Zona Urbana.
                     </p>
                   </div>
                   <Link
@@ -236,9 +230,9 @@ export default function AgencyDashboardPage() {
             )}
 
             {/* ============================================================ */}
-            {/*  Advanced Stats — PREMIER_CITY+ only                         */}
+            {/*  Advanced Stats — PREMIUM only                               */}
             {/* ============================================================ */}
-            {hasPlan(plan, "PREMIER_CITY") ? (
+            {hasPlan(plan, "PREMIUM") ? (
               <div>
                 <h2 className="text-lg font-medium text-primary-dark mb-3">Statistiche Avanzate</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -278,7 +272,7 @@ export default function AgencyDashboardPage() {
                   <div>
                     <h3 className="font-medium text-primary-dark">Statistiche Avanzate</h3>
                     <p className="text-sm text-text-muted mt-1">
-                      Tasso di conversione, tempo medio vendita e metriche dettagliate. Disponibile dal piano Premier City.
+                      Tasso di conversione, tempo medio vendita e metriche dettagliate. Disponibile dalla Zona Premium.
                     </p>
                   </div>
                   <Link

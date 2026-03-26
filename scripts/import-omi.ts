@@ -1,27 +1,24 @@
 /**
  * Import microzone OMI per grandi città italiane.
  *
- * Crea zone MACROQUARTIERE e MICROZONA_PRIME per le città >100k abitanti,
+ * Crea zone URBANA e PREMIUM per le città >100k abitanti,
  * basandosi sulle microzone catastali dell'Osservatorio del Mercato Immobiliare
  * (Agenzia delle Entrate).
  *
  * Le microzone OMI sono classificate per fascia:
- * - Centrale (C) / Centro storico → MICROZONA_PRIME
- * - Semicentrale (B) → MACROQUARTIERE (marketScore alto)
- * - Periferica (D) → MACROQUARTIERE (marketScore medio)
- * - Suburbana (E) / Rurale (R) → MACROQUARTIERE (marketScore basso)
+ * - Centrale (C) / Centro storico → PREMIUM
+ * - Semicentrale (B) → PREMIUM (marketScore alto) o URBANA
+ * - Periferica (D) → URBANA
+ * - Suburbana (E) / Rurale (R) → URBANA
  *
  * Uso: npx tsx scripts/import-omi.ts
- *
- * Nota: I dati OMI reali vanno scaricati dal GeoPortale AdE e convertiti in CSV.
- * Questo script include dati embedded per le principali città come punto di partenza.
  */
 
 import { PrismaClient } from "@prisma/client";
 import type { ZoneClass } from "@prisma/client";
 import {
   calculateMarketScore,
-  calculateZonePricing,
+  calculateZonePrice,
 } from "../src/lib/zone-pricing";
 
 const prisma = new PrismaClient();
@@ -34,11 +31,11 @@ interface OmiMicrozone {
   city: string;
   province: string;
   region: string;
-  name: string;           // Nome quartiere/zona
-  fascia: "C" | "B" | "D" | "E" | "R";  // Fascia OMI
-  population: number;     // Stima popolazione quartiere
-  ntn: number;            // Stima transazioni annue
-  cap?: string[];         // CAP associati
+  name: string;
+  fascia: "C" | "B" | "D" | "E" | "R";
+  population: number;
+  ntn: number;
+  cap?: string[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -163,13 +160,13 @@ function slugify(text: string): string {
 function fasciaToZoneClass(fascia: OmiMicrozone["fascia"]): ZoneClass {
   switch (fascia) {
     case "C":
-      return "MICROZONA_PRIME";
+      return "PREMIUM";
     case "B":
-      return "MACROQUARTIERE";
+      return "PREMIUM";
     case "D":
     case "E":
     case "R":
-      return "MACROQUARTIERE";
+      return "URBANA";
   }
 }
 
@@ -186,7 +183,7 @@ async function main() {
   for (const mz of OMI_DATA) {
     const zoneClass = fasciaToZoneClass(mz.fascia);
     const score = calculateMarketScore(mz.population, mz.ntn);
-    const pricing = calculateZonePricing(zoneClass, score);
+    const pricing = calculateZonePrice(zoneClass, mz.population, mz.ntn);
 
     const slug = slugify(`${mz.city}-${mz.name}`);
 
@@ -200,7 +197,8 @@ async function main() {
             population: mz.population,
             ntn: mz.ntn,
             marketScore: score,
-            ...pricing,
+            monthlyPrice: pricing.monthlyPrice,
+            maxAgencies: pricing.maxAgencies,
           },
         });
         updated++;
@@ -218,7 +216,8 @@ async function main() {
             population: mz.population,
             ntn: mz.ntn,
             marketScore: score,
-            ...pricing,
+            monthlyPrice: pricing.monthlyPrice,
+            maxAgencies: pricing.maxAgencies,
           },
         });
         created++;
@@ -231,12 +230,14 @@ async function main() {
   console.log(`Risultato: ${created} microzone create, ${updated} aggiornate`);
 
   const totalZones = await prisma.zone.count();
-  const microzone = await prisma.zone.count({ where: { zoneClass: "MICROZONA_PRIME" } });
-  const macroquartieri = await prisma.zone.count({ where: { zoneClass: "MACROQUARTIERE" } });
+  const premium = await prisma.zone.count({ where: { zoneClass: "PREMIUM" } });
+  const urbana = await prisma.zone.count({ where: { zoneClass: "URBANA" } });
+  const base = await prisma.zone.count({ where: { zoneClass: "BASE" } });
 
   console.log(`\nTotale zone nel DB: ${totalZones}`);
-  console.log(`  - MICROZONA_PRIME: ${microzone}`);
-  console.log(`  - MACROQUARTIERE: ${macroquartieri}`);
+  console.log(`  - PREMIUM: ${premium}`);
+  console.log(`  - URBANA: ${urbana}`);
+  console.log(`  - BASE: ${base}`);
 }
 
 main()

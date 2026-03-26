@@ -1,68 +1,102 @@
 import type { ZoneClass } from "@prisma/client";
 
 /* ------------------------------------------------------------------ */
-/*  Tipi                                                               */
+/*  Nuovo modello di pricing: 3 fasce, formula basata su dati mercato  */
 /* ------------------------------------------------------------------ */
 
-export type PlanKey =
-  | "BASE"
-  | "PREMIER_LOCAL"
-  | "PREMIER_CITY"
-  | "PREMIER_PRIME"
-  | "PREMIER_ELITE";
-
-/* ------------------------------------------------------------------ */
-/*  Prezzi fissi per tipo di zona (centesimi EUR)                      */
-/* ------------------------------------------------------------------ */
-
-interface FixedPricing {
-  plan: PlanKey;
-  price: number;    // centesimi
-  maxSlots: number;
-  label: string;    // descrizione tipo zona
+interface ZonePricingResult {
+  zoneClass: ZoneClass;
+  monthlyPrice: number;   // centesimi EUR
+  maxAgencies: number;
+  label: string;
 }
 
 /**
- * Determina piano, prezzo fisso e slot per una zona
- * in base alla classe, popolazione e market score.
+ * Calcola prezzo e max agenzie per una zona.
+ *
+ * Formula: prezzoBase × (1 + factorPop × 0.3 + factorNTN × 0.4 + factorPrezzo × 0.3)
+ *
+ * - prezzoBase: 24900 (BASE), 49900 (URBANA), 99900 (PREMIUM) centesimi
+ * - factor*: normalizzato 0-1 all'interno della fascia
  */
-export function getFixedZonePrice(
+export function calculateZonePrice(
   zoneClass: ZoneClass,
   population: number,
-  marketScore: number
-): FixedPricing {
-  switch (zoneClass) {
-    case "CLUSTER_LOCAL":
-      return { plan: "BASE", price: 30000, maxSlots: 3, label: "Cluster rurale" };
+  ntn: number = 0,
+  avgPricePerSqm: number = 0
+): ZonePricingResult {
+  const config: Record<ZoneClass, {
+    basePrice: number;
+    maxPrice: number;
+    baseAgencies: number;
+    maxAgencies: number;
+    popNorm: number;
+    ntnNorm: number;
+    priceNorm: number;
+    label: string;
+  }> = {
+    BASE: {
+      basePrice: 24900,
+      maxPrice: 49900,
+      baseAgencies: 3,
+      maxAgencies: 4,
+      popNorm: 20000,
+      ntnNorm: 100,
+      priceNorm: 2000,
+      label: "Zona Base",
+    },
+    URBANA: {
+      basePrice: 49900,
+      maxPrice: 99900,
+      baseAgencies: 4,
+      maxAgencies: 6,
+      popNorm: 100000,
+      ntnNorm: 500,
+      priceNorm: 3000,
+      label: "Zona Urbana",
+    },
+    PREMIUM: {
+      basePrice: 99900,
+      maxPrice: 260000,
+      baseAgencies: 4,
+      maxAgencies: 7,
+      popNorm: 200000,
+      ntnNorm: 2000,
+      priceNorm: 5000,
+      label: "Zona Premium",
+    },
+  };
 
-    case "COMUNE":
-      if (population < 20000) {
-        return { plan: "BASE", price: 40000, maxSlots: 4, label: "Comune < 20k" };
-      }
-      return { plan: "PREMIER_LOCAL", price: 65000, maxSlots: 5, label: "Comune 20k-80k" };
+  const c = config[zoneClass];
+  if (!c) return { zoneClass: "BASE", monthlyPrice: 24900, maxAgencies: 3, label: "Zona Base" };
 
-    case "MACROQUARTIERE":
-      if (marketScore <= 5) {
-        return { plan: "PREMIER_LOCAL", price: 85000, maxSlots: 5, label: "Macroquartiere periferia" };
-      }
-      return { plan: "PREMIER_CITY", price: 110000, maxSlots: 6, label: "Macroquartiere centro" };
+  const factorPop = Math.min(population / c.popNorm, 1);
+  const factorNTN = Math.min(ntn / c.ntnNorm, 1);
+  const factorPrice = avgPricePerSqm > 0 ? Math.min(avgPricePerSqm / c.priceNorm, 1) : 0.5;
 
-    case "MICROZONA_PRIME":
-      if (marketScore <= 5) {
-        return { plan: "PREMIER_CITY", price: 150000, maxSlots: 6, label: "Microzona OMI B" };
-      }
-      if (marketScore <= 8) {
-        return { plan: "PREMIER_PRIME", price: 220000, maxSlots: 6, label: "Microzona OMI A" };
-      }
-      return { plan: "PREMIER_PRIME", price: 320000, maxSlots: 6, label: "OMI premium" };
+  const multiplier = 1 + factorPop * 0.3 + factorNTN * 0.4 + factorPrice * 0.3;
+  const rawPrice = Math.round(c.basePrice * multiplier);
+  const monthlyPrice = Math.min(rawPrice, c.maxPrice);
 
-    default:
-      return { plan: "BASE", price: 30000, maxSlots: 3, label: "Altro" };
-  }
+  // Max agencies scales with population within tier
+  const agencyRange = c.maxAgencies - c.baseAgencies;
+  const maxAgencies = c.baseAgencies + Math.round(factorPop * agencyRange);
+
+  return { zoneClass, monthlyPrice, maxAgencies, label: c.label };
 }
 
 /* ------------------------------------------------------------------ */
-/*  Calcolo marketScore (invariato)                                    */
+/*  Classificazione zona per popolazione                               */
+/* ------------------------------------------------------------------ */
+
+export function classifyZone(population: number): ZoneClass {
+  if (population < 20000) return "BASE";
+  if (population < 100000) return "URBANA";
+  return "PREMIUM";
+}
+
+/* ------------------------------------------------------------------ */
+/*  Market score (invariato)                                           */
 /* ------------------------------------------------------------------ */
 
 export function calculateMarketScore(population: number, ntn: number): number {
@@ -76,98 +110,3 @@ export function calculateMarketScore(population: number, ntn: number): number {
     Math.max(1, Math.min(10, popScore + ntnScore + densityBonus))
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Calcolo completo prezzi + slot per una zona                        */
-/* ------------------------------------------------------------------ */
-
-export interface ZonePricing {
-  priceBase: number | null;
-  priceLocal: number | null;
-  priceCity: number | null;
-  pricePrime: number | null;
-  priceElite: number | null;
-  maxBase: number;
-  maxLocal: number;
-  maxCity: number;
-  maxPrime: number;
-  maxElite: number;
-}
-
-/**
- * Calcola pricing per una zona. Con il nuovo modello a prezzi fissi,
- * ogni zona ha UN SOLO piano attivo con un prezzo fisso.
- */
-export function calculateZonePricing(
-  zoneClass: ZoneClass | string,
-  marketScore: number,
-  population: number = 0
-): ZonePricing {
-  const fixed = getFixedZonePrice(zoneClass as ZoneClass, population, marketScore);
-
-  return {
-    priceBase: fixed.plan === "BASE" ? fixed.price : null,
-    priceLocal: fixed.plan === "PREMIER_LOCAL" ? fixed.price : null,
-    priceCity: fixed.plan === "PREMIER_CITY" ? fixed.price : null,
-    pricePrime: fixed.plan === "PREMIER_PRIME" ? fixed.price : null,
-    priceElite: null, // Non più usato
-    maxBase: fixed.plan === "BASE" ? fixed.maxSlots : 0,
-    maxLocal: fixed.plan === "PREMIER_LOCAL" ? fixed.maxSlots : 0,
-    maxCity: fixed.plan === "PREMIER_CITY" ? fixed.maxSlots : 0,
-    maxPrime: fixed.plan === "PREMIER_PRIME" ? fixed.maxSlots : 0,
-    maxElite: 0, // Non più usato
-  };
-}
-
-/* ------------------------------------------------------------------ */
-/*  Classificazione automatica zona da popolazione                     */
-/* ------------------------------------------------------------------ */
-
-export function classifyZone(population: number): ZoneClass {
-  if (population < 5000) return "CLUSTER_LOCAL";
-  if (population < 50000) return "COMUNE";
-  if (population < 250000) return "MACROQUARTIERE";
-  return "MICROZONA_PRIME";
-}
-
-/* ------------------------------------------------------------------ */
-/*  Legacy exports per compatibilità                                   */
-/* ------------------------------------------------------------------ */
-
-/** @deprecated Use getFixedZonePrice instead */
-export function calculateZonePrice(plan: PlanKey, marketScore: number): number {
-  // Fallback per compatibilità con codice esistente
-  const prices: Record<PlanKey, number> = {
-    BASE: 30000,
-    PREMIER_LOCAL: 65000,
-    PREMIER_CITY: 110000,
-    PREMIER_PRIME: 220000,
-    PREMIER_ELITE: 320000,
-  };
-  return prices[plan] || 30000;
-}
-
-// Legacy exports
-const PRICE_RANGES: Record<PlanKey, { min: number; max: number }> = {
-  BASE: { min: 30000, max: 40000 },
-  PREMIER_LOCAL: { min: 65000, max: 85000 },
-  PREMIER_CITY: { min: 110000, max: 150000 },
-  PREMIER_PRIME: { min: 220000, max: 320000 },
-  PREMIER_ELITE: { min: 320000, max: 320000 },
-};
-
-const ZONE_CLASS_PLANS: Record<ZoneClass, PlanKey[]> = {
-  CLUSTER_LOCAL: ["BASE"],
-  COMUNE: ["BASE", "PREMIER_LOCAL"],
-  MACROQUARTIERE: ["PREMIER_LOCAL", "PREMIER_CITY"],
-  MICROZONA_PRIME: ["PREMIER_CITY", "PREMIER_PRIME"],
-};
-
-const DEFAULT_SLOTS: Record<ZoneClass, Record<string, number>> = {
-  CLUSTER_LOCAL: { maxBase: 3, maxLocal: 0, maxCity: 0, maxPrime: 0, maxElite: 0 },
-  COMUNE: { maxBase: 4, maxLocal: 5, maxCity: 0, maxPrime: 0, maxElite: 0 },
-  MACROQUARTIERE: { maxBase: 0, maxLocal: 5, maxCity: 6, maxPrime: 0, maxElite: 0 },
-  MICROZONA_PRIME: { maxBase: 0, maxLocal: 0, maxCity: 6, maxPrime: 6, maxElite: 0 },
-};
-
-export { PRICE_RANGES, ZONE_CLASS_PLANS, DEFAULT_SLOTS };

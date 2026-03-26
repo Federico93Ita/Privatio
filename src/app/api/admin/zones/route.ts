@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { calculateMarketScore, calculateZonePricing } from "@/lib/zone-pricing";
+import { calculateMarketScore, calculateZonePrice } from "@/lib/zone-pricing";
 import type { ZoneClass } from "@prisma/client";
 
 /* ------------------------------------------------------------------ */
@@ -45,10 +45,8 @@ export async function GET(req: NextRequest) {
     activePartners: z.territories.length,
     partnersByPlan: {
       BASE: z.territories.filter((t) => t.plan === "BASE").length,
-      PREMIER_LOCAL: z.territories.filter((t) => t.plan === "PREMIER_LOCAL").length,
-      PREMIER_CITY: z.territories.filter((t) => t.plan === "PREMIER_CITY").length,
-      PREMIER_PRIME: z.territories.filter((t) => t.plan === "PREMIER_PRIME").length,
-      PREMIER_ELITE: z.territories.filter((t) => t.plan === "PREMIER_ELITE").length,
+      URBANA: z.territories.filter((t) => t.plan === "URBANA").length,
+      PREMIUM: z.territories.filter((t) => t.plan === "PREMIUM").length,
     },
   }));
 
@@ -77,6 +75,7 @@ export async function POST(req: NextRequest) {
     municipalities,
     population,
     ntn,
+    avgPricePerSqm,
   } = body;
 
   if (!name || !slug || !zoneClass || !region || !province) {
@@ -92,7 +91,7 @@ export async function POST(req: NextRequest) {
   const pop = population || 0;
   const transactions = ntn || 0;
   const score = calculateMarketScore(pop, transactions);
-  const pricing = calculateZonePricing(zoneClass as ZoneClass, score);
+  const pricing = calculateZonePrice(zoneClass as ZoneClass, pop, transactions, avgPricePerSqm || 0);
 
   const zone = await prisma.zone.create({
     data: {
@@ -107,7 +106,9 @@ export async function POST(req: NextRequest) {
       population: pop,
       ntn: transactions,
       marketScore: score,
-      ...pricing,
+      avgPricePerSqm: avgPricePerSqm || null,
+      monthlyPrice: pricing.monthlyPrice,
+      maxAgencies: pricing.maxAgencies,
     },
   });
 
