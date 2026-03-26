@@ -52,12 +52,31 @@ function formatPrice(cents: number): string {
   }).format(cents / 100);
 }
 
-/** Calculate circle radius from population. Returns meters. */
+/** Calculate circle radius from population. Returns meters.
+ *  Peripheral/small towns get larger radii to cover nearby empty areas.
+ *  Population thresholds:
+ *    < 5,000    → 5–6 km  (covers surrounding rural area)
+ *    5–15,000   → 4–6 km  (small towns)
+ *    15–50,000  → 5–8 km  (medium towns)
+ *    > 50,000   → 6–10 km (cities)
+ */
 function getZoneRadius(population: number): number {
-  if (population <= 0) return 1500;
-  // sqrt scaling: small towns ~1.5km, big cities ~8km
-  const base = Math.sqrt(population) * 8;
-  return Math.max(1500, Math.min(12000, base));
+  if (population <= 0) return 5000;
+  if (population < 5000) {
+    // Very small towns: 5–6 km to fill gaps between scattered municipalities
+    return 5000 + Math.sqrt(population) * 15;
+  }
+  if (population < 15000) {
+    // Small towns: 4–6 km
+    return 4000 + Math.sqrt(population) * 16;
+  }
+  if (population < 50000) {
+    // Medium towns: 5–8 km
+    return 5000 + Math.sqrt(population) * 14;
+  }
+  // Cities: 6–10 km
+  const base = Math.sqrt(population) * 12;
+  return Math.min(10000, Math.max(6000, base));
 }
 
 /** Province capitals approximate coordinates for map centering */
