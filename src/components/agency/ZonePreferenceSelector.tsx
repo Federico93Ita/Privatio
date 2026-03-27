@@ -330,10 +330,29 @@ export default function ZonePreferenceSelector({
   );
 
   const normalised = province ? province.trim().toUpperCase() : "";
-  const zonesWithCoords = useMemo(
-    () => zones.filter((z) => z.lat != null && z.lng != null),
-    [zones]
-  );
+  const zonesWithCoords = useMemo(() => {
+    const withCoords = zones.filter((z) => z.lat != null && z.lng != null);
+    if (withCoords.length < 4) return withCoords;
+
+    // Filter outliers: remove zones whose lat/lng is far from the median
+    // This prevents one bad coordinate from breaking the entire Voronoi
+    const sortedLats = withCoords.map((z) => z.lat!).sort((a, b) => a - b);
+    const sortedLngs = withCoords.map((z) => z.lng!).sort((a, b) => a - b);
+    const medianLat = sortedLats[Math.floor(sortedLats.length / 2)];
+    const medianLng = sortedLngs[Math.floor(sortedLngs.length / 2)];
+    const q1Lat = sortedLats[Math.floor(sortedLats.length * 0.25)];
+    const q3Lat = sortedLats[Math.floor(sortedLats.length * 0.75)];
+    const q1Lng = sortedLngs[Math.floor(sortedLngs.length * 0.25)];
+    const q3Lng = sortedLngs[Math.floor(sortedLngs.length * 0.75)];
+    const iqrLat = Math.max(q3Lat - q1Lat, 0.3);
+    const iqrLng = Math.max(q3Lng - q1Lng, 0.3);
+
+    return withCoords.filter(
+      (z) =>
+        Math.abs(z.lat! - medianLat) <= iqrLat * 3 &&
+        Math.abs(z.lng! - medianLng) <= iqrLng * 3
+    );
+  }, [zones]);
   const maxReached = selectedZones.length >= 3;
 
   // Filtered zones for search
