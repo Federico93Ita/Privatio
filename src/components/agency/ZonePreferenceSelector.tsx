@@ -548,9 +548,9 @@ export default function ZonePreferenceSelector({
 
       {/* ── Main layout: Sidebar + Map ── */}
       {!loading && zones.length > 0 && (
-        <div className="flex flex-col lg:flex-row gap-3 rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+        <div className="flex flex-col lg:flex-row rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm lg:h-[560px]">
           {/* ── Left sidebar ── */}
-          <div className="lg:w-[320px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 max-h-[540px]">
+          <div className="lg:w-[320px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 lg:max-h-[560px]">
             {/* Search */}
             <div className="p-3 border-b border-gray-100">
               <div className="relative">
@@ -738,7 +738,7 @@ export default function ZonePreferenceSelector({
           </div>
 
           {/* ── Map ── */}
-          <div className="flex-1 min-h-[320px] lg:min-h-[540px] relative">
+          <div className="flex-1 min-h-[320px] lg:min-h-0 relative">
             {isLoaded && !loadError && zonesWithCoords.length > 0 ? (
               <GoogleMap
                 mapContainerStyle={{
@@ -793,7 +793,7 @@ export default function ZonePreferenceSelector({
                           : isHovered
                           ? 2
                           : 0.8,
-                        strokeOpacity: selected ? 1 : isHovered ? 0.9 : 0.5,
+                        strokeOpacity: selected ? 1 : isHovered ? 0.9 : 0.7,
                         zIndex: selected ? 10 : isHovered ? 5 : 1,
                         clickable: true,
                       }}
