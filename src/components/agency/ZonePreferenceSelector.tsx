@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   GoogleMap,
   useLoadScript,
-  MarkerF,
+  Polygon,
   InfoWindowF,
 } from "@react-google-maps/api";
 import {
@@ -54,6 +54,112 @@ interface ZonePreferenceSelectorProps {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Voronoi tessellation (no deps — Fortune's algorithm lite)          */
+/* ------------------------------------------------------------------ */
+
+/** Compute Voronoi cells from points within a bounding box.
+ *  Returns array of polygons (each polygon = array of {lat,lng}).
+ *  Uses a simple pixel-less approach: for each zone centroid,
+ *  compute the Voronoi cell by intersecting half-planes. */
+function computeVoronoiCells(
+  points: { lat: number; lng: number }[],
+  bounds: { minLat: number; maxLat: number; minLng: number; maxLng: number }
+): { lat: number; lng: number }[][] {
+  if (points.length === 0) return [];
+  if (points.length === 1) {
+    // Single zone covers entire bounds
+    return [
+      [
+        { lat: bounds.minLat, lng: bounds.minLng },
+        { lat: bounds.minLat, lng: bounds.maxLng },
+        { lat: bounds.maxLat, lng: bounds.maxLng },
+        { lat: bounds.maxLat, lng: bounds.minLng },
+      ],
+    ];
+  }
+
+  const cells: { lat: number; lng: number }[][] = [];
+
+  for (let i = 0; i < points.length; i++) {
+    // Start with bounding box as initial polygon
+    let polygon: [number, number][] = [
+      [bounds.minLng, bounds.minLat],
+      [bounds.maxLng, bounds.minLat],
+      [bounds.maxLng, bounds.maxLat],
+      [bounds.minLng, bounds.maxLat],
+    ];
+
+    const pi = points[i];
+
+    for (let j = 0; j < points.length; j++) {
+      if (i === j) continue;
+      const pj = points[j];
+
+      // Compute perpendicular bisector between pi and pj
+      const midLng = (pi.lng + pj.lng) / 2;
+      const midLat = (pi.lat + pj.lat) / 2;
+
+      // Normal vector pointing from pj to pi (we keep the side of pi)
+      const nx = pi.lng - pj.lng;
+      const ny = pi.lat - pj.lat;
+
+      // Clip polygon to the half-plane containing pi
+      polygon = clipPolygonByHalfPlane(polygon, midLng, midLat, nx, ny);
+      if (polygon.length < 3) break;
+    }
+
+    cells.push(
+      polygon.map(([lng, lat]) => ({ lat, lng }))
+    );
+  }
+
+  return cells;
+}
+
+/** Sutherland-Hodgman clip: keep side where dot(p - mid, normal) >= 0 */
+function clipPolygonByHalfPlane(
+  polygon: [number, number][],
+  midX: number,
+  midY: number,
+  nx: number,
+  ny: number
+): [number, number][] {
+  if (polygon.length < 3) return [];
+
+  const result: [number, number][] = [];
+  const n = polygon.length;
+
+  for (let i = 0; i < n; i++) {
+    const curr = polygon[i];
+    const next = polygon[(i + 1) % n];
+
+    const dCurr = (curr[0] - midX) * nx + (curr[1] - midY) * ny;
+    const dNext = (next[0] - midX) * nx + (next[1] - midY) * ny;
+
+    if (dCurr >= 0) {
+      result.push(curr);
+      if (dNext < 0) {
+        // Exiting: compute intersection
+        const t = dCurr / (dCurr - dNext);
+        result.push([
+          curr[0] + t * (next[0] - curr[0]),
+          curr[1] + t * (next[1] - curr[1]),
+        ]);
+      }
+    } else if (dNext >= 0) {
+      // Entering: compute intersection
+      const t = dCurr / (dCurr - dNext);
+      result.push([
+        curr[0] + t * (next[0] - curr[0]),
+        curr[1] + t * (next[1] - curr[1]),
+      ]);
+    }
+  }
+
+  return result;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -74,36 +180,6 @@ function getSlots(zone: ZoneData): { taken: number; max: number } {
   return { taken: zone.currentAgencies || 0, max: zone.maxAgencies || 3 };
 }
 
-/** Province capitals approximate coordinates for map centering */
-const PROVINCE_CENTERS: Record<
-  string,
-  { lat: number; lng: number; zoom: number }
-> = {
-  TO: { lat: 45.07, lng: 7.69, zoom: 10 },
-  MI: { lat: 45.46, lng: 9.19, zoom: 10 },
-  RM: { lat: 41.9, lng: 12.5, zoom: 10 },
-  NA: { lat: 40.85, lng: 14.27, zoom: 10 },
-  FI: { lat: 43.77, lng: 11.25, zoom: 11 },
-  BO: { lat: 44.49, lng: 11.34, zoom: 10 },
-  GE: { lat: 44.41, lng: 8.93, zoom: 11 },
-  PA: { lat: 38.12, lng: 13.36, zoom: 10 },
-  BA: { lat: 41.13, lng: 16.87, zoom: 10 },
-  VE: { lat: 45.44, lng: 12.32, zoom: 10 },
-  VR: { lat: 45.44, lng: 10.99, zoom: 11 },
-  PD: { lat: 45.41, lng: 11.88, zoom: 11 },
-  BS: { lat: 45.54, lng: 10.22, zoom: 10 },
-  CT: { lat: 37.5, lng: 15.09, zoom: 11 },
-  BG: { lat: 45.7, lng: 9.67, zoom: 11 },
-  SA: { lat: 40.68, lng: 14.77, zoom: 11 },
-  AT: { lat: 44.9, lng: 8.21, zoom: 11 },
-  AL: { lat: 44.91, lng: 8.61, zoom: 10 },
-  CN: { lat: 44.39, lng: 7.55, zoom: 10 },
-  NO: { lat: 45.45, lng: 8.62, zoom: 11 },
-  BI: { lat: 45.56, lng: 8.05, zoom: 11 },
-  VC: { lat: 45.32, lng: 8.42, zoom: 11 },
-  VB: { lat: 45.92, lng: 8.55, zoom: 11 },
-};
-
 /** Tier ordering for display: PREMIUM first, then URBANA, then BASE */
 const TIER_ORDER: Record<string, number> = {
   PREMIUM: 0,
@@ -113,71 +189,54 @@ const TIER_ORDER: Record<string, number> = {
 
 const TIER_CONFIG: Record<
   string,
-  { label: string; icon: string; gradient: string; textColor: string; bgColor: string; borderColor: string }
+  {
+    label: string;
+    icon: string;
+    gradient: string;
+    textColor: string;
+    bgColor: string;
+    borderColor: string;
+    mapFill: string;
+    mapFillSelected: string;
+    mapStroke: string;
+  }
 > = {
   PREMIUM: {
-    label: "Zone Premium",
+    label: "Premium",
     icon: "★",
     gradient: "from-rose-500 to-pink-400",
     textColor: "text-rose-700",
     bgColor: "bg-rose-50",
     borderColor: "border-rose-200",
+    mapFill: "rgba(233,69,96,0.18)",
+    mapFillSelected: "rgba(233,69,96,0.45)",
+    mapStroke: "#e94560",
   },
   URBANA: {
-    label: "Zone Urbane",
+    label: "Urbana",
     icon: "◆",
     gradient: "from-cyan-500 to-teal-400",
     textColor: "text-cyan-700",
     bgColor: "bg-cyan-50",
     borderColor: "border-cyan-200",
+    mapFill: "rgba(8,145,178,0.18)",
+    mapFillSelected: "rgba(8,145,178,0.45)",
+    mapStroke: "#0891b2",
   },
   BASE: {
-    label: "Zone Base",
+    label: "Base",
     icon: "●",
     gradient: "from-indigo-500 to-violet-400",
     textColor: "text-indigo-700",
     bgColor: "bg-indigo-50",
     borderColor: "border-indigo-200",
+    mapFill: "rgba(99,102,241,0.18)",
+    mapFillSelected: "rgba(99,102,241,0.45)",
+    mapStroke: "#6366f1",
   },
 };
 
-/** Create SVG data URL for colored map markers */
-function createMarkerIcon(
-  zoneClass: string,
-  isSelected: boolean,
-  isHovered: boolean
-): string {
-  const colors = ZONE_MAP_COLORS[zoneClass] || {
-    fill: "#6366f140",
-    stroke: "#6366f1",
-  };
-  const fillColor = isSelected
-    ? "#2563eb"
-    : isHovered
-    ? colors.stroke
-    : colors.stroke;
-  const size = isSelected || isHovered ? 16 : 12;
-  const strokeWidth = isSelected ? 3 : isHovered ? 2.5 : 2;
-  const strokeColor = isSelected ? "#1d4ed8" : "#ffffff";
-
-  return `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${size * 2}" height="${
-      size * 2
-    }" viewBox="0 0 ${size * 2} ${size * 2}">
-      <circle cx="${size}" cy="${size}" r="${
-      size - strokeWidth
-    }" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-    </svg>`
-  )}`;
-}
-
-const mapContainerStyle = {
-  width: "100%",
-  height: "280px",
-  borderRadius: "12px",
-};
-
-const MAP_STYLES = [
+const MAP_STYLES: google.maps.MapTypeStyle[] = [
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
   {
@@ -185,11 +244,8 @@ const MAP_STYLES = [
     elementType: "labels",
     stylers: [{ visibility: "simplified" }],
   },
-  { featureType: "water", stylers: [{ color: "#e0f2fe" }] },
-  {
-    featureType: "landscape",
-    stylers: [{ color: "#f8fafc" }],
-  },
+  { featureType: "water", stylers: [{ color: "#dbeafe" }] },
+  { featureType: "landscape", stylers: [{ color: "#f1f5f9" }] },
   {
     featureType: "road",
     elementType: "geometry",
@@ -198,7 +254,12 @@ const MAP_STYLES = [
   {
     featureType: "administrative",
     elementType: "geometry.stroke",
-    stylers: [{ color: "#cbd5e1" }, { weight: 1 }],
+    stylers: [{ color: "#94a3b8" }, { weight: 0.8 }],
+  },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels",
+    stylers: [{ visibility: "simplified" }],
   },
 ];
 
@@ -215,9 +276,12 @@ export default function ZonePreferenceSelector({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
-  const [mapInfoZone, setMapInfoZone] = useState<ZoneData | null>(null);
+  const [infoZone, setInfoZone] = useState<ZoneData | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const mapRef = useRef<google.maps.Map | null>(null);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
@@ -266,33 +330,39 @@ export default function ZonePreferenceSelector({
   );
 
   const normalised = province ? province.trim().toUpperCase() : "";
-  const provCenter = PROVINCE_CENTERS[normalised] || {
-    lat: 42.5,
-    lng: 12.5,
-    zoom: 9,
-  };
-  const zonesWithCoords = zones.filter((z) => z.lat && z.lng);
+  const zonesWithCoords = useMemo(
+    () => zones.filter((z) => z.lat != null && z.lng != null),
+    [zones]
+  );
   const maxReached = selectedZones.length >= 3;
 
-  const mapRef = useRef<google.maps.Map | null>(null);
+  // Filtered zones for search
+  const filteredZones = useMemo(() => {
+    if (!searchQuery.trim()) return zones;
+    const q = searchQuery.toLowerCase();
+    return zones.filter(
+      (z) =>
+        z.name.toLowerCase().includes(q) ||
+        z.municipalities.some((m) => m.toLowerCase().includes(q))
+    );
+  }, [zones, searchQuery]);
 
-  // Group zones by tier
+  // Group filtered zones by tier
   const groupedZones = useMemo(() => {
     const groups: Record<string, ZoneData[]> = {};
-    const sorted = [...zones].sort((a, b) => {
+    const sorted = [...filteredZones].sort((a, b) => {
       const tierDiff =
         (TIER_ORDER[a.zoneClass] ?? 9) - (TIER_ORDER[b.zoneClass] ?? 9);
       if (tierDiff !== 0) return tierDiff;
       return (b.population || 0) - (a.population || 0);
     });
-
     for (const zone of sorted) {
       const tier = zone.zoneClass || "BASE";
       if (!groups[tier]) groups[tier] = [];
       groups[tier].push(zone);
     }
     return groups;
-  }, [zones]);
+  }, [filteredZones]);
 
   const tierKeys = useMemo(
     () =>
@@ -302,18 +372,54 @@ export default function ZonePreferenceSelector({
     [groupedZones]
   );
 
-  // Map center
-  const center = useMemo(() => {
-    if (zonesWithCoords.length === 0)
-      return { lat: provCenter.lat, lng: provCenter.lng };
+  // Compute Voronoi polygons
+  const voronoiCells = useMemo(() => {
+    if (zonesWithCoords.length === 0) return new Map<string, { lat: number; lng: number }[]>();
+
+    const lats = zonesWithCoords.map((z) => z.lat!);
+    const lngs = zonesWithCoords.map((z) => z.lng!);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+
+    // Expand bounds by ~20% to cover edges fully
+    const latPad = Math.max((maxLat - minLat) * 0.25, 0.08);
+    const lngPad = Math.max((maxLng - minLng) * 0.25, 0.08);
+
+    const bounds = {
+      minLat: minLat - latPad,
+      maxLat: maxLat + latPad,
+      minLng: minLng - lngPad,
+      maxLng: maxLng + lngPad,
+    };
+
+    const points = zonesWithCoords.map((z) => ({
+      lat: z.lat!,
+      lng: z.lng!,
+    }));
+
+    const cells = computeVoronoiCells(points, bounds);
+
+    const cellMap = new Map<string, { lat: number; lng: number }[]>();
+    zonesWithCoords.forEach((z, i) => {
+      if (cells[i] && cells[i].length >= 3) {
+        cellMap.set(z.id, cells[i]);
+      }
+    });
+
+    return cellMap;
+  }, [zonesWithCoords]);
+
+  // Map center & bounds
+  const mapCenter = useMemo(() => {
+    if (zonesWithCoords.length === 0) return { lat: 42.5, lng: 12.5 };
     const avgLat =
-      zonesWithCoords.reduce((s, z) => s + z.lat!, 0) /
-      zonesWithCoords.length;
+      zonesWithCoords.reduce((s, z) => s + z.lat!, 0) / zonesWithCoords.length;
     const avgLng =
-      zonesWithCoords.reduce((s, z) => s + z.lng!, 0) /
-      zonesWithCoords.length;
+      zonesWithCoords.reduce((s, z) => s + z.lng!, 0) / zonesWithCoords.length;
     return { lat: avgLat, lng: avgLng };
-  }, [zonesWithCoords.length, provCenter.lat, provCenter.lng, zones]);
+  }, [zonesWithCoords]);
 
   const onMapLoad = useCallback(
     (map: google.maps.Map) => {
@@ -323,7 +429,7 @@ export default function ZonePreferenceSelector({
         zonesWithCoords.forEach((z) =>
           bounds.extend({ lat: z.lat!, lng: z.lng! })
         );
-        map.fitBounds(bounds, 40);
+        map.fitBounds(bounds, 50);
       }
     },
     [zonesWithCoords]
@@ -335,7 +441,7 @@ export default function ZonePreferenceSelector({
       zonesWithCoords.forEach((z) =>
         bounds.extend({ lat: z.lat!, lng: z.lng! })
       );
-      mapRef.current.fitBounds(bounds, 40);
+      mapRef.current.fitBounds(bounds, 50);
     }
   }, [zonesWithCoords]);
 
@@ -356,39 +462,47 @@ export default function ZonePreferenceSelector({
         },
       ]);
     }
-    setMapInfoZone(null);
+    setInfoZone(null);
   }
 
   function scrollToCard(zoneId: string) {
     const el = cardRefs.current[zoneId];
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
-      setHoveredZone(zoneId);
-      setTimeout(() => setHoveredZone(null), 2000);
     }
+  }
+
+  function panToZone(zone: ZoneData) {
+    if (mapRef.current && zone.lat && zone.lng) {
+      mapRef.current.panTo({ lat: zone.lat, lng: zone.lng });
+      mapRef.current.setZoom(
+        Math.max(mapRef.current.getZoom() || 11, 12)
+      );
+    }
+    setHoveredZone(zone.id);
   }
 
   // Don't render anything until province is entered
   if (!province || province.length < 2) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Header */}
       <div>
         <h3 className="text-sm font-semibold text-text">
           Zone disponibili — Provincia di {normalised}
         </h3>
         <p className="mt-0.5 text-xs text-text-muted">
-          Seleziona fino a 3 zone di interesse. Le zone contigue alla tua sede
-          saranno suggerite in fase di attivazione.
+          Seleziona fino a 3 zone di interesse. Clicca sulla mappa o nella
+          lista per selezionare.
         </p>
       </div>
 
       {loading && (
-        <div className="h-[200px] animate-pulse rounded-xl bg-bg-soft flex items-center justify-center">
+        <div className="h-[420px] animate-pulse rounded-xl bg-bg-soft flex items-center justify-center">
           <div className="flex items-center gap-2">
             <svg
-              className="animate-spin h-4 w-4 text-text-muted"
+              className="animate-spin h-5 w-5 text-text-muted"
               viewBox="0 0 24 24"
               fill="none"
             >
@@ -426,295 +540,382 @@ export default function ZonePreferenceSelector({
             <strong>{normalised}</strong>.
           </p>
           <p className="mt-1 text-xs text-text-muted">
-            Puoi comunque inviare la richiesta e ti contatteremo quando saranno
-            disponibili.
+            Puoi comunque inviare la richiesta e ti contatteremo quando
+            saranno disponibili.
           </p>
         </div>
       )}
 
-      {/* Map — compact reference view */}
-      {!loading &&
-        zones.length > 0 &&
-        isLoaded &&
-        !loadError &&
-        zonesWithCoords.length > 0 && (
-          <div className="relative">
-            <GoogleMap
-              mapContainerStyle={mapContainerStyle}
-              center={center}
-              zoom={zonesWithCoords.length > 1 ? undefined : provCenter.zoom}
-              onLoad={onMapLoad}
-              options={{
-                disableDefaultUI: true,
-                zoomControl: true,
-                mapTypeControl: false,
-                streetViewControl: false,
-                fullscreenControl: false,
-                styles: MAP_STYLES,
-              }}
-              onClick={() => setMapInfoZone(null)}
+      {/* ── Main layout: Sidebar + Map ── */}
+      {!loading && zones.length > 0 && (
+        <div className="flex flex-col lg:flex-row gap-3 rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          {/* ── Left sidebar ── */}
+          <div className="lg:w-[320px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 max-h-[540px]">
+            {/* Search */}
+            <div className="p-3 border-b border-gray-100">
+              <div className="relative">
+                <svg
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Cerca zona o comune..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-8 pr-3 text-xs placeholder:text-gray-400 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-200 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Zone list */}
+            <div
+              ref={sidebarRef}
+              className="flex-1 overflow-y-auto overscroll-contain p-2 space-y-3"
             >
-              {zonesWithCoords.map((zone) => {
-                const selected = isZoneSelected(zone.id);
-                const isHovered = hoveredZone === zone.id;
+              {tierKeys.map((tier) => {
+                const config = TIER_CONFIG[tier] || TIER_CONFIG.BASE;
+                const tierZones = groupedZones[tier];
 
                 return (
-                  <MarkerF
-                    key={zone.id}
-                    position={{ lat: zone.lat!, lng: zone.lng! }}
-                    icon={{
-                      url: createMarkerIcon(
-                        zone.zoneClass,
-                        selected,
-                        isHovered
-                      ),
-                      scaledSize: new google.maps.Size(
-                        selected || isHovered ? 32 : 24,
-                        selected || isHovered ? 32 : 24
-                      ),
-                      anchor: new google.maps.Point(
-                        selected || isHovered ? 16 : 12,
-                        selected || isHovered ? 16 : 12
-                      ),
-                    }}
-                    onClick={() => setMapInfoZone(zone)}
-                    zIndex={selected ? 10 : isHovered ? 8 : 5}
-                  />
+                  <div key={tier}>
+                    {/* Tier label */}
+                    <div className="flex items-center gap-2 px-1 mb-1.5">
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          background:
+                            ZONE_MAP_COLORS[tier]?.stroke || "#6366f1",
+                        }}
+                      />
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        {config.label}
+                      </span>
+                      <span className="text-[10px] text-gray-400">
+                        ({tierZones.length})
+                      </span>
+                    </div>
+
+                    {/* Zone items */}
+                    <div className="space-y-1">
+                      {tierZones.map((zone) => {
+                        const selected = isZoneSelected(zone.id);
+                        const slots = getSlots(zone);
+                        const isFull = slots.taken >= slots.max;
+                        const isHovered = hoveredZone === zone.id;
+                        const disabled =
+                          (!selected && maxReached) || isFull;
+                        const price = getPrice(zone);
+
+                        return (
+                          <div
+                            key={zone.id}
+                            ref={(el) => {
+                              cardRefs.current[zone.id] = el;
+                            }}
+                            onMouseEnter={() => setHoveredZone(zone.id)}
+                            onMouseLeave={() => setHoveredZone(null)}
+                            onClick={() => {
+                              if (!disabled || selected) {
+                                toggleZone(zone);
+                              }
+                              panToZone(zone);
+                            }}
+                            className={`relative rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150 ${
+                              selected
+                                ? "bg-blue-50 border border-blue-300 shadow-sm"
+                                : isHovered && !disabled
+                                ? `${config.bgColor} border border-transparent`
+                                : isFull
+                                ? "bg-gray-50 border border-transparent opacity-50"
+                                : "bg-white border border-transparent hover:bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  {selected && (
+                                    <svg
+                                      className="h-3.5 w-3.5 text-blue-600 shrink-0"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  )}
+                                  <h4 className="text-xs font-semibold text-gray-900 leading-tight truncate">
+                                    {zone.name}
+                                  </h4>
+                                </div>
+                                {zone.municipalities.length > 0 && (
+                                  <p className="text-[10px] text-gray-500 mt-0.5 leading-snug line-clamp-1">
+                                    {zone.municipalities.length <= 3
+                                      ? zone.municipalities.join(", ")
+                                      : zone.municipalities
+                                          .slice(0, 3)
+                                          .join(", ") +
+                                        ` +${
+                                          zone.municipalities.length - 3
+                                        }`}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0">
+                                {price > 0 && (
+                                  <p className="text-xs font-bold text-gray-900">
+                                    {formatPrice(price)}
+                                    <span className="text-[9px] font-normal text-gray-400">
+                                      /m
+                                    </span>
+                                  </p>
+                                )}
+                                {isFull ? (
+                                  <span className="text-[9px] text-gray-400">
+                                    Esaurita
+                                  </span>
+                                ) : (
+                                  <span className="text-[9px] text-emerald-600">
+                                    {slots.max - slots.taken} post
+                                    {slots.max - slots.taken === 1
+                                      ? "o"
+                                      : "i"}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
 
-              {/* Info window on marker click */}
-              {mapInfoZone && mapInfoZone.lat && mapInfoZone.lng && (
-                <InfoWindowF
-                  position={{ lat: mapInfoZone.lat, lng: mapInfoZone.lng }}
-                  onCloseClick={() => setMapInfoZone(null)}
-                >
-                  <div className="min-w-[200px] p-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                          ZONE_TIER_COLORS[mapInfoZone.zoneClass] ||
-                          "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {ZONE_TIER_SHORT[mapInfoZone.zoneClass] ||
-                          mapInfoZone.zoneClass}
-                      </span>
-                    </div>
-                    <h4 className="font-semibold text-sm text-gray-900">
-                      {mapInfoZone.name}
-                    </h4>
-                    {mapInfoZone.municipalities.length > 0 && (
-                      <p className="text-[11px] text-gray-500 mt-0.5">
-                        {mapInfoZone.municipalities.slice(0, 5).join(", ")}
-                        {mapInfoZone.municipalities.length > 5
-                          ? ` +${mapInfoZone.municipalities.length - 5}`
-                          : ""}
-                      </p>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => scrollToCard(mapInfoZone.id)}
-                      className="mt-2 w-full text-center rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors"
-                    >
-                      Vedi dettagli
-                    </button>
-                  </div>
-                </InfoWindowF>
+              {filteredZones.length === 0 && searchQuery && (
+                <div className="text-center py-6">
+                  <p className="text-xs text-gray-400">
+                    Nessuna zona trovata per &ldquo;{searchQuery}&rdquo;
+                  </p>
+                </div>
               )}
-            </GoogleMap>
+            </div>
 
-            {/* Map legend overlay */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-3 rounded-lg bg-white/90 backdrop-blur-sm px-3 py-1.5 shadow-sm border border-gray-200/80">
-              {Object.entries(ZONE_MAP_COLORS).map(([tier, colors]) => (
-                <span
-                  key={tier}
-                  className="flex items-center gap-1.5 text-[10px] text-gray-600"
-                >
-                  <span
-                    className="h-2.5 w-2.5 rounded-full border-2 border-white shadow-sm"
-                    style={{ background: colors.stroke }}
-                  />
-                  {ZONE_TIER_SHORT[tier] || tier}
+            {/* Legend / zone count */}
+            <div className="p-2.5 border-t border-gray-100 bg-gray-50/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {Object.entries(ZONE_MAP_COLORS).map(([tier, colors]) => (
+                    <span
+                      key={tier}
+                      className="flex items-center gap-1 text-[10px] text-gray-500"
+                    >
+                      <span
+                        className="h-2.5 w-2.5 rounded-sm border border-white shadow-sm"
+                        style={{ background: colors.stroke }}
+                      />
+                      {ZONE_TIER_SHORT[tier]}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-[10px] text-gray-400">
+                  {zones.length} zone
                 </span>
-              ))}
+              </div>
             </div>
           </div>
-        )}
 
-      {/* Zone cards grouped by tier */}
-      {!loading && zones.length > 0 && (
-        <div className="space-y-5">
-          {tierKeys.map((tier) => {
-            const config = TIER_CONFIG[tier] || TIER_CONFIG.BASE;
-            const tierZones = groupedZones[tier];
+          {/* ── Map ── */}
+          <div className="flex-1 min-h-[320px] lg:min-h-[540px] relative">
+            {isLoaded && !loadError && zonesWithCoords.length > 0 ? (
+              <GoogleMap
+                mapContainerStyle={{
+                  width: "100%",
+                  height: "100%",
+                  minHeight: "320px",
+                }}
+                center={mapCenter}
+                zoom={10}
+                onLoad={onMapLoad}
+                options={{
+                  disableDefaultUI: true,
+                  zoomControl: true,
+                  mapTypeControl: false,
+                  streetViewControl: false,
+                  fullscreenControl: false,
+                  styles: MAP_STYLES,
+                  clickableIcons: false,
+                }}
+                onClick={() => setInfoZone(null)}
+              >
+                {/* Render Voronoi polygons for each zone */}
+                {zonesWithCoords.map((zone) => {
+                  const cell = voronoiCells.get(zone.id);
+                  if (!cell || cell.length < 3) return null;
 
-            return (
-              <div key={tier}>
-                {/* Tier header */}
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white bg-gradient-to-r ${config.gradient}`}
+                  const selected = isZoneSelected(zone.id);
+                  const isHovered = hoveredZone === zone.id;
+                  const config =
+                    TIER_CONFIG[zone.zoneClass] || TIER_CONFIG.BASE;
+
+                  return (
+                    <Polygon
+                      key={zone.id}
+                      paths={cell}
+                      options={{
+                        fillColor: selected
+                          ? config.mapStroke
+                          : config.mapStroke,
+                        fillOpacity: selected
+                          ? 0.45
+                          : isHovered
+                          ? 0.35
+                          : 0.15,
+                        strokeColor: selected
+                          ? "#1d4ed8"
+                          : isHovered
+                          ? config.mapStroke
+                          : "#94a3b8",
+                        strokeWeight: selected
+                          ? 2.5
+                          : isHovered
+                          ? 2
+                          : 0.8,
+                        strokeOpacity: selected ? 1 : isHovered ? 0.9 : 0.5,
+                        zIndex: selected ? 10 : isHovered ? 5 : 1,
+                        clickable: true,
+                      }}
+                      onMouseOver={() => setHoveredZone(zone.id)}
+                      onMouseOut={() => setHoveredZone(null)}
+                      onClick={() => {
+                        setInfoZone(zone);
+                        scrollToCard(zone.id);
+                      }}
+                    />
+                  );
+                })}
+
+                {/* Info window on polygon click */}
+                {infoZone && infoZone.lat && infoZone.lng && (
+                  <InfoWindowF
+                    position={{ lat: infoZone.lat, lng: infoZone.lng }}
+                    onCloseClick={() => setInfoZone(null)}
+                    options={{ maxWidth: 260 }}
                   >
-                    <span>{config.icon}</span>
-                    {config.label}
-                  </span>
-                  <span className="text-xs text-text-muted">
-                    {tierZones.length} zon{tierZones.length === 1 ? "a" : "e"}
-                  </span>
-                </div>
-
-                {/* Zone cards grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {tierZones.map((zone) => {
-                    const selected = isZoneSelected(zone.id);
-                    const slots = getSlots(zone);
-                    const isFull = slots.taken >= slots.max;
-                    const isLastSlot = !isFull && slots.max - slots.taken === 1;
-                    const disabled = (!selected && maxReached) || isFull;
-                    const price = getPrice(zone);
-                    const isHovered = hoveredZone === zone.id;
-
-                    return (
-                      <div
-                        key={zone.id}
-                        ref={(el) => {
-                          cardRefs.current[zone.id] = el;
-                        }}
-                        onMouseEnter={() => setHoveredZone(zone.id)}
-                        onMouseLeave={() => setHoveredZone(null)}
-                        className={`relative rounded-xl border-2 p-4 transition-all duration-200 ${
-                          selected
-                            ? "border-blue-500 bg-blue-50/50 shadow-md shadow-blue-100"
-                            : isHovered && !disabled
-                            ? `${config.borderColor} ${config.bgColor} shadow-sm`
-                            : isFull
-                            ? "border-gray-200 bg-gray-50 opacity-60"
-                            : "border-gray-200 bg-white hover:shadow-sm"
-                        }`}
-                      >
-                        {/* Top row: name + badge */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-sm font-semibold text-text leading-tight">
-                              {zone.name}
-                            </h4>
-                            {zone.municipalities.length > 0 && (
-                              <p className="text-[11px] text-text-muted mt-0.5 leading-snug">
-                                {zone.municipalities.length === 1
-                                  ? zone.municipalities[0]
-                                  : zone.municipalities
-                                      .slice(0, 4)
-                                      .join(", ") +
-                                    (zone.municipalities.length > 4
-                                      ? ` +${
-                                          zone.municipalities.length - 4
-                                        } comuni`
-                                      : "")}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Status indicator */}
-                          {isFull ? (
-                            <span className="shrink-0 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">
-                              Esaurita
-                            </span>
-                          ) : isLastSlot ? (
-                            <span className="shrink-0 inline-flex items-center rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-                              Ultimo posto
-                            </span>
-                          ) : (
-                            <span className="shrink-0 inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                              {slots.max - slots.taken} post
-                              {slots.max - slots.taken === 1 ? "o" : "i"}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Bottom row: price + population + select button */}
-                        <div className="flex items-end justify-between mt-3">
-                          <div>
-                            {price > 0 && (
-                              <p className="text-lg font-bold text-text leading-none">
-                                {formatPrice(price)}
-                                <span className="text-xs font-normal text-text-muted">
-                                  /mese
-                                </span>
-                              </p>
-                            )}
-                            {zone.population > 0 && (
-                              <p className="text-[11px] text-text-muted mt-1">
-                                {zone.population.toLocaleString("it-IT")} abitanti
-                              </p>
-                            )}
-                          </div>
-
-                          {!isFull && (
-                            <button
-                              type="button"
-                              disabled={disabled && !selected}
-                              onClick={() => toggleZone(zone)}
-                              className={`shrink-0 rounded-lg px-4 py-2 text-xs font-semibold transition-all duration-150 ${
-                                selected
-                                  ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                                  : disabled
-                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                  : "bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
-                              }`}
-                            >
-                              {selected ? "✓ Selezionata" : "Seleziona"}
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Selected checkmark overlay */}
-                        {selected && (
-                          <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
-                            <svg
-                              className="h-3 w-3 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              strokeWidth={3}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </div>
+                    <div className="min-w-[200px] p-1">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            ZONE_TIER_COLORS[infoZone.zoneClass] ||
+                            "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {ZONE_TIER_SHORT[infoZone.zoneClass] ||
+                            infoZone.zoneClass}
+                        </span>
+                        {getSlots(infoZone).taken >=
+                        getSlots(infoZone).max ? (
+                          <span className="text-[10px] text-gray-400">
+                            Esaurita
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-emerald-600">
+                            {getSlots(infoZone).max -
+                              getSlots(infoZone).taken}{" "}
+                            posti
+                          </span>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
+                      <h4 className="font-semibold text-sm text-gray-900">
+                        {infoZone.name}
+                      </h4>
+                      {infoZone.municipalities.length > 0 && (
+                        <p className="text-[11px] text-gray-500 mt-0.5">
+                          {infoZone.municipalities.slice(0, 5).join(", ")}
+                          {infoZone.municipalities.length > 5
+                            ? ` +${infoZone.municipalities.length - 5}`
+                            : ""}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-gray-100">
+                        {getPrice(infoZone) > 0 && (
+                          <span className="text-sm font-bold text-gray-900">
+                            {formatPrice(getPrice(infoZone))}
+                            <span className="text-xs font-normal text-gray-400">
+                              /mese
+                            </span>
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => toggleZone(infoZone)}
+                          disabled={
+                            (!isZoneSelected(infoZone.id) && maxReached) ||
+                            getSlots(infoZone).taken >=
+                              getSlots(infoZone).max
+                          }
+                          className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
+                            isZoneSelected(infoZone.id)
+                              ? "bg-blue-600 text-white hover:bg-blue-700"
+                              : getSlots(infoZone).taken >=
+                                getSlots(infoZone).max
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : maxReached
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-900 text-white hover:bg-gray-800"
+                          }`}
+                        >
+                          {isZoneSelected(infoZone.id)
+                            ? "✓ Selezionata"
+                            : "Seleziona"}
+                        </button>
+                      </div>
+                    </div>
+                  </InfoWindowF>
+                )}
+              </GoogleMap>
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gray-50">
+                <span className="text-xs text-gray-400">
+                  {loadError
+                    ? "Errore nel caricamento della mappa"
+                    : "Caricamento mappa..."}
+                </span>
               </div>
-            );
-          })}
+            )}
+          </div>
         </div>
       )}
 
-      {/* Selection summary */}
+      {/* ── Selection summary ── */}
       {selectedZones.length > 0 && (
         <div className="sticky bottom-0 z-10 rounded-xl border-2 border-blue-200 bg-blue-50/95 backdrop-blur-sm p-4 shadow-lg">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold text-blue-900">
               Zone selezionate ({selectedZones.length}/3)
             </p>
-            {selectedZones.length > 0 && (
-              <p className="text-sm font-bold text-blue-700">
-                Totale:{" "}
-                {formatPrice(
-                  selectedZones.reduce(
-                    (sum, z) => sum + (z.priceMonthly || 0),
-                    0
-                  )
-                )}
-                /mese
-              </p>
-            )}
+            <p className="text-sm font-bold text-blue-700">
+              Totale:{" "}
+              {formatPrice(
+                selectedZones.reduce(
+                  (sum, z) => sum + (z.priceMonthly || 0),
+                  0
+                )
+              )}
+              /mese
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {selectedZones.map((z) => (
