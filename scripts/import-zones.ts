@@ -199,22 +199,104 @@ function generateFallbackData(): ComuneData[] {
     ["Montemagno", "AT", 1086], ["Cocconato", "AT", 1567],
     ["Montiglio Monferrato", "AT", 1592], ["Incisa Scapaccino", "AT", 2275],
     ["Calamandrana", "AT", 1691],
-    // Milano hinterland
+
+    // Torino hinterland — URBANA
+    ["Moncalieri", "TO", 55844], ["Rivoli", "TO", 47500],
+    ["Collegno", "TO", 48340], ["Nichelino", "TO", 46890],
+    ["Settimo Torinese", "TO", 47300], ["Grugliasco", "TO", 37800],
+    ["Chieri", "TO", 36100], ["Chivasso", "TO", 26700],
+    ["Venaria Reale", "TO", 33500], ["Orbassano", "TO", 23200],
+    ["Alpignano", "TO", 17200], ["Druento", "TO", 8800],
+    // Torino hinterland — BASE (5k-20k)
+    ["Pinerolo", "TO", 36200], ["Ivrea", "TO", 23600],
+    ["Carmagnola", "TO", 29100], ["Cirié", "TO", 18800],
+    ["Avigliana", "TO", 12600], ["Giaveno", "TO", 16500],
+    ["Susa", "TO", 6300], ["Bussoleno", "TO", 6100],
+    ["Rivarolo Canavese", "TO", 12400], ["Cuorgnè", "TO", 9900],
+    ["Castellamonte", "TO", 9600], ["Lanzo Torinese", "TO", 5200],
+    ["San Mauro Torinese", "TO", 19400], ["Trofarello", "TO", 11200],
+    ["La Loggia", "TO", 8900], ["Piobesi Torinese", "TO", 3800],
+    ["Candiolo", "TO", 5700], ["Pecetto Torinese", "TO", 4100],
+    ["Pino Torinese", "TO", 8600], ["Brandizzo", "TO", 8800],
+    ["Castagneto Po", "TO", 1800], ["Volpiano", "TO", 15500],
+    ["Leinì", "TO", 16200], ["Caselle Torinese", "TO", 19400],
+    ["Borgaro Torinese", "TO", 13600],
+    // Torino hinterland — micro (<5k)
+    ["Sangano", "TO", 3900], ["Trana", "TO", 3900], ["Coazze", "TO", 3200],
+    ["Valperga", "TO", 3100], ["Pont Canavese", "TO", 3300],
+    ["Agliè", "TO", 2600], ["Banchette", "TO", 3400],
+    ["Pavone Canavese", "TO", 3900], ["Corio", "TO", 3300],
+    ["Carignano", "TO", 9200], ["Villastellone", "TO", 5000],
+
+    // Milano hinterland — URBANA
     ["Sesto San Giovanni", "MI", 81773], ["Cinisello Balsamo", "MI", 73908],
     ["Rho", "MI", 50904], ["Legnano", "MI", 59922],
     ["Cologno Monzese", "MI", 47500], ["Paderno Dugnano", "MI", 46900],
     ["Corsico", "MI", 34590], ["Rozzano", "MI", 42900],
     ["San Donato Milanese", "MI", 32600], ["Segrate", "MI", 36700],
-    // Roma hinterland
+    ["Pioltello", "MI", 37900], ["Bollate", "MI", 36800],
+    ["Abbiategrasso", "MI", 32700], ["Magenta", "MI", 24200],
+    ["Garbagnate Milanese", "MI", 27300], ["Arese", "MI", 19800],
+    ["Opera", "MI", 14200], ["Peschiera Borromeo", "MI", 24100],
+    ["Bresso", "MI", 26800], ["Buccinasco", "MI", 26900],
+    ["Cernusco sul Naviglio", "MI", 34600], ["Melzo", "MI", 18900],
+    ["San Giuliano Milanese", "MI", 39300],
+
+    // Roma hinterland — URBANA
     ["Guidonia Montecelio", "RM", 88673], ["Fiumicino", "RM", 80175],
     ["Tivoli", "RM", 56510], ["Velletri", "RM", 52948],
     ["Anzio", "RM", 54211], ["Pomezia", "RM", 63360],
     ["Ciampino", "RM", 38760], ["Marino", "RM", 43925],
-    // Torino hinterland
-    ["Moncalieri", "TO", 55844], ["Rivoli", "TO", 47500],
-    ["Collegno", "TO", 48340], ["Nichelino", "TO", 46890],
-    ["Settimo Torinese", "TO", 47300], ["Grugliasco", "TO", 37800],
-    ["Chieri", "TO", 36100], ["Chivasso", "TO", 26700],
+    ["Ardea", "RM", 50700], ["Nettuno", "RM", 49200],
+    ["Monterotondo", "RM", 41200], ["Ladispoli", "RM", 42500],
+    ["Cerveteri", "RM", 37900], ["Palestrina", "RM", 22100],
+    ["Civitavecchia", "RM", 52600], ["Frascati", "RM", 22300],
+    ["Grottaferrata", "RM", 21500], ["Albano Laziale", "RM", 41600],
+    ["Colleferro", "RM", 22100], ["Bracciano", "RM", 19700],
+    ["Zagarolo", "RM", 18300], ["Subiaco", "RM", 9100],
+
+    // Napoli hinterland
+    ["Giugliano in Campania", "NA", 123000], ["Torre del Greco", "NA", 84000],
+    ["Pozzuoli", "NA", 78000], ["Casoria", "NA", 77000],
+    ["Afragola", "NA", 65000], ["Marano di Napoli", "NA", 60000],
+    ["Portici", "NA", 55000], ["Ercolano", "NA", 52000],
+    ["Casalnuovo di Napoli", "NA", 51000], ["Torre Annunziata", "NA", 42000],
+    ["Nola", "NA", 34000], ["Acerra", "NA", 60000],
+    ["Castellammare di Stabia", "NA", 66000], ["Somma Vesuviana", "NA", 35000],
+
+    // Palermo hinterland
+    ["Bagheria", "PA", 55000], ["Carini", "PA", 39000],
+    ["Partinico", "PA", 32000], ["Monreale", "PA", 39000],
+    ["Termini Imerese", "PA", 25000], ["Villabate", "PA", 20000],
+    ["Misilmeri", "PA", 29000], ["Ficarazzi", "PA", 12500],
+
+    // Genova hinterland
+    ["Rapallo", "GE", 29700], ["Chiavari", "GE", 27500],
+    ["Lavagna", "GE", 12600], ["Sestri Levante", "GE", 18300],
+    ["Arenzano", "GE", 11600], ["Recco", "GE", 9900],
+    ["Camogli", "GE", 5400], ["Santa Margherita Ligure", "GE", 9200],
+    ["Busalla", "GE", 5700], ["Ronco Scrivia", "GE", 4500],
+
+    // Bologna hinterland
+    ["Imola", "BO", 70000], ["Casalecchio di Reno", "BO", 36500],
+    ["San Lazzaro di Savena", "BO", 32800], ["Castel Maggiore", "BO", 18400],
+    ["Budrio", "BO", 18300], ["Pianoro", "BO", 17600],
+    ["Zola Predosa", "BO", 19100], ["San Giovanni in Persiceto", "BO", 28200],
+    ["Castel San Pietro Terme", "BO", 21000],
+
+    // Firenze hinterland
+    ["Scandicci", "FI", 50800], ["Sesto Fiorentino", "FI", 49000],
+    ["Campi Bisenzio", "FI", 47200], ["Bagno a Ripoli", "FI", 25800],
+    ["Lastra a Signa", "FI", 20700], ["Calenzano", "FI", 18300],
+    ["Pontassieve", "FI", 20800], ["Empoli", "FI", 49000],
+    ["Fucecchio", "FI", 23600], ["Castelfiorentino", "FI", 17600],
+
+    // Bari hinterland
+    ["Altamura", "BA", 70000], ["Monopoli", "BA", 48000],
+    ["Bitonto", "BA", 55000], ["Corato", "BA", 48000],
+    ["Molfetta", "BA", 58000], ["Modugno", "BA", 38000],
+    ["Conversano", "BA", 26000], ["Triggiano", "BA", 27000],
+    ["Ruvo di Puglia", "BA", 25500], ["Gioia del Colle", "BA", 27000],
   ];
 
   for (const [name, province, population] of smallCities) {
@@ -352,6 +434,130 @@ function clusterByProximity(
 }
 
 /* ------------------------------------------------------------------ */
+/*  Quartieri delle grandi città (stile Immobiliare.it)                */
+/* ------------------------------------------------------------------ */
+
+interface CityNeighborhood {
+  name: string;
+  lat: number;
+  lng: number;
+  population: number;
+  municipalities: string[];
+  avgPricePerSqm: number;
+  ntnEstimate: number;
+}
+
+/**
+ * Per le città > 200k abitanti, definizione dei quartieri/sub-zone.
+ * Ispirato alla suddivisione di Immobiliare.it.
+ * Ogni quartiere diventa una zona PREMIUM indipendente.
+ */
+const CITY_NEIGHBORHOODS: Record<string, CityNeighborhood[]> = {
+  "Roma": [
+    { name: "Roma Centro Storico", lat: 41.8986, lng: 12.4769, population: 120000, municipalities: ["Centro Storico", "Trevi", "Monti", "Trastevere", "Navona"], avgPricePerSqm: 5500, ntnEstimate: 2800 },
+    { name: "Roma Prati - Trionfale", lat: 41.9097, lng: 12.4559, population: 155000, municipalities: ["Prati", "Trionfale", "Della Vittoria", "Borgo"], avgPricePerSqm: 4200, ntnEstimate: 2200 },
+    { name: "Roma Parioli - Salario", lat: 41.9206, lng: 12.4928, population: 130000, municipalities: ["Parioli", "Salario", "Trieste", "Villa Ada"], avgPricePerSqm: 4800, ntnEstimate: 1900 },
+    { name: "Roma Nomentano - Tiburtino", lat: 41.9104, lng: 12.5233, population: 185000, municipalities: ["Nomentano", "Tiburtino", "San Lorenzo", "Pietralata"], avgPricePerSqm: 3200, ntnEstimate: 2400 },
+    { name: "Roma Tuscolano - Appio", lat: 41.8770, lng: 12.5183, population: 210000, municipalities: ["Tuscolano", "Appio Latino", "Don Bosco", "Cinecittà"], avgPricePerSqm: 3000, ntnEstimate: 2800 },
+    { name: "Roma EUR - Torrino", lat: 41.8314, lng: 12.4698, population: 180000, municipalities: ["EUR", "Torrino", "Laurentino", "Fonte Ostiense"], avgPricePerSqm: 3500, ntnEstimate: 2100 },
+    { name: "Roma Ostia - Litorale", lat: 41.7350, lng: 12.2874, population: 100000, municipalities: ["Ostia", "Acilia", "Infernetto", "Casal Palocco"], avgPricePerSqm: 2400, ntnEstimate: 1200 },
+    { name: "Roma Monte Mario - Balduina", lat: 41.9261, lng: 12.4297, population: 165000, municipalities: ["Monte Mario", "Balduina", "Primavalle", "Ottavia"], avgPricePerSqm: 3100, ntnEstimate: 2000 },
+    { name: "Roma San Giovanni - Prenestino", lat: 41.8866, lng: 12.5172, population: 195000, municipalities: ["San Giovanni", "Prenestino", "Centocelle", "Torpignattara"], avgPricePerSqm: 2800, ntnEstimate: 2600 },
+    { name: "Roma Monteverde - Portuense", lat: 41.8750, lng: 12.4500, population: 175000, municipalities: ["Monteverde", "Portuense", "Gianicolense", "Marconi"], avgPricePerSqm: 3400, ntnEstimate: 2100 },
+    { name: "Roma Aurelio - Boccea", lat: 41.9010, lng: 12.4080, population: 170000, municipalities: ["Aurelio", "Boccea", "Casalotti", "Val Cannuta"], avgPricePerSqm: 2600, ntnEstimate: 1800 },
+    { name: "Roma Casilino - Torre Angela", lat: 41.8650, lng: 12.5700, population: 220000, municipalities: ["Casilino", "Torre Angela", "Torre Maura", "Tor Bella Monaca"], avgPricePerSqm: 2100, ntnEstimate: 2500 },
+  ],
+  "Milano": [
+    { name: "Milano Centro - Duomo", lat: 45.4642, lng: 9.1900, population: 95000, municipalities: ["Centro", "Duomo", "Brera", "Vittorio Emanuele"], avgPricePerSqm: 7500, ntnEstimate: 2800 },
+    { name: "Milano Navigli - Porta Genova", lat: 45.4530, lng: 9.1740, population: 85000, municipalities: ["Navigli", "Porta Genova", "Porta Ticinese", "Barona"], avgPricePerSqm: 5200, ntnEstimate: 1800 },
+    { name: "Milano Porta Romana - Lodi", lat: 45.4495, lng: 9.2040, population: 120000, municipalities: ["Porta Romana", "Lodi", "Corvetto", "Rogoredo"], avgPricePerSqm: 4200, ntnEstimate: 2100 },
+    { name: "Milano Città Studi - Lambrate", lat: 45.4750, lng: 9.2280, population: 135000, municipalities: ["Città Studi", "Lambrate", "Ortica", "Casoretto"], avgPricePerSqm: 4000, ntnEstimate: 2200 },
+    { name: "Milano Loreto - Turro", lat: 45.4850, lng: 9.2200, population: 115000, municipalities: ["Loreto", "Turro", "Gorla", "Precotto"], avgPricePerSqm: 3800, ntnEstimate: 1900 },
+    { name: "Milano Sempione - Fiera", lat: 45.4780, lng: 9.1550, population: 110000, municipalities: ["Sempione", "Fiera", "City Life", "De Angeli"], avgPricePerSqm: 5000, ntnEstimate: 2000 },
+    { name: "Milano Isola - Garibaldi", lat: 45.4850, lng: 9.1840, population: 80000, municipalities: ["Isola", "Garibaldi", "Porta Nuova", "Repubblica"], avgPricePerSqm: 6000, ntnEstimate: 1600 },
+    { name: "Milano San Siro - Baggio", lat: 45.4630, lng: 9.1200, population: 140000, municipalities: ["San Siro", "Baggio", "Quarto Cagnino", "Quinto Romano"], avgPricePerSqm: 3200, ntnEstimate: 2000 },
+    { name: "Milano Bicocca - Niguarda", lat: 45.5100, lng: 9.2050, population: 155000, municipalities: ["Bicocca", "Niguarda", "Affori", "Bovisa"], avgPricePerSqm: 3500, ntnEstimate: 2200 },
+    { name: "Milano Certosa - Gallaratese", lat: 45.4980, lng: 9.1300, population: 130000, municipalities: ["Certosa", "Gallaratese", "QT8", "Villapizzone"], avgPricePerSqm: 3400, ntnEstimate: 1800 },
+  ],
+  "Napoli": [
+    { name: "Napoli Centro - Porto", lat: 40.8470, lng: 14.2560, population: 125000, municipalities: ["Centro Storico", "Porto", "Mercato", "Pendino"], avgPricePerSqm: 3200, ntnEstimate: 1800 },
+    { name: "Napoli Chiaia - Posillipo", lat: 40.8350, lng: 14.2280, population: 105000, municipalities: ["Chiaia", "Posillipo", "Mergellina", "San Ferdinando"], avgPricePerSqm: 4500, ntnEstimate: 1500 },
+    { name: "Napoli Vomero - Arenella", lat: 40.8530, lng: 14.2350, population: 135000, municipalities: ["Vomero", "Arenella", "Rione Alto"], avgPricePerSqm: 3800, ntnEstimate: 1700 },
+    { name: "Napoli Fuorigrotta - Bagnoli", lat: 40.8230, lng: 14.1890, population: 120000, municipalities: ["Fuorigrotta", "Bagnoli", "Agnano", "Cavalleggeri"], avgPricePerSqm: 2800, ntnEstimate: 1400 },
+    { name: "Napoli Est - Ponticelli", lat: 40.8580, lng: 14.3100, population: 155000, municipalities: ["Ponticelli", "San Giovanni", "Barra", "Poggioreale"], avgPricePerSqm: 2000, ntnEstimate: 1600 },
+    { name: "Napoli Nord - Secondigliano", lat: 40.8940, lng: 14.2520, population: 145000, municipalities: ["Secondigliano", "Scampia", "Miano", "Piscinola"], avgPricePerSqm: 1800, ntnEstimate: 1400 },
+    { name: "Napoli Capodimonte - Stella", lat: 40.8700, lng: 14.2530, population: 125000, municipalities: ["Capodimonte", "Stella", "San Carlo Arena", "Avvocata"], avgPricePerSqm: 2200, ntnEstimate: 1300 },
+  ],
+  "Torino": [
+    { name: "Torino Centro", lat: 45.070, lng: 7.687, population: 180000, municipalities: ["Centro", "Crocetta", "San Salvario", "Vanchiglia"], avgPricePerSqm: 3500, ntnEstimate: 2500 },
+    { name: "Torino Collina", lat: 45.050, lng: 7.720, population: 85000, municipalities: ["Precollina", "Borgo Po", "Madonna del Pilone", "Cavoretto"], avgPricePerSqm: 4200, ntnEstimate: 1000 },
+    { name: "Torino Nord", lat: 45.105, lng: 7.665, population: 125000, municipalities: ["Barriera di Milano", "Aurora", "Rebaudengo", "Falchera"], avgPricePerSqm: 1800, ntnEstimate: 1800 },
+    { name: "Torino Sud", lat: 45.030, lng: 7.670, population: 140000, municipalities: ["Lingotto", "Mirafiori", "Nizza Millefonti", "Santa Rita"], avgPricePerSqm: 2200, ntnEstimate: 2000 },
+    { name: "Torino Ovest", lat: 45.075, lng: 7.625, population: 115000, municipalities: ["San Paolo", "Cenisia", "Pozzo Strada", "Parella"], avgPricePerSqm: 2000, ntnEstimate: 1700 },
+  ],
+  "Palermo": [
+    { name: "Palermo Centro", lat: 38.1157, lng: 13.3615, population: 130000, municipalities: ["Centro Storico", "Kalsa", "Capo", "Albergheria"], avgPricePerSqm: 1800, ntnEstimate: 1500 },
+    { name: "Palermo Libertà - Politeama", lat: 38.1220, lng: 13.3510, population: 120000, municipalities: ["Libertà", "Politeama", "Malaspina", "Noce"], avgPricePerSqm: 2200, ntnEstimate: 1400 },
+    { name: "Palermo Nord - Mondello", lat: 38.1800, lng: 13.3300, population: 100000, municipalities: ["Mondello", "Partanna", "Pallavicino", "Tommaso Natale"], avgPricePerSqm: 2000, ntnEstimate: 1100 },
+    { name: "Palermo Resuttana - Zisa", lat: 38.1350, lng: 13.3350, population: 140000, municipalities: ["Resuttana", "Zisa", "Altarello", "Uditore"], avgPricePerSqm: 1500, ntnEstimate: 1300 },
+    { name: "Palermo Brancaccio - Ciaculli", lat: 38.0900, lng: 13.3800, population: 140000, municipalities: ["Brancaccio", "Ciaculli", "Settecannoli", "Corso dei Mille"], avgPricePerSqm: 1200, ntnEstimate: 1200 },
+  ],
+  "Genova": [
+    { name: "Genova Centro", lat: 44.4068, lng: 8.9340, population: 110000, municipalities: ["Centro Storico", "Castelletto", "Porto Antico", "Carignano"], avgPricePerSqm: 2800, ntnEstimate: 1500 },
+    { name: "Genova Levante", lat: 44.3950, lng: 8.9700, population: 120000, municipalities: ["Albaro", "Sturla", "Quarto", "Nervi"], avgPricePerSqm: 3200, ntnEstimate: 1400 },
+    { name: "Genova Ponente", lat: 44.4200, lng: 8.8700, population: 130000, municipalities: ["Sampierdarena", "Cornigliano", "Sestri Ponente", "Pegli"], avgPricePerSqm: 1800, ntnEstimate: 1300 },
+    { name: "Genova Valpolcevera", lat: 44.4400, lng: 8.9100, population: 100000, municipalities: ["Rivarolo", "Bolzaneto", "Pontedecimo", "Begato"], avgPricePerSqm: 1500, ntnEstimate: 1000 },
+    { name: "Genova Valbisagno", lat: 44.4250, lng: 8.9500, population: 100000, municipalities: ["Marassi", "Staglieno", "Molassana", "Struppa"], avgPricePerSqm: 1600, ntnEstimate: 1100 },
+  ],
+  "Bologna": [
+    { name: "Bologna Centro", lat: 44.4949, lng: 11.3426, population: 95000, municipalities: ["Centro Storico", "Galvani", "Irnerio", "Malpighi"], avgPricePerSqm: 4000, ntnEstimate: 1800 },
+    { name: "Bologna Collina - San Luca", lat: 44.4750, lng: 11.3200, population: 80000, municipalities: ["Colli", "San Luca", "Saragozza", "San Mamolo"], avgPricePerSqm: 3800, ntnEstimate: 1200 },
+    { name: "Bologna Nord - Fiera", lat: 44.5150, lng: 11.3400, population: 110000, municipalities: ["Fiera", "Bolognina", "Corticella", "Navile"], avgPricePerSqm: 2800, ntnEstimate: 1600 },
+    { name: "Bologna San Donato - Pilastro", lat: 44.5050, lng: 11.3800, population: 110000, municipalities: ["San Donato", "Pilastro", "San Vitale", "Massarenti"], avgPricePerSqm: 2600, ntnEstimate: 1500 },
+  ],
+  "Firenze": [
+    { name: "Firenze Centro", lat: 43.7696, lng: 11.2558, population: 85000, municipalities: ["Centro Storico", "Santa Croce", "San Frediano", "Oltrarno"], avgPricePerSqm: 5000, ntnEstimate: 1600 },
+    { name: "Firenze Campo di Marte", lat: 43.7780, lng: 11.2750, population: 95000, municipalities: ["Campo di Marte", "Coverciano", "Settignano", "Rovezzano"], avgPricePerSqm: 3800, ntnEstimate: 1300 },
+    { name: "Firenze Rifredi - Novoli", lat: 43.7900, lng: 11.2350, population: 100000, municipalities: ["Rifredi", "Novoli", "Careggi", "Le Piagge"], avgPricePerSqm: 3000, ntnEstimate: 1400 },
+    { name: "Firenze Gavinana - Galluzzo", lat: 43.7450, lng: 11.2500, population: 87000, municipalities: ["Gavinana", "Galluzzo", "Soffiano", "Porta Romana"], avgPricePerSqm: 3200, ntnEstimate: 1200 },
+  ],
+  "Bari": [
+    { name: "Bari Centro - Murat", lat: 41.1260, lng: 16.8700, population: 80000, municipalities: ["Murat", "Bari Vecchia", "Libertà", "Madonnella"], avgPricePerSqm: 2500, ntnEstimate: 1200 },
+    { name: "Bari Poggiofranco - Picone", lat: 41.1100, lng: 16.8600, population: 85000, municipalities: ["Poggiofranco", "Picone", "Carrassi", "Mungivacca"], avgPricePerSqm: 2200, ntnEstimate: 1100 },
+    { name: "Bari Japigia - San Paolo", lat: 41.0950, lng: 16.8700, population: 80000, municipalities: ["Japigia", "San Paolo", "Stanic", "Torre a Mare"], avgPricePerSqm: 1600, ntnEstimate: 900 },
+    { name: "Bari Santo Spirito - Palese", lat: 41.1450, lng: 16.8200, population: 70000, municipalities: ["Santo Spirito", "Palese", "San Pio", "Catino"], avgPricePerSqm: 1800, ntnEstimate: 800 },
+  ],
+  "Catania": [
+    { name: "Catania Centro", lat: 37.5079, lng: 15.0830, population: 100000, municipalities: ["Centro", "Porta Uzeda", "Civita", "San Cristoforo"], avgPricePerSqm: 1800, ntnEstimate: 1000 },
+    { name: "Catania Nord - Ognina", lat: 37.5300, lng: 15.0950, population: 100000, municipalities: ["Ognina", "Picanello", "Barriera", "Canalicchio"], avgPricePerSqm: 2200, ntnEstimate: 1000 },
+    { name: "Catania Ovest - Nesima", lat: 37.5100, lng: 15.0500, population: 100000, municipalities: ["Nesima", "Monte Po", "San Giovanni Galermo", "San Nullo"], avgPricePerSqm: 1200, ntnEstimate: 900 },
+  ],
+  "Verona": [
+    { name: "Verona Centro", lat: 45.4384, lng: 10.9916, population: 65000, municipalities: ["Centro Storico", "Cittadella", "San Zeno", "Veronetta"], avgPricePerSqm: 3200, ntnEstimate: 1200 },
+    { name: "Verona Nord - Borgo Trento", lat: 45.4550, lng: 10.9800, population: 65000, municipalities: ["Borgo Trento", "Valdonega", "Avesa", "Quinzano"], avgPricePerSqm: 2800, ntnEstimate: 1000 },
+    { name: "Verona Sud - Borgo Roma", lat: 45.4180, lng: 10.9850, population: 65000, municipalities: ["Borgo Roma", "Golosine", "Santa Lucia", "Cadidavid"], avgPricePerSqm: 1800, ntnEstimate: 1100 },
+    { name: "Verona Est - Borgo Venezia", lat: 45.4400, lng: 11.0200, population: 63000, municipalities: ["Borgo Venezia", "Porto San Pancrazio", "San Michele", "Montorio"], avgPricePerSqm: 2000, ntnEstimate: 900 },
+  ],
+  "Venezia": [
+    { name: "Venezia Centro Storico", lat: 45.4375, lng: 12.3358, population: 52000, municipalities: ["San Marco", "Dorsoduro", "Cannaregio", "Castello"], avgPricePerSqm: 5000, ntnEstimate: 800 },
+    { name: "Venezia Lido - Pellestrina", lat: 45.3800, lng: 12.3600, population: 22000, municipalities: ["Lido", "Pellestrina", "Malamocco", "Alberoni"], avgPricePerSqm: 3200, ntnEstimate: 400 },
+    { name: "Venezia Mestre", lat: 45.4900, lng: 12.2400, population: 90000, municipalities: ["Mestre Centro", "Carpenedo", "Bissuola", "Chirignago"], avgPricePerSqm: 2200, ntnEstimate: 1400 },
+    { name: "Venezia Marghera - Favaro", lat: 45.4700, lng: 12.2100, population: 50000, municipalities: ["Marghera", "Favaro Veneto", "Catene", "Malcontenta"], avgPricePerSqm: 1600, ntnEstimate: 800 },
+    { name: "Venezia Murano - Burano", lat: 45.4580, lng: 12.3520, population: 40000, municipalities: ["Murano", "Burano", "Torcello", "Sant'Erasmo"], avgPricePerSqm: 3000, ntnEstimate: 400 },
+  ],
+  "Messina": [
+    { name: "Messina Centro", lat: 38.1937, lng: 15.5542, population: 75000, municipalities: ["Centro", "Duomo", "Provinciale", "Giostra"], avgPricePerSqm: 1200, ntnEstimate: 800 },
+    { name: "Messina Nord - Villafranca", lat: 38.2300, lng: 15.5200, population: 75000, municipalities: ["Villafranca Tirrena", "Rometta", "Tremestieri", "Gravitelli"], avgPricePerSqm: 1000, ntnEstimate: 700 },
+    { name: "Messina Sud - Gazzi", lat: 38.1600, lng: 15.5400, population: 72000, municipalities: ["Gazzi", "Contesse", "Pistunina", "Giampilieri"], avgPricePerSqm: 900, ntnEstimate: 600 },
+  ],
+  "Padova": [
+    { name: "Padova Centro", lat: 45.4064, lng: 11.8768, population: 70000, municipalities: ["Centro Storico", "Portello", "Santo", "Prato della Valle"], avgPricePerSqm: 3000, ntnEstimate: 1200 },
+    { name: "Padova Nord - Arcella", lat: 45.4250, lng: 11.8750, population: 70000, municipalities: ["Arcella", "San Bellino", "Pontevigodarzere", "Torre"], avgPricePerSqm: 2000, ntnEstimate: 1000 },
+    { name: "Padova Est - Forcellini", lat: 45.4000, lng: 11.9100, population: 67000, municipalities: ["Forcellini", "Terranegra", "Voltabarozzo", "Salboro"], avgPricePerSqm: 1800, ntnEstimate: 900 },
+  ],
+};
+
+/* ------------------------------------------------------------------ */
 /*  Genera slug univoco                                                */
 /* ------------------------------------------------------------------ */
 
@@ -388,29 +594,59 @@ async function createZones(comuni: ComuneData[]) {
     const comuniPiccoli5k = provinceComuni.filter((c) => c.population >= 5000 && c.population < 20000);  // BASE singolo
     const comuniMicro = provinceComuni.filter((c) => c.population < 5000);  // BASE cluster
 
-    // Grandi città (>100k): PREMIUM
+    // Grandi città (>100k): PREMIUM — con split in quartieri se disponibile
     for (const c of comuniGrandi) {
-      const slug = slugify(`${c.name}-${province}`);
-      const score = calculateMarketScore(c.population, c.population * 0.015);
-      const pricing = calculateZonePrice("PREMIUM", c.population, c.population * 0.015);
-      const coords = await geocode(`${c.name}, ${province}, Italia`);
+      const neighborhoods = CITY_NEIGHBORHOODS[c.name];
 
-      await upsertZone({
-        name: c.name,
-        slug,
-        zoneClass: "PREMIUM",
-        region,
-        province,
-        city: c.name,
-        municipalities: [c.name],
-        population: c.population,
-        marketScore: score,
-        lat: coords?.lat ?? null,
-        lng: coords?.lng ?? null,
-        monthlyPrice: pricing.monthlyPrice,
-        maxAgencies: pricing.maxAgencies,
-      });
-      created++;
+      if (neighborhoods && neighborhoods.length > 0) {
+        // Split città in quartieri
+        console.log(`  ↳ ${c.name}: split in ${neighborhoods.length} quartieri`);
+        for (const hood of neighborhoods) {
+          const slug = slugify(`${hood.name}-${province}`);
+          const score = calculateMarketScore(hood.population, hood.ntnEstimate);
+          const pricing = calculateZonePrice("PREMIUM", hood.population, hood.ntnEstimate, hood.avgPricePerSqm);
+          await upsertZone({
+            name: hood.name,
+            slug,
+            zoneClass: "PREMIUM",
+            region,
+            province,
+            city: c.name,
+            municipalities: hood.municipalities,
+            population: hood.population,
+            marketScore: score,
+            lat: hood.lat,
+            lng: hood.lng,
+            monthlyPrice: pricing.monthlyPrice,
+            maxAgencies: pricing.maxAgencies,
+            avgPricePerSqm: hood.avgPricePerSqm,
+            ntn: hood.ntnEstimate,
+          });
+          created++;
+        }
+      } else {
+        // Città senza quartieri definiti: zona singola
+        const slug = slugify(`${c.name}-${province}`);
+        const score = calculateMarketScore(c.population, c.population * 0.015);
+        const pricing = calculateZonePrice("PREMIUM", c.population, c.population * 0.015);
+        const coords = await geocode(`${c.name}, ${province}, Italia`);
+        await upsertZone({
+          name: c.name,
+          slug,
+          zoneClass: "PREMIUM",
+          region,
+          province,
+          city: c.name,
+          municipalities: [c.name],
+          population: c.population,
+          marketScore: score,
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
+          monthlyPrice: pricing.monthlyPrice,
+          maxAgencies: pricing.maxAgencies,
+        });
+        created++;
+      }
     }
 
     // Comuni medi (20k-100k): URBANA
@@ -554,6 +790,8 @@ interface ZoneInput {
   lng: number | null;
   monthlyPrice: number;
   maxAgencies: number;
+  avgPricePerSqm?: number;
+  ntn?: number;
 }
 
 async function upsertZone(input: ZoneInput) {
@@ -568,6 +806,8 @@ async function upsertZone(input: ZoneInput) {
         lng: input.lng,
         monthlyPrice: input.monthlyPrice,
         maxAgencies: input.maxAgencies,
+        avgPricePerSqm: input.avgPricePerSqm ?? null,
+        ntn: input.ntn ?? 0,
       },
       create: {
         name: input.name,
@@ -579,12 +819,13 @@ async function upsertZone(input: ZoneInput) {
         municipalities: input.municipalities,
         capCodes: [],
         population: input.population,
-        ntn: 0,
+        ntn: input.ntn ?? 0,
         marketScore: input.marketScore,
         lat: input.lat,
         lng: input.lng,
         monthlyPrice: input.monthlyPrice,
         maxAgencies: input.maxAgencies,
+        avgPricePerSqm: input.avgPricePerSqm ?? null,
       },
     });
   } catch (err) {
