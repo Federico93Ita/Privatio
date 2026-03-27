@@ -447,6 +447,7 @@ model Zone {
 
   lat            Float?
   lng            Float?
+  boundary       Json?
 
   isActive       Boolean    @default(true)
   createdAt      DateTime   @default(now())

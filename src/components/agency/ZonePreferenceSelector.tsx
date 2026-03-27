@@ -27,6 +27,7 @@ interface ZoneData {
   city: string | null;
   lat: number | null;
   lng: number | null;
+  boundary?: { type: string; coordinates: number[][][] | number[][][][] } | null;
   municipalities: string[];
   marketScore: number;
   population: number;
@@ -54,109 +55,28 @@ interface ZonePreferenceSelectorProps {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Voronoi tessellation (no deps — Fortune's algorithm lite)          */
+/*  GeoJSON → Google Maps paths conversion                             */
 /* ------------------------------------------------------------------ */
 
-/** Compute Voronoi cells from points within a bounding box.
- *  Returns array of polygons (each polygon = array of {lat,lng}).
- *  Uses a simple pixel-less approach: for each zone centroid,
- *  compute the Voronoi cell by intersecting half-planes. */
-function computeVoronoiCells(
-  points: { lat: number; lng: number }[],
-  bounds: { minLat: number; maxLat: number; minLng: number; maxLng: number }
+/** Convert GeoJSON boundary to Google Maps Polygon paths.
+ *  GeoJSON uses [lng, lat]; Google Maps uses {lat, lng}. */
+function boundaryToPaths(
+  boundary: { type: string; coordinates: number[][][] | number[][][][] }
 ): { lat: number; lng: number }[][] {
-  if (points.length === 0) return [];
-  if (points.length === 1) {
-    // Single zone covers entire bounds
-    return [
-      [
-        { lat: bounds.minLat, lng: bounds.minLng },
-        { lat: bounds.minLat, lng: bounds.maxLng },
-        { lat: bounds.maxLat, lng: bounds.maxLng },
-        { lat: bounds.maxLat, lng: bounds.minLng },
-      ],
-    ];
-  }
-
-  const cells: { lat: number; lng: number }[][] = [];
-
-  for (let i = 0; i < points.length; i++) {
-    // Start with bounding box as initial polygon
-    let polygon: [number, number][] = [
-      [bounds.minLng, bounds.minLat],
-      [bounds.maxLng, bounds.minLat],
-      [bounds.maxLng, bounds.maxLat],
-      [bounds.minLng, bounds.maxLat],
-    ];
-
-    const pi = points[i];
-
-    for (let j = 0; j < points.length; j++) {
-      if (i === j) continue;
-      const pj = points[j];
-
-      // Compute perpendicular bisector between pi and pj
-      const midLng = (pi.lng + pj.lng) / 2;
-      const midLat = (pi.lat + pj.lat) / 2;
-
-      // Normal vector pointing from pj to pi (we keep the side of pi)
-      const nx = pi.lng - pj.lng;
-      const ny = pi.lat - pj.lat;
-
-      // Clip polygon to the half-plane containing pi
-      polygon = clipPolygonByHalfPlane(polygon, midLng, midLat, nx, ny);
-      if (polygon.length < 3) break;
-    }
-
-    cells.push(
-      polygon.map(([lng, lat]) => ({ lat, lng }))
+  if (boundary.type === "Polygon") {
+    const coords = boundary.coordinates as number[][][];
+    return coords.map((ring) =>
+      ring.map(([lng, lat]) => ({ lat, lng }))
     );
   }
-
-  return cells;
-}
-
-/** Sutherland-Hodgman clip: keep side where dot(p - mid, normal) >= 0 */
-function clipPolygonByHalfPlane(
-  polygon: [number, number][],
-  midX: number,
-  midY: number,
-  nx: number,
-  ny: number
-): [number, number][] {
-  if (polygon.length < 3) return [];
-
-  const result: [number, number][] = [];
-  const n = polygon.length;
-
-  for (let i = 0; i < n; i++) {
-    const curr = polygon[i];
-    const next = polygon[(i + 1) % n];
-
-    const dCurr = (curr[0] - midX) * nx + (curr[1] - midY) * ny;
-    const dNext = (next[0] - midX) * nx + (next[1] - midY) * ny;
-
-    if (dCurr >= 0) {
-      result.push(curr);
-      if (dNext < 0) {
-        // Exiting: compute intersection
-        const t = dCurr / (dCurr - dNext);
-        result.push([
-          curr[0] + t * (next[0] - curr[0]),
-          curr[1] + t * (next[1] - curr[1]),
-        ]);
-      }
-    } else if (dNext >= 0) {
-      // Entering: compute intersection
-      const t = dCurr / (dCurr - dNext);
-      result.push([
-        curr[0] + t * (next[0] - curr[0]),
-        curr[1] + t * (next[1] - curr[1]),
-      ]);
-    }
+  if (boundary.type === "MultiPolygon") {
+    const coords = boundary.coordinates as number[][][][];
+    // Return outer ring of each polygon
+    return coords.map((poly) =>
+      poly[0].map(([lng, lat]) => ({ lat, lng }))
+    );
   }
-
-  return result;
+  return [];
 }
 
 /* ------------------------------------------------------------------ */
@@ -330,29 +250,15 @@ export default function ZonePreferenceSelector({
   );
 
   const normalised = province ? province.trim().toUpperCase() : "";
-  const zonesWithCoords = useMemo(() => {
-    const withCoords = zones.filter((z) => z.lat != null && z.lng != null);
-    if (withCoords.length < 4) return withCoords;
-
-    // Filter outliers: remove zones whose lat/lng is far from the median
-    // This prevents one bad coordinate from breaking the entire Voronoi
-    const sortedLats = withCoords.map((z) => z.lat!).sort((a, b) => a - b);
-    const sortedLngs = withCoords.map((z) => z.lng!).sort((a, b) => a - b);
-    const medianLat = sortedLats[Math.floor(sortedLats.length / 2)];
-    const medianLng = sortedLngs[Math.floor(sortedLngs.length / 2)];
-    const q1Lat = sortedLats[Math.floor(sortedLats.length * 0.25)];
-    const q3Lat = sortedLats[Math.floor(sortedLats.length * 0.75)];
-    const q1Lng = sortedLngs[Math.floor(sortedLngs.length * 0.25)];
-    const q3Lng = sortedLngs[Math.floor(sortedLngs.length * 0.75)];
-    const iqrLat = Math.max(q3Lat - q1Lat, 0.3);
-    const iqrLng = Math.max(q3Lng - q1Lng, 0.3);
-
-    return withCoords.filter(
-      (z) =>
-        Math.abs(z.lat! - medianLat) <= iqrLat * 3 &&
-        Math.abs(z.lng! - medianLng) <= iqrLng * 3
-    );
-  }, [zones]);
+  const zonesWithBoundary = useMemo(
+    () => zones.filter((z) => z.boundary != null),
+    [zones]
+  );
+  // Fallback for zones without boundary (use lat/lng for map centering)
+  const zonesWithCoords = useMemo(
+    () => zones.filter((z) => z.lat != null && z.lng != null),
+    [zones]
+  );
   const maxReached = selectedZones.length >= 3;
 
   // Filtered zones for search
@@ -391,78 +297,66 @@ export default function ZonePreferenceSelector({
     [groupedZones]
   );
 
-  // Compute Voronoi polygons
-  const voronoiCells = useMemo(() => {
-    if (zonesWithCoords.length === 0) return new Map<string, { lat: number; lng: number }[]>();
-
-    const lats = zonesWithCoords.map((z) => z.lat!);
-    const lngs = zonesWithCoords.map((z) => z.lng!);
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs);
-    const maxLng = Math.max(...lngs);
-
-    // Expand bounds by ~20% to cover edges fully
-    const latPad = Math.max((maxLat - minLat) * 0.25, 0.08);
-    const lngPad = Math.max((maxLng - minLng) * 0.25, 0.08);
-
-    const bounds = {
-      minLat: minLat - latPad,
-      maxLat: maxLat + latPad,
-      minLng: minLng - lngPad,
-      maxLng: maxLng + lngPad,
-    };
-
-    const points = zonesWithCoords.map((z) => ({
-      lat: z.lat!,
-      lng: z.lng!,
-    }));
-
-    const cells = computeVoronoiCells(points, bounds);
-
-    const cellMap = new Map<string, { lat: number; lng: number }[]>();
-    zonesWithCoords.forEach((z, i) => {
-      if (cells[i] && cells[i].length >= 3) {
-        cellMap.set(z.id, cells[i]);
+  // Compute bounds from boundary polygons for accurate map fitting
+  const mapBounds = useMemo(() => {
+    const b = { minLat: Infinity, maxLat: -Infinity, minLng: Infinity, maxLng: -Infinity };
+    let hasPoints = false;
+    for (const z of zonesWithBoundary) {
+      const paths = boundaryToPaths(z.boundary!);
+      for (const ring of paths) {
+        for (const pt of ring) {
+          if (pt.lat < b.minLat) b.minLat = pt.lat;
+          if (pt.lat > b.maxLat) b.maxLat = pt.lat;
+          if (pt.lng < b.minLng) b.minLng = pt.lng;
+          if (pt.lng > b.maxLng) b.maxLng = pt.lng;
+          hasPoints = true;
+        }
       }
-    });
+    }
+    // Fallback to centroids if no boundaries
+    if (!hasPoints) {
+      for (const z of zonesWithCoords) {
+        if (z.lat! < b.minLat) b.minLat = z.lat!;
+        if (z.lat! > b.maxLat) b.maxLat = z.lat!;
+        if (z.lng! < b.minLng) b.minLng = z.lng!;
+        if (z.lng! > b.maxLng) b.maxLng = z.lng!;
+        hasPoints = true;
+      }
+    }
+    return hasPoints ? b : null;
+  }, [zonesWithBoundary, zonesWithCoords]);
 
-    return cellMap;
-  }, [zonesWithCoords]);
-
-  // Map center & bounds
   const mapCenter = useMemo(() => {
-    if (zonesWithCoords.length === 0) return { lat: 42.5, lng: 12.5 };
-    const avgLat =
-      zonesWithCoords.reduce((s, z) => s + z.lat!, 0) / zonesWithCoords.length;
-    const avgLng =
-      zonesWithCoords.reduce((s, z) => s + z.lng!, 0) / zonesWithCoords.length;
-    return { lat: avgLat, lng: avgLng };
-  }, [zonesWithCoords]);
+    if (!mapBounds) return { lat: 42.5, lng: 12.5 };
+    return {
+      lat: (mapBounds.minLat + mapBounds.maxLat) / 2,
+      lng: (mapBounds.minLng + mapBounds.maxLng) / 2,
+    };
+  }, [mapBounds]);
+
+  const fitMapBounds = useCallback(
+    (map: google.maps.Map) => {
+      if (!mapBounds) return;
+      const bounds = new google.maps.LatLngBounds(
+        { lat: mapBounds.minLat, lng: mapBounds.minLng },
+        { lat: mapBounds.maxLat, lng: mapBounds.maxLng }
+      );
+      map.fitBounds(bounds, 50);
+    },
+    [mapBounds]
+  );
 
   const onMapLoad = useCallback(
     (map: google.maps.Map) => {
       mapRef.current = map;
-      if (zonesWithCoords.length > 1) {
-        const bounds = new google.maps.LatLngBounds();
-        zonesWithCoords.forEach((z) =>
-          bounds.extend({ lat: z.lat!, lng: z.lng! })
-        );
-        map.fitBounds(bounds, 50);
-      }
+      fitMapBounds(map);
     },
-    [zonesWithCoords]
+    [fitMapBounds]
   );
 
   useEffect(() => {
-    if (mapRef.current && zonesWithCoords.length > 1) {
-      const bounds = new google.maps.LatLngBounds();
-      zonesWithCoords.forEach((z) =>
-        bounds.extend({ lat: z.lat!, lng: z.lng! })
-      );
-      mapRef.current.fitBounds(bounds, 50);
-    }
-  }, [zonesWithCoords]);
+    if (mapRef.current) fitMapBounds(mapRef.current);
+  }, [fitMapBounds]);
 
   function toggleZone(zone: ZoneData) {
     const slots = getSlots(zone);
@@ -758,7 +652,7 @@ export default function ZonePreferenceSelector({
 
           {/* ── Map ── */}
           <div className="flex-1 min-h-[320px] lg:min-h-0 relative">
-            {isLoaded && !loadError && zonesWithCoords.length > 0 ? (
+            {isLoaded && !loadError && (zonesWithBoundary.length > 0 || zonesWithCoords.length > 0) ? (
               <GoogleMap
                 mapContainerStyle={{
                   width: "100%",
@@ -779,10 +673,10 @@ export default function ZonePreferenceSelector({
                 }}
                 onClick={() => setInfoZone(null)}
               >
-                {/* Render Voronoi polygons for each zone */}
-                {zonesWithCoords.map((zone) => {
-                  const cell = voronoiCells.get(zone.id);
-                  if (!cell || cell.length < 3) return null;
+                {/* Render real administrative boundary polygons */}
+                {zonesWithBoundary.map((zone) => {
+                  const paths = boundaryToPaths(zone.boundary!);
+                  if (paths.length === 0) return null;
 
                   const selected = isZoneSelected(zone.id);
                   const isHovered = hoveredZone === zone.id;
@@ -792,11 +686,9 @@ export default function ZonePreferenceSelector({
                   return (
                     <Polygon
                       key={zone.id}
-                      paths={cell}
+                      paths={paths}
                       options={{
-                        fillColor: selected
-                          ? config.mapStroke
-                          : config.mapStroke,
+                        fillColor: config.mapStroke,
                         fillOpacity: selected
                           ? 0.45
                           : isHovered

@@ -84,6 +84,7 @@ function formatZone(z: {
   city: string | null;
   lat: number | null;
   lng: number | null;
+  boundary: unknown | null;
   municipalities: string[];
   marketScore: number;
   population: number;
@@ -102,6 +103,7 @@ function formatZone(z: {
     city: z.city,
     lat: z.lat,
     lng: z.lng,
+    boundary: z.boundary,
     municipalities: z.municipalities,
     marketScore: z.marketScore,
     population: z.population,
