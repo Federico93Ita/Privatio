@@ -50,6 +50,8 @@ export interface ZonePreference {
 
 interface ZonePreferenceSelectorProps {
   province: string;
+  /** Città sede agenzia — usata per calcolare le zone geograficamente consentite */
+  city?: string;
   selectedZones: ZonePreference[];
   onSelectionChange: (zones: ZonePreference[]) => void;
 }
@@ -189,6 +191,7 @@ const MAP_STYLES: google.maps.MapTypeStyle[] = [
 
 export default function ZonePreferenceSelector({
   province,
+  city,
   selectedZones,
   onSelectionChange,
 }: ZonePreferenceSelectorProps) {
@@ -209,12 +212,25 @@ export default function ZonePreferenceSelector({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
   });
 
-  // Fetch zone consentite per l'agenzia loggata (401 = non autenticato → nessuna restrizione)
+  // Fetch zone consentite:
+  // 1. Se autenticata (dashboard agenzia) → endpoint autenticato che usa city/province dalla sede
+  // 2. Se non autenticata (form pubblico) → endpoint pubblico con city+province dalla form
   useEffect(() => {
+    // Prima prova l'endpoint autenticato
     fetch("/api/dashboard/agency/territories/allowed")
       .then((res) => {
-        if (!res.ok) return null;
-        return res.json() as Promise<{ allowedZoneIds: string[] }>;
+        if (res.ok) return res.json() as Promise<{ allowedZoneIds: string[] }>;
+        // 401 = non autenticato → prova endpoint pubblico se city è disponibile
+        if (res.status === 401 && city && province) {
+          const params = new URLSearchParams({
+            city: city.trim(),
+            province: province.trim().toUpperCase(),
+          });
+          return fetch(`/api/zones/allowed?${params}`).then((r) =>
+            r.ok ? (r.json() as Promise<{ allowedZoneIds: string[] }>) : null
+          );
+        }
+        return null;
       })
       .then((data) => {
         if (data) setAllowedZoneIds(data.allowedZoneIds);
@@ -222,7 +238,7 @@ export default function ZonePreferenceSelector({
       .catch(() => {
         // In caso di errore non applichiamo restrizioni
       });
-  }, []);
+  }, [city, province]);
 
   // Fetch zones
   useEffect(() => {

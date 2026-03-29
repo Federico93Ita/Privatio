@@ -181,6 +181,7 @@ export default function AgenzieRegistrationForm() {
       <ZoneSelectorErrorBoundary>
         <ZonePreferenceSelector
           province={form.province}
+          city={form.city}
           selectedZones={preferredZones}
           onSelectionChange={setPreferredZones}
         />
