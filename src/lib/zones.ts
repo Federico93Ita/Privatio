@@ -1,4 +1,16 @@
 import { prisma } from "./prisma";
+import { geocodeAddress } from "./geocode";
+
+function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 /**
  * Risolve la zona per un immobile basandosi su CAP, città e provincia.
@@ -10,7 +22,7 @@ import { prisma } from "./prisma";
  * 1. Match esatto per CAP
  * 2. Match per città + provincia
  * 3. Match per comune nel cluster (municipalities)
- * 4. Fallback: prima zona della provincia
+ * 4. Fallback: geocodifica il comune e trova la zona più vicina
  */
 export async function resolveZoneForProperty(
   city: string,
@@ -47,13 +59,29 @@ export async function resolveZoneForProperty(
   });
   if (clusterMatch) return clusterMatch.id;
 
-  // 4. Fallback: prima zona della provincia per marketScore
-  const provinceMatch = await prisma.zone.findFirst({
+  // 4. Fallback: geocodifica il comune e trova la zona più vicina per distanza
+  const allProvZones = await prisma.zone.findMany({
     where: { isActive: true, province: province.toUpperCase() },
-    select: { id: true },
-    orderBy: { marketScore: "desc" },
+    select: { id: true, lat: true, lng: true },
   });
-  return provinceMatch?.id || null;
+
+  if (allProvZones.length === 0) return null;
+
+  const geo = await geocodeAddress("", city, province);
+  if (geo.ok) {
+    let closest: { id: string; dist: number } | null = null;
+    for (const z of allProvZones) {
+      if (!z.lat || !z.lng) continue;
+      const d = distanceKm(geo.lat, geo.lng, z.lat, z.lng);
+      if (!closest || d < closest.dist) {
+        closest = { id: z.id, dist: d };
+      }
+    }
+    if (closest) return closest.id;
+  }
+
+  // Ultimo fallback: prima zona della provincia
+  return allProvZones[0]?.id || null;
 }
 
 /**

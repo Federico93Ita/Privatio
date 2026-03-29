@@ -112,10 +112,12 @@ export async function POST(req: NextRequest) {
           { status: 403 }
         );
       }
-      // Blocca se distanza > 5km
+      // Blocca se distanza fuori raggio (variabile per classe)
       if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
+        const radiusByClass: Record<string, number> = { PREMIUM: 5, URBANA: 8, BASE: 15 };
+        const maxDist = radiusByClass[zone.zoneClass] ?? 10;
         const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
-        if (dist > 10) {
+        if (dist > maxDist) {
           return NextResponse.json(
             { error: "Puoi presidiare solo zone nella tua area geografica" },
             { status: 403 }

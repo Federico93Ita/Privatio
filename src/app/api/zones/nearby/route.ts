@@ -11,7 +11,11 @@ import { resolveZoneForProperty } from "@/lib/zones";
  * Risposta: { homeZoneId: string | null, zones: FormattedZone[] }
  */
 
-const MAX_DISTANCE_KM = 10;
+const RADIUS_BY_CLASS: Record<string, number> = {
+  PREMIUM: 5,
+  URBANA: 8,
+  BASE: 15,
+};
 
 function distanceKm(
   lat1: number,
@@ -67,13 +71,14 @@ export async function GET(req: NextRequest) {
     orderBy: [{ zoneClass: "asc" }, { name: "asc" }],
   });
 
-  // 3. Filtra per distanza (5km) E stessa classe della zona home
+  // 3. Filtra per distanza (variabile per classe) E stessa classe della zona home
+  const maxDist = RADIUS_BY_CLASS[homeZone!.zoneClass] ?? 10;
   const nearbyZones = allZones.filter((z) => {
     if (!z.lat || !z.lng) return false;
     if (z.id === homeZoneId) return true;
     // Deve essere stessa zoneClass E entro il raggio
     if (z.zoneClass !== homeZone!.zoneClass) return false;
-    return distanceKm(homeZone.lat!, homeZone.lng!, z.lat, z.lng) <= MAX_DISTANCE_KM;
+    return distanceKm(homeZone.lat!, homeZone.lng!, z.lat, z.lng) <= maxDist;
   });
 
   // 4. Formatta risposta
