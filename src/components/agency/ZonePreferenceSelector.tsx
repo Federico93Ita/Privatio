@@ -198,6 +198,8 @@ export default function ZonePreferenceSelector({
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [infoZone, setInfoZone] = useState<ZoneData | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  // null = nessuna restrizione (utente non autenticato o lead form)
+  const [allowedZoneIds, setAllowedZoneIds] = useState<string[] | null>(null);
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -206,6 +208,21 @@ export default function ZonePreferenceSelector({
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
   });
+
+  // Fetch zone consentite per l'agenzia loggata (401 = non autenticato → nessuna restrizione)
+  useEffect(() => {
+    fetch("/api/dashboard/agency/territories/allowed")
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json() as Promise<{ allowedZoneIds: string[] }>;
+      })
+      .then((data) => {
+        if (data) setAllowedZoneIds(data.allowedZoneIds);
+      })
+      .catch(() => {
+        // In caso di errore non applichiamo restrizioni
+      });
+  }, []);
 
   // Fetch zones
   useEffect(() => {
@@ -247,6 +264,12 @@ export default function ZonePreferenceSelector({
   const isZoneSelected = useCallback(
     (zoneId: string) => selectedZones.some((z) => z.zoneId === zoneId),
     [selectedZones]
+  );
+
+  // null = nessuna restrizione attiva (lead form / non autenticato)
+  const isZoneAllowed = useCallback(
+    (zoneId: string) => allowedZoneIds === null || allowedZoneIds.includes(zoneId),
+    [allowedZoneIds]
   );
 
   const normalised = province ? province.trim().toUpperCase() : "";
@@ -359,6 +382,7 @@ export default function ZonePreferenceSelector({
   }, [fitMapBounds]);
 
   function toggleZone(zone: ZoneData) {
+    if (!isZoneAllowed(zone.id)) return;
     const slots = getSlots(zone);
     if (isZoneSelected(zone.id)) {
       onSelectionChange(selectedZones.filter((z) => z.zoneId !== zone.id));
@@ -525,8 +549,9 @@ export default function ZonePreferenceSelector({
                         const slots = getSlots(zone);
                         const isFull = slots.taken >= slots.max;
                         const isHovered = hoveredZone === zone.id;
+                        const notAllowed = !isZoneAllowed(zone.id);
                         const disabled =
-                          (!selected && maxReached) || isFull;
+                          (!selected && maxReached) || isFull || notAllowed;
                         const price = getPrice(zone);
 
                         return (
@@ -541,16 +566,19 @@ export default function ZonePreferenceSelector({
                               if (!disabled || selected) {
                                 toggleZone(zone);
                               }
-                              panToZone(zone);
+                              if (!notAllowed) panToZone(zone);
                             }}
-                            className={`relative rounded-lg px-3 py-2.5 cursor-pointer transition-all duration-150 ${
-                              selected
-                                ? "bg-blue-50 border border-blue-300 shadow-sm"
+                            title={notAllowed ? "Disponibile solo per agenzie con sede in quest'area" : undefined}
+                            className={`relative rounded-lg px-3 py-2.5 transition-all duration-150 ${
+                              notAllowed
+                                ? "bg-gray-50 border border-transparent opacity-40 cursor-not-allowed"
+                                : selected
+                                ? "bg-blue-50 border border-blue-300 shadow-sm cursor-pointer"
                                 : isHovered && !disabled
-                                ? `${config.bgColor} border border-transparent`
+                                ? `${config.bgColor} border border-transparent cursor-pointer`
                                 : isFull
-                                ? "bg-gray-50 border border-transparent opacity-50"
-                                : "bg-white border border-transparent hover:bg-gray-50"
+                                ? "bg-gray-50 border border-transparent opacity-50 cursor-not-allowed"
+                                : "bg-white border border-transparent hover:bg-gray-50 cursor-pointer"
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -680,6 +708,7 @@ export default function ZonePreferenceSelector({
 
                   const selected = isZoneSelected(zone.id);
                   const isHovered = hoveredZone === zone.id;
+                  const notAllowed = !isZoneAllowed(zone.id);
                   const config =
                     TIER_CONFIG[zone.zoneClass] || TIER_CONFIG.BASE;
 
@@ -688,29 +717,30 @@ export default function ZonePreferenceSelector({
                       key={zone.id}
                       paths={paths}
                       options={{
-                        fillColor: config.mapStroke,
-                        fillOpacity: selected
+                        fillColor: notAllowed ? "#94a3b8" : config.mapStroke,
+                        fillOpacity: notAllowed
+                          ? 0.08
+                          : selected
                           ? 0.45
                           : isHovered
                           ? 0.35
                           : 0.15,
-                        strokeColor: selected
+                        strokeColor: notAllowed
+                          ? "#cbd5e1"
+                          : selected
                           ? "#1d4ed8"
                           : isHovered
                           ? config.mapStroke
                           : "#94a3b8",
-                        strokeWeight: selected
-                          ? 2.5
-                          : isHovered
-                          ? 2
-                          : 0.8,
-                        strokeOpacity: selected ? 1 : isHovered ? 0.9 : 0.7,
+                        strokeWeight: selected ? 2.5 : isHovered ? 2 : 0.8,
+                        strokeOpacity: notAllowed ? 0.4 : selected ? 1 : isHovered ? 0.9 : 0.7,
                         zIndex: selected ? 10 : isHovered ? 5 : 1,
-                        clickable: true,
+                        clickable: !notAllowed,
                       }}
-                      onMouseOver={() => setHoveredZone(zone.id)}
+                      onMouseOver={() => { if (!notAllowed) setHoveredZone(zone.id); }}
                       onMouseOut={() => setHoveredZone(null)}
                       onClick={() => {
+                        if (notAllowed) return;
                         setInfoZone(zone);
                         scrollToCard(zone.id);
                       }}
@@ -773,22 +803,26 @@ export default function ZonePreferenceSelector({
                           type="button"
                           onClick={() => toggleZone(infoZone)}
                           disabled={
+                            !isZoneAllowed(infoZone.id) ||
                             (!isZoneSelected(infoZone.id) && maxReached) ||
-                            getSlots(infoZone).taken >=
-                              getSlots(infoZone).max
+                            getSlots(infoZone).taken >= getSlots(infoZone).max
                           }
+                          title={!isZoneAllowed(infoZone.id) ? "Disponibile solo per agenzie con sede in quest'area" : undefined}
                           className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-all ${
-                            isZoneSelected(infoZone.id)
+                            !isZoneAllowed(infoZone.id)
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : isZoneSelected(infoZone.id)
                               ? "bg-blue-600 text-white hover:bg-blue-700"
-                              : getSlots(infoZone).taken >=
-                                getSlots(infoZone).max
+                              : getSlots(infoZone).taken >= getSlots(infoZone).max
                               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                               : maxReached
                               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                               : "bg-gray-900 text-white hover:bg-gray-800"
                           }`}
                         >
-                          {isZoneSelected(infoZone.id)
+                          {!isZoneAllowed(infoZone.id)
+                            ? "Fuori area"
+                            : isZoneSelected(infoZone.id)
                             ? "✓ Selezionata"
                             : "Seleziona"}
                         </button>

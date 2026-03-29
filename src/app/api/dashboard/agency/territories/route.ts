@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { stripe, PLANS, createZoneStripePrice, highestPlan } from "@/lib/stripe";
 import type { PlanKey } from "@/lib/stripe";
+import { resolveZoneForProperty } from "@/lib/zones";
 
 /* ------------------------------------------------------------------ */
 /*  GET /api/dashboard/agency/territories                              */
@@ -97,6 +98,22 @@ export async function POST(req: NextRequest) {
 
   if (zone.monthlyPrice <= 0) {
     return NextResponse.json({ error: "Prezzo zona non configurato" }, { status: 400 });
+  }
+
+  // Verifica restrizione geografica: l'agenzia può presidiare solo la propria zona e quelle adiacenti
+  const homeZoneId = await resolveZoneForProperty(agency.city, agency.province, "");
+  if (homeZoneId) {
+    const homeZone = await prisma.zone.findUnique({
+      where: { id: homeZoneId },
+      select: { adjacentZoneIds: true },
+    });
+    const allowed = [homeZoneId, ...(homeZone?.adjacentZoneIds ?? [])];
+    if (!allowed.includes(zoneId)) {
+      return NextResponse.json(
+        { error: "Puoi presidiare solo zone nella tua area geografica" },
+        { status: 403 }
+      );
+    }
   }
 
   // Verifica slot

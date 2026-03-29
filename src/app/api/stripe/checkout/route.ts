@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { stripe, PLANS, createZoneStripePrice } from "@/lib/stripe";
 import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { resolveZoneForProperty } from "@/lib/zones";
 
 /**
  * POST /api/stripe/checkout
@@ -84,6 +85,22 @@ export async function POST(req: NextRequest) {
         { error: "Limite di 3 zone raggiunto" },
         { status: 400 }
       );
+    }
+
+    // Verifica restrizione geografica: l'agenzia può presidiare solo la propria zona e quelle adiacenti
+    const homeZoneId = await resolveZoneForProperty(user.agency.city, user.agency.province, "");
+    if (homeZoneId) {
+      const homeZone = await prisma.zone.findUnique({
+        where: { id: homeZoneId },
+        select: { adjacentZoneIds: true },
+      });
+      const allowed = [homeZoneId, ...(homeZone?.adjacentZoneIds ?? [])];
+      if (!allowed.includes(zoneId)) {
+        return NextResponse.json(
+          { error: "Puoi presidiare solo zone nella tua area geografica" },
+          { status: 403 }
+        );
+      }
     }
 
     // Plan = zona's zoneClass
