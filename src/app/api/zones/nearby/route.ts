@@ -6,12 +6,12 @@ import { resolveZoneForProperty } from "@/lib/zones";
  * GET /api/zones/nearby?city=Moncalieri&province=TO
  *
  * Restituisce le zone acquistabili da un'agenzia con sede nel comune indicato:
- * la zona "home" del comune + tutte le zone entro 15 km di distanza.
+ * la zona "home" del comune + zone entro 5 km E della stessa classe (BASE/URBANA/PREMIUM).
  *
  * Risposta: { homeZoneId: string | null, zones: FormattedZone[] }
  */
 
-const MAX_DISTANCE_KM = 15;
+const MAX_DISTANCE_KM = 5;
 
 function distanceKm(
   lat1: number,
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
 
   const homeZone = await prisma.zone.findUnique({
     where: { id: homeZoneId },
-    select: { lat: true, lng: true },
+    select: { lat: true, lng: true, zoneClass: true },
   });
 
   if (!homeZone?.lat || !homeZone?.lng) {
@@ -67,10 +67,12 @@ export async function GET(req: NextRequest) {
     orderBy: [{ zoneClass: "asc" }, { name: "asc" }],
   });
 
-  // 3. Filtra per distanza dal centroide della zona home
+  // 3. Filtra per distanza (5km) E stessa classe della zona home
   const nearbyZones = allZones.filter((z) => {
     if (!z.lat || !z.lng) return false;
     if (z.id === homeZoneId) return true;
+    // Deve essere stessa zoneClass E entro il raggio
+    if (z.zoneClass !== homeZone!.zoneClass) return false;
     return distanceKm(homeZone.lat!, homeZone.lng!, z.lat, z.lng) <= MAX_DISTANCE_KM;
   });
 

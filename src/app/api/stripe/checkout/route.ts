@@ -98,16 +98,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica restrizione geografica: l'agenzia può presidiare solo zone entro 15 km dalla sede
+    // Verifica restrizione geografica: entro 5km E stessa classe (BASE/URBANA/PREMIUM)
     const homeZoneId = await resolveZoneForProperty(user.agency.city, user.agency.province, "");
     if (homeZoneId && homeZoneId !== zoneId) {
       const homeZone = await prisma.zone.findUnique({
         where: { id: homeZoneId },
-        select: { lat: true, lng: true },
+        select: { lat: true, lng: true, zoneClass: true },
       });
+      // Blocca se classe diversa
+      if (homeZone?.zoneClass && zone.zoneClass !== homeZone.zoneClass) {
+        return NextResponse.json(
+          { error: "Puoi presidiare solo zone della tua stessa classe" },
+          { status: 403 }
+        );
+      }
+      // Blocca se distanza > 5km
       if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
         const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
-        if (dist > 15) {
+        if (dist > 5) {
           return NextResponse.json(
             { error: "Puoi presidiare solo zone nella tua area geografica" },
             { status: 403 }
