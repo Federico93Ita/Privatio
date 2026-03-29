@@ -6,6 +6,17 @@ import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { resolveZoneForProperty } from "@/lib/zones";
 
+function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 /**
  * POST /api/stripe/checkout
  *
@@ -87,19 +98,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica restrizione geografica: l'agenzia può presidiare solo la propria zona e quelle adiacenti
+    // Verifica restrizione geografica: l'agenzia può presidiare solo zone entro 15 km dalla sede
     const homeZoneId = await resolveZoneForProperty(user.agency.city, user.agency.province, "");
-    if (homeZoneId) {
+    if (homeZoneId && homeZoneId !== zoneId) {
       const homeZone = await prisma.zone.findUnique({
         where: { id: homeZoneId },
-        select: { adjacentZoneIds: true },
+        select: { lat: true, lng: true },
       });
-      const allowed = [homeZoneId, ...(homeZone?.adjacentZoneIds ?? [])];
-      if (!allowed.includes(zoneId)) {
-        return NextResponse.json(
-          { error: "Puoi presidiare solo zone nella tua area geografica" },
-          { status: 403 }
-        );
+      if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
+        const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
+        if (dist > 15) {
+          return NextResponse.json(
+            { error: "Puoi presidiare solo zone nella tua area geografica" },
+            { status: 403 }
+          );
+        }
       }
     }
 
