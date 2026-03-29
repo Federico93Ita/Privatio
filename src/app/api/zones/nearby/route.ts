@@ -11,7 +11,7 @@ import { resolveZoneForProperty } from "@/lib/zones";
  * Risposta: { homeZoneId: string | null, zones: FormattedZone[] }
  */
 
-const MAX_DISTANCE_KM = 5;
+const MAX_DISTANCE_KM = 10;
 
 function distanceKm(
   lat1: number,

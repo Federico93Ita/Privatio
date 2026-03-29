@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
     // Blocca se distanza > 5km
     if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
       const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
-      if (dist > 5) {
+      if (dist > 10) {
         return NextResponse.json(
           { error: "Puoi presidiare solo zone nella tua area geografica" },
           { status: 403 }
