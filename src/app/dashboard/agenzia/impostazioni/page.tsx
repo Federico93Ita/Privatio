@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import TwoFactorSetup from "@/components/auth/TwoFactorSetup";
 
 export default function AgencySettingsPage() {
   const [agency, setAgency] = useState<any>(null);
@@ -38,6 +39,15 @@ export default function AgencySettingsPage() {
   }, []);
 
   const [error, setError] = useState<string | null>(null);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+
+  // Fetch 2FA status
+  useEffect(() => {
+    fetch("/api/auth/two-factor/status")
+      .then((r) => r.json())
+      .then((data) => setTwoFactorEnabled(data.enabled || false))
+      .catch(() => {});
+  }, []);
 
   async function handleSave() {
     setSaving(true);
@@ -124,6 +134,12 @@ export default function AgencySettingsPage() {
                 {error && <p className="text-sm text-error font-medium">{error}</p>}
               </div>
             </div>
+
+            {/* 2FA */}
+            <TwoFactorSetup
+              isEnabled={twoFactorEnabled}
+              onStatusChange={setTwoFactorEnabled}
+            />
 
             {/* Team */}
             <div className="bg-white rounded-xl p-6 border border-border">

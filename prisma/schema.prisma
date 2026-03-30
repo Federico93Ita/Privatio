@@ -31,6 +31,9 @@ model User {
   savedSearches     SavedSearch[]
   reviews           Review[]
   notifications     Notification[]
+  // Two-Factor Authentication
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
   // Consent tracking
   termsAcceptedAt    DateTime?
   privacyAcceptedAt  DateTime?
