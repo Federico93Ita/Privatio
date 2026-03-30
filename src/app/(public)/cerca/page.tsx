@@ -7,6 +7,16 @@ import Footer from "@/components/layout/Footer";
 import PropertyCard from "@/components/property/PropertyCard";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const SearchMapView = dynamic(() => import("@/components/search/SearchMapView"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-[500px] bg-bg-soft rounded-xl border border-border animate-pulse">
+      <p className="text-text-muted text-sm">Caricamento mappa...</p>
+    </div>
+  ),
+});
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -32,6 +42,8 @@ interface Property {
   hasGarden: boolean;
   hasBalcony: boolean;
   hasElevator: boolean;
+  lat?: number | null;
+  lng?: number | null;
   photos: PropertyPhoto[];
 }
 
@@ -139,6 +151,7 @@ function CercaPageInner() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
   const [saveSearchMsg, setSaveSearchMsg] = useState<string | null>(null);
 
@@ -555,6 +568,40 @@ function CercaPageInner() {
                 </p>
 
                 <div className="flex items-center gap-3">
+                  {/* View mode toggle */}
+                  <div className="flex rounded-lg border border-border overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("grid")}
+                      className={cn(
+                        "p-2 transition-colors",
+                        viewMode === "grid"
+                          ? "bg-primary text-white"
+                          : "bg-white text-text-muted hover:bg-bg-soft"
+                      )}
+                      title="Vista griglia"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("map")}
+                      className={cn(
+                        "p-2 transition-colors",
+                        viewMode === "map"
+                          ? "bg-primary text-white"
+                          : "bg-white text-text-muted hover:bg-bg-soft"
+                      )}
+                      title="Vista mappa"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+                      </svg>
+                    </button>
+                  </div>
+
                   {/* Save search button */}
                   <button
                     type="button"
@@ -666,8 +713,8 @@ function CercaPageInner() {
                 </div>
               )}
 
-              {/* Results grid */}
-              {!loading && properties.length > 0 && (
+              {/* Results grid or map */}
+              {!loading && properties.length > 0 && viewMode === "grid" && (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {properties.map((property) => (
@@ -676,6 +723,10 @@ function CercaPageInner() {
                   </div>
                   {renderPagination()}
                 </>
+              )}
+
+              {!loading && properties.length > 0 && viewMode === "map" && (
+                <SearchMapView properties={properties} />
               )}
             </div>
           </div>

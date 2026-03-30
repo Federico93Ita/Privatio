@@ -54,28 +54,77 @@ async function getProperty(slug: string) {
   }
 }
 
-async function getSimilarProperties(property: { id: string; city: string; type: string; price: number }) {
+async function getSimilarProperties(property: {
+  id: string; city: string; province: string; type: string;
+  price: number; surface: number; rooms: number;
+  lat: number | null; lng: number | null;
+  hasGarage: boolean; hasGarden: boolean; hasBalcony: boolean;
+  hasElevator: boolean; hasPool: boolean; hasAirConditioning: boolean;
+}) {
   try {
     const priceMin = Math.round(property.price * 0.7);
     const priceMax = Math.round(property.price * 1.3);
 
-    const similar = await prisma.property.findMany({
+    // Fetch candidates from same province within price range
+    const candidates = await prisma.property.findMany({
       where: {
         id: { not: property.id },
         status: "PUBLISHED",
-        OR: [
-          { city: property.city },
-          { type: property.type as never, price: { gte: priceMin, lte: priceMax } },
-        ],
+        province: property.province,
+        price: { gte: priceMin, lte: priceMax },
       },
       include: {
         photos: { where: { isCover: true }, take: 1 },
       },
-      orderBy: { publishedAt: "desc" },
-      take: 3,
+      take: 50,
     });
 
-    return similar;
+    // Score each candidate by similarity
+    const scored = candidates.map((c) => {
+      let score = 0;
+
+      // Same city: +30
+      if (c.city.toLowerCase() === property.city.toLowerCase()) score += 30;
+
+      // Same type: +20
+      if (c.type === property.type) score += 20;
+
+      // Similar surface (within 30%): +10
+      if (property.surface > 0 && c.surface > 0) {
+        const surfaceRatio = c.surface / property.surface;
+        if (surfaceRatio >= 0.7 && surfaceRatio <= 1.3) score += 10;
+      }
+
+      // Same rooms: +10
+      if (c.rooms === property.rooms) score += 10;
+
+      // Matching features: +3 each
+      const features = ["hasGarage", "hasGarden", "hasBalcony", "hasElevator", "hasPool", "hasAirConditioning"] as const;
+      for (const f of features) {
+        if (c[f] === property[f] && c[f] === true) score += 3;
+      }
+
+      // Geographic proximity (if coordinates available): up to +25
+      if (property.lat && property.lng && c.lat && c.lng) {
+        const R = 6371;
+        const dLat = ((c.lat - property.lat) * Math.PI) / 180;
+        const dLng = ((c.lng - property.lng) * Math.PI) / 180;
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos((property.lat * Math.PI) / 180) * Math.cos((c.lat * Math.PI) / 180) *
+          Math.sin(dLng / 2) ** 2;
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        // Within 2km: +25, within 5km: +15, within 10km: +5
+        if (dist <= 2) score += 25;
+        else if (dist <= 5) score += 15;
+        else if (dist <= 10) score += 5;
+      }
+
+      return { ...c, _score: score };
+    });
+
+    // Sort by score descending, take top 6
+    scored.sort((a, b) => b._score - a._score);
+    return scored.slice(0, 6).map(({ _score, ...rest }) => rest);
   } catch {
     return [];
   }
@@ -174,8 +223,19 @@ export default async function PropertyDetailPage({ params }: Props) {
     ? await getSimilarProperties({
         id: property.id,
         city: property.city,
+        province: property.province,
         type: property.type,
         price: property.price,
+        surface: property.surface,
+        rooms: property.rooms,
+        lat: property.lat,
+        lng: property.lng,
+        hasGarage: property.hasGarage,
+        hasGarden: property.hasGarden,
+        hasBalcony: property.hasBalcony,
+        hasElevator: property.hasElevator,
+        hasPool: property.hasPool,
+        hasAirConditioning: property.hasAirConditioning,
       })
     : [];
 
