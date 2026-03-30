@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
+import NotificationBell from "./NotificationBell";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -388,19 +389,8 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            {/* Notification Bell with unread message count */}
-            <Link
-              href={role === "seller" ? "/dashboard/venditore/messaggi" : role === "buyer" ? "/dashboard/acquirente/messaggi" : role === "agency" ? "/dashboard/agenzia/messaggi" : "#"}
-              className="relative flex h-10 w-10 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-soft hover:text-text"
-              aria-label="Notifiche"
-            >
-              <BellIcon />
-              {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-error px-1 text-[10px] font-bold text-white">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </Link>
+            {/* In-app Notification Bell with dropdown */}
+            <NotificationBell />
 
             {/* User info */}
             <div className="hidden items-center gap-3 sm:flex">

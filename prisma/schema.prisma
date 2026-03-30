@@ -30,6 +30,7 @@ model User {
   favorites         Favorite[]
   savedSearches     SavedSearch[]
   reviews           Review[]
+  notifications     Notification[]
   // Consent tracking
   termsAcceptedAt    DateTime?
   privacyAcceptedAt  DateTime?
@@ -499,6 +500,32 @@ enum ComplaintStatus {
   IN_REVIEW
   RESOLVED
   CLOSED
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  href      String?          // Deep link to relevant page
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+enum NotificationType {
+  LEAD_RECEIVED       // New buyer lead on a property
+  PROPERTY_ASSIGNED   // Property assigned to agency
+  VISIT_SCHEDULED     // Visit scheduled
+  VISIT_CONFIRMED     // Visit confirmed
+  CONTRACT_SIGNED     // Contract signed
+  PAYMENT_FAILED      // Subscription payment failed
+  TERRITORY_ACTIVATED // Territory subscription activated
+  SYSTEM              // Generic system notification
 }
 
 model AuditLog {

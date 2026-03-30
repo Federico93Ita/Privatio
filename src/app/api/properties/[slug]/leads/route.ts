@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buyerLeadSchema } from "@/lib/validations";
 import { sendEmail } from "@/lib/email";
+import { notifyAgency } from "@/lib/notifications";
 
 export async function POST(
   req: NextRequest,
@@ -42,8 +43,16 @@ export async function POST(
       },
     });
 
-    // Notify assigned agency
+    // Notify assigned agency (in-app + email)
     if (property.assignment?.agency) {
+      await notifyAgency({
+        agencyId: property.assignment.agency.id,
+        type: "LEAD_RECEIVED",
+        title: "Nuova richiesta acquirente",
+        body: `${parsed.data.name} ha richiesto info per "${property.title}"`,
+        href: "/dashboard/agenzia",
+      });
+
       await sendEmail({
         to: property.assignment.agency.email,
         subject: `Nuova richiesta per: ${property.title}`,

@@ -3,6 +3,7 @@ import { stripe, highestPlan } from "@/lib/stripe";
 import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { notifyAgency } from "@/lib/notifications";
 import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
@@ -73,6 +74,16 @@ export async function POST(req: NextRequest) {
             isActive: true,
             stripeSubId: subscriptionId,
           },
+        });
+
+        // In-app notification
+        const zone = await prisma.zone.findUnique({ where: { id: zoneId }, select: { name: true } });
+        await notifyAgency({
+          agencyId,
+          type: "TERRITORY_ACTIVATED",
+          title: "Territorio attivato",
+          body: `Il territorio "${zone?.name || zoneId}" è ora attivo.`,
+          href: "/dashboard/agenzia/territori",
         });
       }
       break;
@@ -189,6 +200,15 @@ export async function POST(req: NextRequest) {
       });
 
       if (agency) {
+        // In-app notification
+        await notifyAgency({
+          agencyId: agency.id,
+          type: "PAYMENT_FAILED",
+          title: "Pagamento non riuscito",
+          body: "Il pagamento del tuo abbonamento non è andato a buon fine. Aggiorna il metodo di pagamento.",
+          href: "/dashboard/agenzia/fatturazione",
+        });
+
         await sendEmail({
           to: agency.email,
           subject: "Pagamento fallito — Privatio",

@@ -136,9 +136,39 @@ export default function AgencyBillingPage() {
     }
   }
 
-  // Commissions section — stats endpoint doesn't include full assignment data.
-  // This is a placeholder until a dedicated commissions API is built.
-  const completedSales: any[] = [];
+  // Invoices
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/dashboard/agency/invoices")
+      .then((r) => r.json())
+      .then((data) => setInvoices(data.invoices || []))
+      .catch(console.error)
+      .finally(() => setInvoicesLoading(false));
+  }, []);
+
+  async function downloadInvoice(invoiceId: string) {
+    setDownloadingId(invoiceId);
+    try {
+      const res = await fetch(`/api/dashboard/agency/invoices?download=${invoiceId}`);
+      const data = await res.json();
+      if (data.pdf) {
+        // data.pdf is a data URI, trigger download
+        const link = document.createElement("a");
+        link.href = data.pdf;
+        link.download = `fattura-${data.invoiceNumber || invoiceId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (err) {
+      console.error("Download error:", err);
+    } finally {
+      setDownloadingId(null);
+    }
+  }
 
   const inputClass = (field: string) =>
     `w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
@@ -504,50 +534,63 @@ export default function AgencyBillingPage() {
               )}
             </div>
 
-            {/* Completed Sales */}
+            {/* Storico Fatture */}
             <div className="bg-white rounded-xl p-6 border border-border">
               <h2 className="font-medium text-primary-dark mb-4">
-                Vendite Completate
+                Storico Fatture
               </h2>
-              {completedSales.length === 0 ? (
+              {invoicesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-12 bg-bg-soft rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              ) : invoices.length === 0 ? (
                 <p className="text-text-muted text-center py-4">
-                  Nessuna vendita completata ancora.
+                  Nessuna fattura disponibile.
                 </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-border">
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
-                          Immobile
-                        </th>
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
-                          Prezzo Vendita
-                        </th>
-                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">
-                          Stato
-                        </th>
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">N. Fattura</th>
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">Data</th>
+                        <th className="text-left py-3 px-3 text-sm font-semibold text-text-muted">Importo</th>
+                        <th className="text-right py-3 px-3 text-sm font-semibold text-text-muted">Azioni</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {completedSales.map((sale: any) => (
-                        <tr key={sale.id} className="border-b border-border">
-                          <td className="py-3 px-3 text-sm">
-                            {sale.property.title}
+                      {invoices.map((inv: any) => (
+                        <tr key={inv.id} className="border-b border-border/50 hover:bg-bg-soft/50 transition-colors">
+                          <td className="py-3 px-3 text-sm font-medium text-text">{inv.number}</td>
+                          <td className="py-3 px-3 text-sm text-text-muted">
+                            {new Date(inv.date).toLocaleDateString("it-IT")}
                           </td>
-                          <td className="py-3 px-3 text-sm font-semibold">
-                            {formatPrice(sale.property.price)}
+                          <td className="py-3 px-3 text-sm font-semibold text-text">
+                            {new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(inv.amount)}
                           </td>
-                          <td className="py-3 px-3">
-                            <span className="text-xs px-2 py-1 rounded-full bg-success/10 text-success">
-                              Completata
-                            </span>
+                          <td className="py-3 px-3 text-right">
+                            <button
+                              onClick={() => downloadInvoice(inv.id)}
+                              disabled={downloadingId === inv.id}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary border border-primary/20 rounded-lg hover:bg-primary/5 transition-colors disabled:opacity-50"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                              </svg>
+                              {downloadingId === inv.id ? "..." : "PDF"}
+                            </button>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  <p className="text-xs text-text-muted mt-3">Privatio non applica commissioni sulle vendite. Il tuo abbonamento territoriale copre il servizio di lead generation.</p>
+                  <p className="text-xs text-text-muted mt-3">
+                    Le fatture sono generate automaticamente dopo ogni pagamento. Scarica il PDF per i tuoi archivi contabili.
+                  </p>
                 </div>
               )}
             </div>
