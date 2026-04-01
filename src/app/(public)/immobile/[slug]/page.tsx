@@ -292,7 +292,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       <main className="bg-bg-soft min-h-screen pt-28 md:pt-32">
         {/* Gallery (placeholder shown when no photos) */}
         <div className="max-w-7xl mx-auto px-4 pt-6">
-          <PropertyGallery photos={property.photos ?? []} />
+          <PropertyGallery photos={property.photos ?? []} propertyType={property.type} />
 
           {/* Video tour / Virtual tour */}
           {(property.videoUrl || property.virtualTourUrl) && (
@@ -544,6 +544,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             <div className="lg:max-w-2xl mx-auto">
               <PropertyValuation
                 city={property.city}
+                province={property.province}
                 surface={property.surface}
                 rooms={property.rooms}
                 price={property.price}

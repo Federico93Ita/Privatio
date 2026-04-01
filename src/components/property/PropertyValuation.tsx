@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 interface PropertyValuationProps {
   city: string;
+  province: string;
   surface: number;
   rooms: number;
   price: number;
@@ -11,20 +12,26 @@ interface PropertyValuationProps {
 }
 
 interface ValuationData {
+  available: boolean;
   avgPricePerSqm: number;
   minPricePerSqm: number;
   maxPricePerSqm: number;
-  count: number;
+  zoneName: string;
+  isProvincial: boolean;
+  source: string;
+  message?: string;
 }
 
-export default function PropertyValuation({ city, surface, rooms, price, type }: PropertyValuationProps) {
+export default function PropertyValuation({ city, province, surface, price, type }: PropertyValuationProps) {
   const [data, setData] = useState<ValuationData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchValuation() {
       try {
-        const res = await fetch(`/api/valuation?city=${encodeURIComponent(city)}&type=${type}`);
+        const params = new URLSearchParams({ city, type });
+        if (province) params.set("province", province);
+        const res = await fetch(`/api/valuation?${params}`);
         if (res.ok) {
           setData(await res.json());
         }
@@ -35,7 +42,7 @@ export default function PropertyValuation({ city, surface, rooms, price, type }:
       }
     }
     fetchValuation();
-  }, [city, type]);
+  }, [city, province, type]);
 
   if (loading) {
     return (
@@ -43,8 +50,14 @@ export default function PropertyValuation({ city, surface, rooms, price, type }:
     );
   }
 
-  if (!data || data.count < 2) {
-    return null; // Not enough data for comparison
+  if (!data || !data.available) {
+    return (
+      <div className="text-center py-6">
+        <p className="text-sm text-text-muted">
+          {data?.message || "Dati di mercato non disponibili per questa zona."}
+        </p>
+      </div>
+    );
   }
 
   const propertyPricePerSqm = Math.round(price / surface);
@@ -110,13 +123,13 @@ export default function PropertyValuation({ city, surface, rooms, price, type }:
           <p className="text-sm font-medium text-text">{data.avgPricePerSqm.toLocaleString("it-IT")} €/m²</p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-text-muted">Immobili simili</p>
-          <p className="text-sm font-medium text-text">{data.count}</p>
+          <p className="text-xs text-text-muted">Zona OMI</p>
+          <p className="text-sm font-medium text-text truncate" title={data.zoneName}>{data.zoneName}</p>
         </div>
       </div>
 
       <p className="text-[10px] text-text-muted text-center pt-1">
-        Stima basata su {data.count} immobili simili a {city}. Valore indicativo, non costituisce una perizia.
+        Fonte: Osservatorio Mercato Immobiliare{data.isProvincial ? " (media provinciale)" : ""} — zona {data.zoneName}. Valore indicativo.
       </p>
     </div>
   );

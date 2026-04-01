@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
- * GET /api/valuation?city=Torino&type=APPARTAMENTO
+ * GET /api/valuation?city=Torino&province=TO&type=APPARTAMENTO
  *
- * Returns average, min, and max price per sqm for published properties
- * in the given city and type. Used for the property valuation widget.
+ * Returns market valuation data based on OMI (Osservatorio Mercato Immobiliare)
+ * zone data stored in the Zone table. Falls back to provincial averages when
+ * no exact city match is found.
  */
 export async function GET(req: NextRequest) {
   const limited = await applyRateLimit(RATE_LIMITS.apiRead, req);
@@ -14,46 +15,89 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const city = searchParams.get("city");
-  const type = searchParams.get("type");
+  const province = searchParams.get("province");
 
   if (!city) {
     return NextResponse.json({ error: "city required" }, { status: 400 });
   }
 
   try {
-    const properties = await prisma.property.findMany({
+    const cityLower = city.toLowerCase();
+
+    // Step 1: Find zone by exact city match or municipality inclusion
+    let zone = await prisma.zone.findFirst({
       where: {
-        city: { equals: city, mode: "insensitive" },
-        status: "PUBLISHED",
-        surface: { gt: 0 },
-        ...(type ? { type: type as never } : {}),
+        isActive: true,
+        avgPricePerSqm: { not: null },
+        OR: [
+          { city: { equals: city, mode: "insensitive" } },
+          { name: { equals: city, mode: "insensitive" } },
+        ],
       },
-      select: { price: true, surface: true },
+      select: { name: true, avgPricePerSqm: true, zoneClass: true, province: true },
     });
 
-    if (properties.length < 2) {
-      return NextResponse.json({ count: properties.length }, {
-        headers: { "Cache-Control": "public, s-maxage=3600" },
+    // Step 2: Check municipalities array
+    if (!zone) {
+      const allZones = await prisma.zone.findMany({
+        where: {
+          isActive: true,
+          avgPricePerSqm: { not: null },
+          ...(province ? { province: province.toUpperCase() } : {}),
+        },
+        select: { name: true, avgPricePerSqm: true, zoneClass: true, province: true, municipalities: true },
       });
+
+      zone = allZones.find((z) =>
+        z.municipalities.some((m) => m.toLowerCase() === cityLower)
+      ) ?? null;
     }
 
-    const pricesPerSqm = properties.map((p) => Math.round(p.price / p.surface));
-    const sorted = pricesPerSqm.sort((a, b) => a - b);
+    // Step 3: Fallback to provincial average
+    let isProvincial = false;
+    if (!zone && province) {
+      const provincialZones = await prisma.zone.findMany({
+        where: {
+          isActive: true,
+          province: province.toUpperCase(),
+          avgPricePerSqm: { not: null },
+        },
+        select: { avgPricePerSqm: true, zoneClass: true, province: true, name: true },
+      });
 
-    // Remove outliers (bottom and top 10%)
-    const trimStart = Math.floor(sorted.length * 0.1);
-    const trimEnd = Math.ceil(sorted.length * 0.9);
-    const trimmed = sorted.slice(trimStart, trimEnd);
-    const effective = trimmed.length > 0 ? trimmed : sorted;
+      if (provincialZones.length > 0) {
+        const prices = provincialZones.map((z) => z.avgPricePerSqm!);
+        const avg = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+        zone = {
+          name: `Provincia di ${province.toUpperCase()}`,
+          avgPricePerSqm: avg,
+          zoneClass: provincialZones[0].zoneClass,
+          province: province.toUpperCase(),
+        };
+        isProvincial = true;
+      }
+    }
 
-    const avg = Math.round(effective.reduce((a, b) => a + b, 0) / effective.length);
+    if (!zone || !zone.avgPricePerSqm) {
+      return NextResponse.json(
+        { available: false, message: "Dati di mercato non disponibili per questa zona" },
+        { headers: { "Cache-Control": "public, s-maxage=3600" } }
+      );
+    }
+
+    const avg = zone.avgPricePerSqm;
+    const minPricePerSqm = Math.round(avg * 0.8);
+    const maxPricePerSqm = Math.round(avg * 1.2);
 
     return NextResponse.json(
       {
-        avgPricePerSqm: avg,
-        minPricePerSqm: effective[0],
-        maxPricePerSqm: effective[effective.length - 1],
-        count: properties.length,
+        available: true,
+        avgPricePerSqm: Math.round(avg),
+        minPricePerSqm,
+        maxPricePerSqm,
+        zoneName: zone.name,
+        isProvincial,
+        source: "omi",
       },
       {
         headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=1800" },

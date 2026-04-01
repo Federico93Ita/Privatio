@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { getDemoImages } from "@/lib/demo-images";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -16,14 +17,20 @@ interface GalleryPhoto {
 
 interface PropertyGalleryProps {
   photos: GalleryPhoto[];
+  propertyType?: string;
 }
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function PropertyGallery({ photos }: PropertyGalleryProps) {
-  const sorted = [...photos].sort((a, b) => a.order - b.order);
+export default function PropertyGallery({ photos, propertyType }: PropertyGalleryProps) {
+  // Use demo images when no real photos exist
+  const demoUrls = photos.length === 0 ? getDemoImages(propertyType || "") : [];
+  const isDemo = demoUrls.length > 0;
+  const sorted = isDemo
+    ? demoUrls.map((url, i) => ({ url, order: i }))
+    : [...photos].sort((a, b) => a.order - b.order);
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [direction, setDirection] = useState(0);
@@ -62,52 +69,7 @@ export default function PropertyGallery({ photos }: PropertyGalleryProps) {
   );
 
   if (sorted.length === 0) {
-    return (
-      <div className="aspect-[16/9] rounded-2xl overflow-hidden relative bg-gradient-to-br from-primary/[0.03] via-bg-soft to-primary/[0.06]">
-        {/* Decorative SVG grid pattern */}
-        <svg
-          className="absolute inset-0 w-full h-full opacity-[0.04]"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <pattern id="placeholder-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#placeholder-grid)" className="text-primary" />
-        </svg>
-
-        {/* Corner frame accents */}
-        <div className="absolute top-6 left-6 w-12 h-12 border-t-2 border-l-2 border-primary/10 rounded-tl-lg" />
-        <div className="absolute top-6 right-6 w-12 h-12 border-t-2 border-r-2 border-primary/10 rounded-tr-lg" />
-        <div className="absolute bottom-6 left-6 w-12 h-12 border-b-2 border-l-2 border-primary/10 rounded-bl-lg" />
-        <div className="absolute bottom-6 right-6 w-12 h-12 border-b-2 border-r-2 border-primary/10 rounded-br-lg" />
-
-        {/* Center content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          {/* Camera icon in card with pulse ring */}
-          <div className="relative mb-5">
-            <div className="absolute inset-0 -m-3 rounded-full border border-primary/10 animate-pulse" />
-            <div className="w-16 h-16 rounded-2xl bg-white shadow-sm border border-border flex items-center justify-center">
-              <svg className="w-8 h-8 text-primary/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-              </svg>
-            </div>
-          </div>
-
-          {/* "Coming soon" badge */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-medium mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
-            Prossimamente
-          </span>
-
-          {/* Text */}
-          <p className="text-sm font-medium text-text/70">Foto non ancora disponibili</p>
-          <p className="text-xs text-text-muted/50 mt-1">Le immagini saranno pubblicate a breve</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   /* Framer-motion slide variants */
@@ -157,6 +119,13 @@ export default function PropertyGallery({ photos }: PropertyGalleryProps) {
           <span className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full">
             {activeIndex + 1} / {sorted.length}
           </span>
+
+          {/* Demo badge */}
+          {isDemo && (
+            <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full">
+              Foto illustrativa
+            </span>
+          )}
 
           {/* Expand icon */}
           <span className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
