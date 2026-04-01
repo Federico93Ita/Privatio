@@ -10,14 +10,24 @@ interface PlaceResult {
 }
 
 /**
- * Category → OpenStreetMap amenity/public_transport tags
+ * Classify an OSM element into a category based on its tags
  */
-const OSM_QUERIES: Record<string, string> = {
-  school: `node["amenity"~"school|university"](around:3000,{LAT},{LNG});way["amenity"~"school|university"](around:3000,{LAT},{LNG});`,
-  transit: `node["public_transport"~"station|stop_position|platform"](around:3000,{LAT},{LNG});node["railway"~"station|halt|tram_stop"](around:3000,{LAT},{LNG});node["amenity"="bus_station"](around:3000,{LAT},{LNG});node["highway"="bus_stop"](around:3000,{LAT},{LNG});way["railway"="station"](around:3000,{LAT},{LNG});way["amenity"="bus_station"](around:3000,{LAT},{LNG});`,
-  store: `node["shop"~"supermarket|mall|convenience"](around:3000,{LAT},{LNG});way["shop"~"supermarket|mall|convenience"](around:3000,{LAT},{LNG});`,
-  hospital: `node["amenity"~"hospital|pharmacy|clinic|doctors"](around:3000,{LAT},{LNG});way["amenity"~"hospital|clinic"](around:3000,{LAT},{LNG});`,
-};
+function classifyElement(tags: Record<string, string>): string | null {
+  const amenity = tags.amenity || "";
+  const shop = tags.shop || "";
+  const pt = tags.public_transport || "";
+  const railway = tags.railway || "";
+  const highway = tags.highway || "";
+
+  if (amenity === "school" || amenity === "university") return "school";
+  if (amenity === "hospital" || amenity === "pharmacy" || amenity === "clinic" || amenity === "doctors") return "hospital";
+  if (amenity === "bus_station") return "transit";
+  if (shop === "supermarket" || shop === "mall" || shop === "convenience") return "store";
+  if (pt === "station" || pt === "stop_position" || pt === "platform") return "transit";
+  if (railway === "station" || railway === "halt" || railway === "tram_stop") return "transit";
+  if (highway === "bus_stop") return "transit";
+  return null;
+}
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -73,68 +83,80 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "lat and lng required" }, { status: 400 });
   }
 
-  const results: Record<string, PlaceResult[]> = {};
+  const results: Record<string, PlaceResult[]> = {
+    school: [],
+    transit: [],
+    store: [],
+    hospital: [],
+  };
 
-  await Promise.all(
-    Object.entries(OSM_QUERIES).map(async ([category, queryTemplate]) => {
-      try {
-        const query = queryTemplate.replace(/{LAT}/g, String(lat)).replace(/{LNG}/g, String(lng));
-        const overpassQuery = `[out:json][timeout:15];(${query});out center 30;`;
+  try {
+    // Single Overpass query for all categories to avoid rate-limiting
+    const overpassQuery = `[out:json][timeout:25];(
+      node["amenity"~"school|university"](around:3000,${lat},${lng});
+      way["amenity"~"school|university"](around:3000,${lat},${lng});
+      node["amenity"~"hospital|pharmacy|clinic|doctors"](around:3000,${lat},${lng});
+      way["amenity"~"hospital|clinic"](around:3000,${lat},${lng});
+      node["shop"~"supermarket|mall|convenience"](around:3000,${lat},${lng});
+      way["shop"~"supermarket|mall|convenience"](around:3000,${lat},${lng});
+      node["public_transport"~"station|stop_position|platform"](around:3000,${lat},${lng});
+      node["railway"~"station|halt|tram_stop"](around:3000,${lat},${lng});
+      node["amenity"="bus_station"](around:3000,${lat},${lng});
+      node["highway"="bus_stop"](around:3000,${lat},${lng});
+      way["railway"="station"](around:3000,${lat},${lng});
+      way["amenity"="bus_station"](around:3000,${lat},${lng});
+    );out center 100;`;
 
-        const res = await fetch("https://overpass-api.de/api/interpreter", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `data=${encodeURIComponent(overpassQuery)}`,
-          next: { revalidate: 86400 }, // Cache 24h
-        });
+    const res = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `data=${encodeURIComponent(overpassQuery)}`,
+      next: { revalidate: 86400 },
+    });
 
-        if (!res.ok) {
-          results[category] = [];
-          return;
+    if (res.ok) {
+      const data = await res.json();
+      if (data.elements) {
+        // Deduplicate by name per category
+        const seen: Record<string, Set<string>> = {
+          school: new Set(), transit: new Set(), store: new Set(), hospital: new Set(),
+        };
+
+        const grouped: Record<string, (PlaceResult & { distKm: number })[]> = {
+          school: [], transit: [], store: [], hospital: [],
+        };
+
+        for (const el of data.elements) {
+          if (!el.tags?.name) continue;
+          const elLat = el.lat ?? el.center?.lat;
+          const elLon = el.lon ?? el.center?.lon;
+          if (!elLat || !elLon) continue;
+
+          const category = classifyElement(el.tags);
+          if (!category) continue;
+          if (seen[category].has(el.tags.name)) continue;
+          seen[category].add(el.tags.name);
+
+          const dist = haversine(lat, lng, elLat, elLon);
+          grouped[category].push({
+            name: el.tags.name,
+            type: formatType(el.tags),
+            distance: formatDist(dist),
+            lat: elLat,
+            lng: elLon,
+            distKm: dist,
+          });
         }
 
-        const data = await res.json();
-
-        if (data.elements && data.elements.length > 0) {
-          // Deduplicate by name (node + way for same place)
-          const seen = new Set<string>();
-          const places: PlaceResult[] = data.elements
-            .filter((el: { type?: string; tags?: Record<string, string>; lat?: number; lon?: number; center?: { lat: number; lon: number } }) => {
-              const elLat = el.lat ?? el.center?.lat;
-              const elLon = el.lon ?? el.center?.lon;
-              if (!el.tags?.name || !elLat || !elLon) return false;
-              if (seen.has(el.tags.name)) return false;
-              seen.add(el.tags.name);
-              return true;
-            })
-            .map((el: { tags: Record<string, string>; lat?: number; lon?: number; center?: { lat: number; lon: number } }) => {
-              const elLat = (el.lat ?? el.center?.lat)!;
-              const elLon = (el.lon ?? el.center?.lon)!;
-              const dist = haversine(lat, lng, elLat, elLon);
-              return {
-                name: el.tags.name,
-                type: formatType(el.tags),
-                distance: formatDist(dist),
-                lat: elLat,
-                lng: elLon,
-              };
-            })
-            .sort((a: PlaceResult, b: PlaceResult) => {
-              const distA = parseFloat(a.distance);
-              const distB = parseFloat(b.distance);
-              return distA - distB;
-            })
-            .slice(0, 5);
-
-          results[category] = places;
-        } else {
-          results[category] = [];
+        for (const cat of Object.keys(results)) {
+          grouped[cat].sort((a, b) => a.distKm - b.distKm);
+          results[cat] = grouped[cat].slice(0, 5).map(({ distKm: _, ...rest }) => rest);
         }
-      } catch {
-        results[category] = [];
       }
-    })
-  );
+    }
+  } catch {
+    // Return empty results on error
+  }
 
   return NextResponse.json(results, {
     headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=43200" },
