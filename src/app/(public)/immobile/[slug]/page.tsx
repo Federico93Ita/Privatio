@@ -518,8 +518,32 @@ export default async function PropertyDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* ── Mortgage Calculator (full width, below grid) ── */}
+          {/* ── Property Valuation ── */}
           <div className="mt-16 pt-12">
+            <div className="text-center mb-8">
+              <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
+                Analisi di mercato
+              </h2>
+              <p className="text-text-muted text-sm mt-2">
+                Come si posiziona questo immobile rispetto al mercato di {property.city}
+              </p>
+            </div>
+            <div className="lg:max-w-3xl mx-auto">
+              <div className="bg-white rounded-2xl p-8 border border-border shadow-sm">
+                <PropertyValuation
+                  city={property.city}
+                  province={property.province}
+                  surface={property.surface}
+                  rooms={property.rooms}
+                  price={property.price}
+                  type={property.type}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Mortgage Calculator (full width, below valuation) ── */}
+          <div className="mt-16 pt-12 border-t border-border">
             <div className="text-center mb-8">
               <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
                 Simula il tuo mutuo
@@ -530,26 +554,6 @@ export default async function PropertyDetailPage({ params }: Props) {
             </div>
             <div className="lg:max-w-4xl mx-auto">
               <MortgageCalc defaultPrice={property.price} />
-            </div>
-          </div>
-
-          {/* ── Property Valuation ── */}
-          <div className="bg-white rounded-2xl p-8 border border-border">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-medium text-text">Analisi di mercato</h2>
-              <p className="text-text-muted text-sm mt-2">
-                Come si posiziona questo immobile rispetto al mercato di {property.city}
-              </p>
-            </div>
-            <div className="lg:max-w-2xl mx-auto">
-              <PropertyValuation
-                city={property.city}
-                province={property.province}
-                surface={property.surface}
-                rooms={property.rooms}
-                price={property.price}
-                type={property.type}
-              />
             </div>
           </div>
 
