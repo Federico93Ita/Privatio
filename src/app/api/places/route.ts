@@ -13,10 +13,10 @@ interface PlaceResult {
  * Category → OpenStreetMap amenity/public_transport tags
  */
 const OSM_QUERIES: Record<string, string> = {
-  school: `node["amenity"~"school|university"](around:2000,{LAT},{LNG});`,
-  transit: `node["public_transport"~"station|stop_position"](around:2000,{LAT},{LNG});node["railway"="station"](around:2000,{LAT},{LNG});node["amenity"="bus_station"](around:2000,{LAT},{LNG});`,
-  store: `node["shop"~"supermarket|mall|convenience"](around:2000,{LAT},{LNG});`,
-  hospital: `node["amenity"~"hospital|pharmacy|clinic|doctors"](around:2000,{LAT},{LNG});`,
+  school: `node["amenity"~"school|university"](around:3000,{LAT},{LNG});way["amenity"~"school|university"](around:3000,{LAT},{LNG});`,
+  transit: `node["public_transport"~"station|stop_position|platform"](around:3000,{LAT},{LNG});node["railway"~"station|halt|tram_stop"](around:3000,{LAT},{LNG});node["amenity"="bus_station"](around:3000,{LAT},{LNG});node["highway"="bus_stop"](around:3000,{LAT},{LNG});way["railway"="station"](around:3000,{LAT},{LNG});way["amenity"="bus_station"](around:3000,{LAT},{LNG});`,
+  store: `node["shop"~"supermarket|mall|convenience"](around:3000,{LAT},{LNG});way["shop"~"supermarket|mall|convenience"](around:3000,{LAT},{LNG});`,
+  hospital: `node["amenity"~"hospital|pharmacy|clinic|doctors"](around:3000,{LAT},{LNG});way["amenity"~"hospital|clinic"](around:3000,{LAT},{LNG});`,
 };
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -34,7 +34,7 @@ function formatDist(km: number): string {
 }
 
 function formatType(tags: Record<string, string>): string {
-  const amenity = tags.amenity || tags.shop || tags.public_transport || tags.railway || "";
+  const amenity = tags.amenity || tags.shop || tags.public_transport || tags.railway || tags.highway || "";
   const labels: Record<string, string> = {
     school: "Scuola",
     university: "Università",
@@ -46,8 +46,12 @@ function formatType(tags: Record<string, string>): string {
     mall: "Centro commerciale",
     convenience: "Alimentari",
     station: "Stazione",
+    halt: "Fermata treno",
+    tram_stop: "Fermata tram",
     stop_position: "Fermata",
+    platform: "Fermata",
     bus_station: "Stazione bus",
+    bus_stop: "Fermata bus",
   };
   return labels[amenity] || amenity.replace(/_/g, " ");
 }
@@ -75,7 +79,7 @@ export async function GET(req: NextRequest) {
     Object.entries(OSM_QUERIES).map(async ([category, queryTemplate]) => {
       try {
         const query = queryTemplate.replace(/{LAT}/g, String(lat)).replace(/{LNG}/g, String(lng));
-        const overpassQuery = `[out:json][timeout:10];(${query});out body 10;`;
+        const overpassQuery = `[out:json][timeout:15];(${query});out center 30;`;
 
         const res = await fetch("https://overpass-api.de/api/interpreter", {
           method: "POST",
@@ -92,16 +96,27 @@ export async function GET(req: NextRequest) {
         const data = await res.json();
 
         if (data.elements && data.elements.length > 0) {
+          // Deduplicate by name (node + way for same place)
+          const seen = new Set<string>();
           const places: PlaceResult[] = data.elements
-            .filter((el: { tags?: Record<string, string>; lat?: number; lon?: number }) => el.tags?.name && el.lat && el.lon)
-            .map((el: { tags: Record<string, string>; lat: number; lon: number }) => {
-              const dist = haversine(lat, lng, el.lat, el.lon);
+            .filter((el: { type?: string; tags?: Record<string, string>; lat?: number; lon?: number; center?: { lat: number; lon: number } }) => {
+              const elLat = el.lat ?? el.center?.lat;
+              const elLon = el.lon ?? el.center?.lon;
+              if (!el.tags?.name || !elLat || !elLon) return false;
+              if (seen.has(el.tags.name)) return false;
+              seen.add(el.tags.name);
+              return true;
+            })
+            .map((el: { tags: Record<string, string>; lat?: number; lon?: number; center?: { lat: number; lon: number } }) => {
+              const elLat = (el.lat ?? el.center?.lat)!;
+              const elLon = (el.lon ?? el.center?.lon)!;
+              const dist = haversine(lat, lng, elLat, elLon);
               return {
                 name: el.tags.name,
                 type: formatType(el.tags),
                 distance: formatDist(dist),
-                lat: el.lat,
-                lng: el.lon,
+                lat: elLat,
+                lng: elLon,
               };
             })
             .sort((a: PlaceResult, b: PlaceResult) => {
