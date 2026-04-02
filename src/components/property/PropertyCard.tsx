@@ -83,9 +83,9 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     <Link
       href={`/immobile/${slug}`}
       className={cn(
-        "group block rounded-2xl overflow-hidden bg-white border border-border",
-        "shadow-sm hover:shadow-lg transition-all duration-300 ease-out",
-        "hover:scale-[1.02]"
+        "group block rounded-3xl overflow-hidden bg-white border border-black/[0.04]",
+        "shadow-sm transition-all duration-500 ease-out",
+        "hover:shadow-xl hover:shadow-black/[0.06] hover:-translate-y-1"
       )}
     >
       {/* ---- Photo ---- */}
@@ -113,13 +113,16 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </>
         )}
 
+        {/* Image gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
         {/* Commission badge */}
-        <span className="absolute top-3 left-3 bg-success/90 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
+        <span className="absolute top-3 left-3 bg-emerald-600/90 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-1.5 rounded-xl shadow-sm">
           0% comm. venditore
         </span>
 
         {/* Property type badge */}
-        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-text text-xs font-medium px-2.5 py-1 rounded-full">
+        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-[#0B1D3A] text-[11px] font-semibold px-3 py-1.5 rounded-xl shadow-sm">
           {getPropertyTypeLabel(type)}
         </span>
 
@@ -132,24 +135,28 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       </div>
 
       {/* ---- Body ---- */}
-      <div className="p-4 flex flex-col gap-2">
+      <div className="p-5 flex flex-col gap-2.5">
         {/* Title */}
-        <h3 className="font-medium text-text text-base leading-snug line-clamp-2 group-hover:text-[#C9A84C] transition-colors">
+        <h3 className="font-medium text-[#0B1D3A] text-base leading-snug line-clamp-2 group-hover:text-[#C9A84C] transition-colors duration-300">
           {title}
         </h3>
 
         {/* Location */}
-        <p className="text-text-muted text-sm">
+        <div className="flex items-center gap-1.5 text-[#0B1D3A]/40 text-sm">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+          </svg>
           {city}, {province}
-        </p>
+        </div>
 
         {/* Price */}
-        <p className="text-[#C9A84C] font-semibold text-xl">
+        <p className="text-xl font-semibold bg-gradient-to-r from-[#C9A84C] to-[#B8943B] bg-clip-text text-transparent">
           {formatPrice(price)}
         </p>
 
         {/* Stats row */}
-        <div className="flex items-center gap-4 text-text-muted text-sm pt-1 border-t border-border">
+        <div className="flex items-center gap-4 text-[#0B1D3A]/40 text-sm pt-2 border-t border-black/[0.04]">
           {/* Surface */}
           <span className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

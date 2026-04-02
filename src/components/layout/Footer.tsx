@@ -37,8 +37,8 @@ const footerColumns = [
 function InstagramIcon() {
   return (
     <svg
-      width="20"
-      height="20"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -57,8 +57,8 @@ function InstagramIcon() {
 function LinkedInIcon() {
   return (
     <svg
-      width="20"
-      height="20"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -95,33 +95,61 @@ function MailIcon() {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#071428] border-t border-white/10">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
+    <footer className="relative bg-[#071428] overflow-hidden">
+      {/* Top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/20 to-transparent" />
+
+      {/* Decorative elements */}
+      <div className="absolute top-[10%] right-[-5%] w-64 h-64 rounded-full bg-[#C9A84C]/[0.02] blur-[80px]" />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="sm:col-span-2 lg:col-span-2">
             <Link href="/" className="inline-flex items-center">
-              <span className="text-lg font-semibold tracking-[-0.03em] text-[#C9A84C]">
+              <span className="text-xl font-semibold tracking-[-0.03em] bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] bg-clip-text text-transparent">
                 Privatio
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
-              La prima piattaforma pensata per chi vende
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/40">
+              La prima piattaforma immobiliare italiana pensata per chi vende. Zero commissioni, massima trasparenza.
             </p>
+
+            {/* Social icons */}
+            <div className="mt-8 flex items-center gap-3">
+              <a
+                href="https://instagram.com/privatio.it"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05] text-white/40 transition-all duration-300 hover:bg-[#C9A84C]/15 hover:text-[#C9A84C] hover:scale-105"
+              >
+                <InstagramIcon />
+              </a>
+              <a
+                href="https://linkedin.com/company/privatio"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05] text-white/40 transition-all duration-300 hover:bg-[#C9A84C]/15 hover:text-[#C9A84C] hover:scale-105"
+              >
+                <LinkedInIcon />
+              </a>
+            </div>
           </div>
 
           {/* Link Columns */}
           {footerColumns.map((column) => (
             <div key={column.title}>
-              <h3 className="text-xs font-medium tracking-wide text-[#C9A84C]/70">
+              <h3 className="text-xs font-medium tracking-[0.15em] uppercase text-[#C9A84C]/50">
                 {column.title}
               </h3>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-5 space-y-3">
                 {column.links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-white/50 transition-colors hover:text-[#C9A84C]"
+                      className="text-sm text-white/40 transition-colors duration-300 hover:text-[#C9A84C]"
                     >
                       {link.label}
                     </Link>
@@ -132,39 +160,19 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Contatti Section - displayed under columns on larger screens */}
-        <div className="mt-10 border-t border-white/10 pt-8">
+        {/* Contatti Section */}
+        <div className="mt-14 border-t border-white/[0.06] pt-10">
           <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-xs font-medium tracking-wide text-[#C9A84C]/70">
+              <h3 className="text-xs font-medium tracking-[0.15em] uppercase text-[#C9A84C]/50">
                 Contatti
               </h3>
               <a
                 href="mailto:info@privatio.it"
-                className="mt-2 inline-flex items-center gap-2 text-sm text-white/50 transition-colors hover:text-[#C9A84C]"
+                className="mt-3 inline-flex items-center gap-2 text-sm text-white/40 transition-colors duration-300 hover:text-[#C9A84C]"
               >
                 <MailIcon />
                 info@privatio.it
-              </a>
-            </div>
-            <div className="flex items-center gap-4">
-              <a
-                href="https://instagram.com/privatio.it"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/50 transition-colors hover:bg-[#C9A84C] hover:text-[#0B1D3A]"
-              >
-                <InstagramIcon />
-              </a>
-              <a
-                href="https://linkedin.com/company/privatio"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/50 transition-colors hover:bg-[#C9A84C] hover:text-[#0B1D3A]"
-              >
-                <LinkedInIcon />
               </a>
             </div>
           </div>
@@ -172,15 +180,16 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-4">
-            <p className="text-xs text-white/30">
+      <div className="border-t border-white/[0.04]">
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+            <p className="text-xs text-white/20">
               {COMPANY.footerText(new Date().getFullYear())}
             </p>
+            <div className="hidden sm:block h-3 w-px bg-white/10" />
             <button
               onClick={resetConsent}
-              className="text-xs text-white/20 hover:text-white/40 transition-colors duration-200"
+              className="text-xs text-white/15 hover:text-white/30 transition-colors duration-300"
             >
               Gestisci cookie
             </button>
