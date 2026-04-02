@@ -12,8 +12,8 @@ import dynamic from "next/dynamic";
 const SearchMapView = dynamic(() => import("@/components/search/SearchMapView"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[500px] bg-bg-soft rounded-xl border border-border animate-pulse">
-      <p className="text-text-muted text-sm">Caricamento mappa...</p>
+    <div className="flex items-center justify-center h-[500px] bg-[#F8F6F1] rounded-3xl border border-[#C9A84C]/[0.08] animate-pulse">
+      <p className="text-[#0B1D3A]/50 text-sm">Caricamento mappa...</p>
     </div>
   ),
 });
@@ -238,15 +238,15 @@ function CercaPageInner() {
 
   /* ---- Render helpers ---- */
   const inputClass = cn(
-    "w-full rounded-lg border border-border px-3 py-2.5 text-sm",
-    "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
-    "transition-colors bg-white"
+    "w-full rounded-lg border border-[#0B1D3A]/10 px-3 py-2.5 text-sm",
+    "focus:outline-none focus:ring-1 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50",
+    "transition-colors bg-white text-[#0B1D3A] placeholder:text-[#0B1D3A]/40"
   );
 
   const selectClass = cn(
-    "w-full rounded-lg border border-border px-3 py-2.5 text-sm appearance-none",
-    "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
-    "transition-colors bg-white"
+    "w-full rounded-lg border border-[#0B1D3A]/10 px-3 py-2.5 text-sm appearance-none",
+    "focus:outline-none focus:ring-1 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50",
+    "transition-colors bg-white text-[#0B1D3A]"
   );
 
   /* ---------------------------------------------------------------- */
@@ -255,10 +255,10 @@ function CercaPageInner() {
 
   const filtersContent = (
     <div className="space-y-5">
-      {/* Città */}
+      {/* Citta */}
       <div className="space-y-1.5">
-        <label htmlFor="filter-city" className="block text-sm font-medium text-text">
-          Città
+        <label htmlFor="filter-city" className="block text-sm font-medium text-[#0B1D3A]">
+          Citta
         </label>
         <input
           id="filter-city"
@@ -279,7 +279,7 @@ function CercaPageInner() {
 
       {/* Tipo immobile */}
       <div className="space-y-1.5">
-        <label htmlFor="filter-type" className="block text-sm font-medium text-text">
+        <label htmlFor="filter-type" className="block text-sm font-medium text-[#0B1D3A]">
           Tipo immobile
         </label>
         <select
@@ -298,7 +298,7 @@ function CercaPageInner() {
 
       {/* Prezzo */}
       <div className="space-y-1.5">
-        <span className="block text-sm font-medium text-text">Prezzo</span>
+        <span className="block text-sm font-medium text-[#0B1D3A]">Prezzo</span>
         <div className="grid grid-cols-2 gap-2">
           <input
             type="number"
@@ -321,7 +321,7 @@ function CercaPageInner() {
 
       {/* Superficie */}
       <div className="space-y-1.5">
-        <span className="block text-sm font-medium text-text">Superficie (mq)</span>
+        <span className="block text-sm font-medium text-[#0B1D3A]">Superficie (mq)</span>
         <div className="grid grid-cols-2 gap-2">
           <input
             type="number"
@@ -344,7 +344,7 @@ function CercaPageInner() {
 
       {/* N. locali */}
       <div className="space-y-1.5">
-        <label htmlFor="filter-rooms" className="block text-sm font-medium text-text">
+        <label htmlFor="filter-rooms" className="block text-sm font-medium text-[#0B1D3A]">
           N. locali
         </label>
         <select
@@ -363,7 +363,7 @@ function CercaPageInner() {
 
       {/* Caratteristiche */}
       <div className="space-y-2">
-        <span className="block text-sm font-medium text-text">Caratteristiche</span>
+        <span className="block text-sm font-medium text-[#0B1D3A]">Caratteristiche</span>
         {[
           { key: "hasGarage" as const, label: "Garage" },
           { key: "hasGarden" as const, label: "Giardino" },
@@ -375,9 +375,9 @@ function CercaPageInner() {
               type="checkbox"
               checked={filters[key]}
               onChange={(e) => updateFilter(key, e.target.checked)}
-              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-[#0B1D3A]/20 accent-[#C9A84C] focus:ring-[#C9A84C]"
             />
-            <span className="text-sm text-text">{label}</span>
+            <span className="text-sm text-[#0B1D3A]/80">{label}</span>
           </label>
         ))}
       </div>
@@ -388,8 +388,8 @@ function CercaPageInner() {
           type="button"
           onClick={handleSearch}
           className={cn(
-            "w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white",
-            "hover:bg-primary/85 transition-colors shadow-sm"
+            "w-full rounded-lg bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-4 py-2.5 text-sm font-semibold text-[#0B1D3A]",
+            "hover:opacity-90 transition-opacity shadow-sm"
           )}
         >
           Cerca
@@ -398,8 +398,8 @@ function CercaPageInner() {
           type="button"
           onClick={handleReset}
           className={cn(
-            "w-full rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-text-muted",
-            "hover:bg-bg-soft transition-colors"
+            "w-full px-4 py-2.5 text-sm font-medium text-[#0B1D3A]/50",
+            "hover:text-[#0B1D3A]/80 transition-colors"
           )}
         >
           Reset filtri
@@ -441,8 +441,8 @@ function CercaPageInner() {
           className={cn(
             "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
             page === 1
-              ? "text-text-muted/40 cursor-not-allowed"
-              : "text-text-muted hover:bg-bg-soft hover:text-primary"
+              ? "text-[#0B1D3A]/25 cursor-not-allowed"
+              : "text-[#0B1D3A]/60 hover:bg-[#C9A84C]/10 hover:text-[#0B1D3A]"
           )}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -454,7 +454,7 @@ function CercaPageInner() {
         {/* Page numbers */}
         {pages.map((p, idx) =>
           typeof p === "string" ? (
-            <span key={`ellipsis-${idx}`} className="px-2 text-text-muted text-sm">
+            <span key={`ellipsis-${idx}`} className="px-2 text-[#0B1D3A]/40 text-sm">
               ...
             </span>
           ) : (
@@ -465,8 +465,8 @@ function CercaPageInner() {
               className={cn(
                 "rounded-lg px-3 py-2 text-sm font-medium transition-colors min-w-[40px]",
                 p === page
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-text-muted hover:bg-bg-soft hover:text-primary"
+                  ? "bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A] shadow-sm"
+                  : "text-[#0B1D3A]/60 hover:bg-[#C9A84C]/10 hover:text-[#0B1D3A]"
               )}
             >
               {p}
@@ -482,8 +482,8 @@ function CercaPageInner() {
           className={cn(
             "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
             page === totalPages
-              ? "text-text-muted/40 cursor-not-allowed"
-              : "text-text-muted hover:bg-bg-soft hover:text-primary"
+              ? "text-[#0B1D3A]/25 cursor-not-allowed"
+              : "text-[#0B1D3A]/60 hover:bg-[#C9A84C]/10 hover:text-[#0B1D3A]"
           )}
         >
           Succ.
@@ -503,29 +503,40 @@ function CercaPageInner() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-bg-soft pt-20 md:pt-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          {/* ---- Page title ---- */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-light tracking-[-0.03em] sm:text-4xl text-primary-dark">
+      <main className="min-h-screen bg-[#F8F6F1]">
+        {/* ---- Navy hero strip ---- */}
+        <section className="relative overflow-hidden bg-[#0B1D3A] pt-28 pb-12 md:pt-32 md:pb-14">
+          {/* Grain texture overlay */}
+          <div className="grain pointer-events-none absolute inset-0 z-[1]" />
+          {/* Gradient orb */}
+          <div className="pointer-events-none absolute -top-32 right-1/4 h-80 w-80 rounded-full bg-[#C9A84C]/10 blur-[100px]" />
+          <div className="pointer-events-none absolute -bottom-20 left-1/3 h-60 w-60 rounded-full bg-[#C9A84C]/[0.06] blur-[80px]" />
+
+          <div className="relative z-[2] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-3">
+              Cerca Casa
+            </p>
+            <h1 className="font-heading text-3xl font-light tracking-[-0.03em] sm:text-4xl text-white">
               Cerca il tuo immobile
             </h1>
-            <p className="mt-2 text-text-muted text-base">
+            <p className="mt-2 text-white/60 text-base max-w-xl">
               Trova la casa dei tuoi sogni tra gli immobili disponibili sulla piattaforma.
             </p>
           </div>
+        </section>
 
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {/* ---- Mobile filter toggle ---- */}
           <div className="lg:hidden mb-6">
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
               className={cn(
-                "flex items-center gap-2 rounded-lg border border-border bg-white px-4 py-2.5",
-                "text-sm font-medium text-text shadow-sm hover:bg-bg-soft transition-colors w-full justify-center"
+                "flex items-center gap-2 rounded-3xl border border-[#C9A84C]/30 bg-white px-5 py-3",
+                "text-sm font-medium text-[#0B1D3A] shadow-sm hover:bg-[#C9A84C]/5 transition-colors w-full justify-center"
               )}
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="w-5 h-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
               </svg>
               {mobileFiltersOpen ? "Chiudi filtri" : "Mostra filtri"}
@@ -533,7 +544,10 @@ function CercaPageInner() {
 
             {/* Mobile filters panel */}
             {mobileFiltersOpen && (
-              <div className="mt-4 rounded-2xl border border-border bg-white p-5 shadow-sm">
+              <div className="mt-4 rounded-3xl border border-[#C9A84C]/[0.08] bg-white p-6 shadow-sm">
+                <h2 className="font-heading text-lg font-medium text-[#0B1D3A] mb-4">
+                  Filtri
+                </h2>
                 {filtersContent}
               </div>
             )}
@@ -542,8 +556,8 @@ function CercaPageInner() {
           <div className="flex gap-8">
             {/* ---- Desktop sidebar ---- */}
             <aside className="hidden lg:block w-72 shrink-0">
-              <div className="sticky top-28 rounded-2xl border border-border bg-white p-5 shadow-sm">
-                <h2 className="text-lg font-medium text-text mb-4">
+              <div className="sticky top-28 rounded-3xl border border-[#C9A84C]/[0.08] bg-white p-6 shadow-sm">
+                <h2 className="font-heading text-lg font-medium text-[#0B1D3A] mb-4">
                   Filtri
                 </h2>
                 {filtersContent}
@@ -554,12 +568,12 @@ function CercaPageInner() {
             <div className="flex-1 min-w-0">
               {/* Results header: count + sort */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                <p className="text-text-muted text-sm">
+                <p className="text-[#0B1D3A]/50 text-sm">
                   {loading ? (
                     "Ricerca in corso..."
                   ) : pagination ? (
                     <>
-                      <span className="font-semibold text-text">{pagination.total}</span>{" "}
+                      <span className="font-semibold text-[#0B1D3A]">{pagination.total}</span>{" "}
                       {pagination.total === 1 ? "immobile trovato" : "immobili trovati"}
                     </>
                   ) : (
@@ -569,15 +583,15 @@ function CercaPageInner() {
 
                 <div className="flex items-center gap-3">
                   {/* View mode toggle */}
-                  <div className="flex rounded-lg border border-border overflow-hidden">
+                  <div className="flex rounded-lg border border-[#0B1D3A]/10 overflow-hidden">
                     <button
                       type="button"
                       onClick={() => setViewMode("grid")}
                       className={cn(
                         "p-2 transition-colors",
                         viewMode === "grid"
-                          ? "bg-primary text-white"
-                          : "bg-white text-text-muted hover:bg-bg-soft"
+                          ? "bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A]"
+                          : "bg-white text-[#0B1D3A]/40 hover:bg-[#C9A84C]/5"
                       )}
                       title="Vista griglia"
                     >
@@ -591,8 +605,8 @@ function CercaPageInner() {
                       className={cn(
                         "p-2 transition-colors",
                         viewMode === "map"
-                          ? "bg-primary text-white"
-                          : "bg-white text-text-muted hover:bg-bg-soft"
+                          ? "bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A]"
+                          : "bg-white text-[#0B1D3A]/40 hover:bg-[#C9A84C]/5"
                       )}
                       title="Vista mappa"
                     >
@@ -646,7 +660,7 @@ function CercaPageInner() {
                         setTimeout(() => setSaveSearchMsg(null), 3000);
                       }
                     }}
-                    className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm text-text-muted hover:bg-bg-soft hover:text-primary transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg border border-[#C9A84C]/20 bg-white px-3 py-2 text-sm text-[#0B1D3A]/60 hover:bg-[#C9A84C]/5 hover:text-[#C9A84C] transition-colors"
                     title="Salva questa ricerca"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -655,10 +669,10 @@ function CercaPageInner() {
                     <span className="hidden sm:inline">Salva ricerca</span>
                   </button>
                   {saveSearchMsg && (
-                    <span className="text-xs text-primary font-medium">{saveSearchMsg}</span>
+                    <span className="text-xs text-[#C9A84C] font-medium">{saveSearchMsg}</span>
                   )}
 
-                  <label htmlFor="sort-select" className="text-sm text-text-muted whitespace-nowrap">
+                  <label htmlFor="sort-select" className="text-sm text-[#0B1D3A]/50 whitespace-nowrap">
                     Ordina per:
                   </label>
                   <select
@@ -666,8 +680,8 @@ function CercaPageInner() {
                     value={filters.sort}
                     onChange={(e) => handleSortChange(e.target.value)}
                     className={cn(
-                      "rounded-lg border border-border px-3 py-2 text-sm bg-white",
-                      "focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary",
+                      "rounded-lg border border-[#0B1D3A]/10 px-3 py-2 text-sm bg-white text-[#0B1D3A]",
+                      "focus:outline-none focus:ring-1 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50",
                       "transition-colors appearance-none"
                     )}
                   >
@@ -692,21 +706,21 @@ function CercaPageInner() {
               {/* Empty state */}
               {!loading && properties.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="w-20 h-20 rounded-full bg-bg-soft flex items-center justify-center mb-4">
-                    <svg className="w-10 h-10 text-text-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-20 h-20 rounded-full bg-[#C9A84C]/10 flex items-center justify-center mb-4">
+                    <svg className="w-10 h-10 text-[#C9A84C]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-text mb-1">
+                  <h3 className="font-heading text-lg font-semibold text-[#0B1D3A] mb-1">
                     Nessun immobile trovato
                   </h3>
-                  <p className="text-text-muted text-sm max-w-sm">
+                  <p className="text-[#0B1D3A]/50 text-sm max-w-sm">
                     Prova a modificare i filtri per ampliare la ricerca.
                   </p>
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="mt-4 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/85 transition-colors"
+                    className="mt-4 rounded-lg bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-5 py-2.5 text-sm font-semibold text-[#0B1D3A] hover:opacity-90 transition-opacity"
                   >
                     Reset filtri
                   </button>
@@ -748,12 +762,17 @@ export default function CercaPage() {
       fallback={
         <>
           <Header />
-          <main className="min-h-screen bg-bg-soft pt-20 md:pt-24">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-              <div className="mb-8">
-                <div className="h-10 w-64 bg-border/60 rounded animate-pulse" />
-                <div className="mt-2 h-5 w-96 bg-border/60 rounded animate-pulse" />
+          <main className="min-h-screen bg-[#F8F6F1]">
+            {/* Navy hero strip skeleton */}
+            <section className="relative overflow-hidden bg-[#0B1D3A] pt-28 pb-12 md:pt-32 md:pb-14">
+              <div className="grain pointer-events-none absolute inset-0 z-[1]" />
+              <div className="relative z-[2] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="h-4 w-24 bg-white/10 rounded animate-pulse mb-3" />
+                <div className="h-10 w-64 bg-white/10 rounded animate-pulse" />
+                <div className="mt-2 h-5 w-96 bg-white/10 rounded animate-pulse" />
               </div>
+            </section>
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 lg:ml-80">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <SkeletonCard key={i} />

@@ -45,8 +45,8 @@ function formatPrice(price: number): string {
 }
 
 function formatPricePerMq(price: number, surface: number): string {
-  if (!surface) return "—";
-  return `${Math.round(price / surface).toLocaleString("it-IT")} €/m²`;
+  if (!surface) return "\u2014";
+  return `${Math.round(price / surface).toLocaleString("it-IT")} \u20AC/m\u00B2`;
 }
 
 const typeLabels: Record<string, string> = {
@@ -63,7 +63,7 @@ const typeLabels: Record<string, string> = {
 
 function CheckIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-success" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500" aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -71,7 +71,7 @@ function CheckIcon() {
 
 function XIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-text-muted" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-[#0B1D3A]/20" aria-hidden="true">
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
@@ -128,11 +128,11 @@ export default function ConfrontaPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-soft px-4 py-12">
+      <div className="min-h-screen bg-[#F8F6F1] px-4 py-12">
         <div className="mx-auto max-w-6xl">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 w-64 rounded bg-border" />
-            <div className="h-96 w-full rounded-xl bg-border" />
+            <div className="h-8 w-64 rounded-xl bg-[#0B1D3A]/10" />
+            <div className="h-96 w-full rounded-3xl bg-[#0B1D3A]/5" />
           </div>
         </div>
       </div>
@@ -141,13 +141,15 @@ export default function ConfrontaPage() {
 
   if (error || properties.length < 2) {
     return (
-      <div className="min-h-screen bg-bg-soft flex items-center justify-center px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-medium text-text mb-4">Confronta Immobili</h1>
-          <p className="text-sm text-text-muted mb-6">{error || "Seleziona almeno 2 immobili da confrontare."}</p>
+      <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-[#0B1D3A]" />
+        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.05] blur-[120px]" />
+        <div className="relative text-center">
+          <h1 className="font-heading text-2xl font-normal text-white mb-4">Confronta Immobili</h1>
+          <p className="text-sm text-white/40 mb-6">{error || "Seleziona almeno 2 immobili da confrontare."}</p>
           <Link
             href="/cerca"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white hover:bg-primary/85 transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-6 py-3.5 text-sm font-medium text-[#0B1D3A] hover:shadow-lg hover:shadow-[#C9A84C]/20 transition-all duration-300"
           >
             Cerca Immobili
           </Link>
@@ -157,15 +159,15 @@ export default function ConfrontaPage() {
   }
 
   const rows: { label: string; getValue: (p: Property) => React.ReactNode }[] = [
-    { label: "Prezzo", getValue: (p) => <span className="font-medium text-primary">{formatPrice(p.price)}</span> },
-    { label: "Prezzo/m²", getValue: (p) => formatPricePerMq(p.price, p.surface) },
+    { label: "Prezzo", getValue: (p) => <span className="font-medium bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] bg-clip-text text-transparent">{formatPrice(p.price)}</span> },
+    { label: "Prezzo/m\u00B2", getValue: (p) => formatPricePerMq(p.price, p.surface) },
     { label: "Tipo", getValue: (p) => typeLabels[p.type] || p.type },
-    { label: "Superficie", getValue: (p) => `${p.surface} m²` },
+    { label: "Superficie", getValue: (p) => `${p.surface} m\u00B2` },
     { label: "Locali", getValue: (p) => p.rooms },
     { label: "Bagni", getValue: (p) => p.bathrooms },
-    { label: "Piano", getValue: (p) => p.floor != null ? `${p.floor}/${p.totalFloors || "—"}` : "—" },
-    { label: "Classe Energetica", getValue: (p) => p.energyClass || "—" },
-    { label: "Anno Costruzione", getValue: (p) => p.yearBuilt || "—" },
+    { label: "Piano", getValue: (p) => p.floor != null ? `${p.floor}/${p.totalFloors || "\u2014"}` : "\u2014" },
+    { label: "Classe Energetica", getValue: (p) => p.energyClass || "\u2014" },
+    { label: "Anno Costruzione", getValue: (p) => p.yearBuilt || "\u2014" },
     { label: "Garage", getValue: (p) => p.hasGarage ? <CheckIcon /> : <XIcon /> },
     { label: "Giardino", getValue: (p) => p.hasGarden ? <CheckIcon /> : <XIcon /> },
     { label: "Balcone", getValue: (p) => p.hasBalcony ? <CheckIcon /> : <XIcon /> },
@@ -187,43 +189,44 @@ export default function ConfrontaPage() {
   const bestSurfaceId = getBestSurface();
 
   return (
-    <div className="min-h-screen bg-bg-soft px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-[#F8F6F1] px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-medium text-text sm:text-3xl">Confronta Immobili</h1>
-            <p className="mt-1 text-sm text-text-muted">
+            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-2">Confronto</span>
+            <h1 className="font-heading text-2xl font-normal text-[#0B1D3A] sm:text-3xl">Confronta Immobili</h1>
+            <p className="mt-1 text-sm text-[#0B1D3A]/50">
               Confronta {properties.length} immobili fianco a fianco.
             </p>
           </div>
           <Link
             href="/cerca"
-            className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-primary-dark hover:bg-bg-soft transition-colors"
+            className="rounded-xl border border-[#C9A84C]/20 px-4 py-2.5 text-sm font-medium text-[#0B1D3A] hover:bg-[#C9A84C]/5 transition-colors"
           >
             Torna alla Ricerca
           </Link>
         </div>
 
         {/* Comparison Table */}
-        <div className="rounded-xl border border-border bg-white shadow-sm overflow-x-auto">
+        <div className="rounded-3xl border border-[#C9A84C]/[0.08] bg-white shadow-sm overflow-x-auto">
           <table className="w-full">
             {/* Header row with images */}
             <thead>
-              <tr className="border-b border-border">
+              <tr className="border-b border-[#C9A84C]/[0.08]">
                 <th className="sticky left-0 z-10 bg-white p-4 text-left w-40" />
                 {properties.map((prop) => (
                   <th key={prop.id} className="p-4 text-center min-w-[220px]">
                     <Link href={`/immobile/${prop.slug}`} className="group block">
-                      <div className="mx-auto mb-3 aspect-[4/3] max-w-[200px] rounded-lg overflow-hidden bg-bg-soft">
+                      <div className="mx-auto mb-3 aspect-[4/3] max-w-[200px] rounded-2xl overflow-hidden bg-[#F8F6F1]">
                         {prop.photos[0] ? (
                           <img
                             src={prop.photos[0].url}
                             alt={prop.title}
-                            className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-text-muted">
+                          <div className="flex h-full w-full items-center justify-center text-[#0B1D3A]/20">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                               <rect x="3" y="3" width="18" height="18" rx="2" />
                               <circle cx="8.5" cy="8.5" r="1.5" />
@@ -232,10 +235,10 @@ export default function ConfrontaPage() {
                           </div>
                         )}
                       </div>
-                      <p className="text-sm font-medium text-primary-dark group-hover:text-primary line-clamp-2">
+                      <p className="text-sm font-medium text-[#0B1D3A] group-hover:text-[#C9A84C] transition-colors line-clamp-2">
                         {prop.title || `${prop.rooms} locali a ${prop.city}`}
                       </p>
-                      <p className="text-xs text-text-muted mt-0.5">{prop.address}</p>
+                      <p className="text-xs text-[#0B1D3A]/40 mt-0.5">{prop.address}</p>
                     </Link>
                   </th>
                 ))}
@@ -243,8 +246,11 @@ export default function ConfrontaPage() {
             </thead>
             <tbody>
               {rows.map((row, idx) => (
-                <tr key={row.label} className={idx % 2 === 0 ? "bg-bg-soft" : "bg-white"}>
-                  <td className="sticky left-0 z-10 border-r border-border p-4 text-sm font-medium text-text-muted whitespace-nowrap" style={{ backgroundColor: idx % 2 === 0 ? "var(--color-bg-soft)" : "#fff" }}>
+                <tr key={row.label} className={idx % 2 === 0 ? "bg-[#F8F6F1]/50" : "bg-white"}>
+                  <td
+                    className="sticky left-0 z-10 border-r border-[#C9A84C]/[0.06] p-4 text-sm font-medium text-[#0B1D3A]/50 whitespace-nowrap"
+                    style={{ backgroundColor: idx % 2 === 0 ? "#FDFBF7" : "#fff" }}
+                  >
                     {row.label}
                   </td>
                   {properties.map((prop) => {
@@ -256,8 +262,8 @@ export default function ConfrontaPage() {
                     return (
                       <td
                         key={prop.id}
-                        className={`p-4 text-center text-sm ${
-                          highlight ? "bg-success/5 font-semibold" : ""
+                        className={`p-4 text-center text-sm text-[#0B1D3A] ${
+                          highlight ? "bg-[#C9A84C]/[0.06] font-semibold" : ""
                         }`}
                       >
                         <div className="flex items-center justify-center">{row.getValue(prop)}</div>
@@ -277,7 +283,7 @@ export default function ConfrontaPage() {
             <div key={prop.id} className="text-center">
               <Link
                 href={`/immobile/${prop.slug}`}
-                className="inline-flex rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary/85"
+                className="inline-flex rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-5 py-3 text-sm font-medium text-[#0B1D3A] shadow-sm hover:shadow-lg hover:shadow-[#C9A84C]/20 transition-all duration-300"
               >
                 Vedi Dettagli
               </Link>

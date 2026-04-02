@@ -3,8 +3,6 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -45,8 +43,8 @@ function VerifyEmailContent() {
   if (status === "loading") {
     return (
       <div className="text-center py-16">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-text-muted">Verifica in corso...</p>
+        <div className="w-12 h-12 border-4 border-[#C9A84C] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-[#0B1D3A]/50">Verifica in corso...</p>
       </div>
     );
   }
@@ -54,18 +52,18 @@ function VerifyEmailContent() {
   if (status === "success") {
     return (
       <div className="text-center py-16">
-        <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-xl font-medium text-primary-dark mb-3">Email verificata!</h2>
-        <p className="text-text-muted mb-6">
+        <h2 className="font-heading text-xl font-normal text-[#0B1D3A] mb-3">Email verificata!</h2>
+        <p className="text-[#0B1D3A]/50 mb-6">
           Il tuo indirizzo email è stato verificato con successo.
         </p>
         <Link
           href="/accedi"
-          className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors inline-block"
+          className="px-6 py-3.5 bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A] rounded-xl font-medium hover:shadow-lg hover:shadow-[#C9A84C]/20 transition-all duration-300 inline-block"
         >
           Accedi al tuo account
         </Link>
@@ -75,16 +73,16 @@ function VerifyEmailContent() {
 
   return (
     <div className="text-center py-16">
-      <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg className="w-8 h-8 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
-      <h2 className="text-xl font-medium text-primary-dark mb-3">Verifica non riuscita</h2>
-      <p className="text-text-muted mb-6">{errorMsg}</p>
+      <h2 className="font-heading text-xl font-normal text-[#0B1D3A] mb-3">Verifica non riuscita</h2>
+      <p className="text-[#0B1D3A]/50 mb-6">{errorMsg}</p>
       <Link
         href="/accedi"
-        className="text-sm text-primary hover:underline"
+        className="text-sm text-[#C9A84C] hover:text-[#B8943B] transition-colors"
       >
         Torna al Login
       </Link>
@@ -94,16 +92,26 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-bg-soft pt-32 pb-16 px-4">
-        <div className="max-w-lg mx-auto bg-white rounded-2xl p-8 border border-border shadow-sm">
-          <Suspense fallback={<div className="h-64 animate-pulse bg-bg-soft rounded-lg" />}>
+    <div className="relative min-h-screen flex items-center justify-center px-4 py-12 overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[#0B1D3A]" />
+      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.05] blur-[120px]" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#C9A84C]/[0.03] blur-[80px]" />
+
+      <div className="relative w-full max-w-lg">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block">
+            <span className="text-2xl font-semibold tracking-[-0.03em] bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] bg-clip-text text-transparent">Privatio</span>
+          </Link>
+        </div>
+
+        <div className="rounded-3xl bg-white/[0.95] backdrop-blur-xl border border-white/20 p-8 shadow-2xl shadow-black/20">
+          <Suspense fallback={<div className="h-64 animate-pulse bg-[#0B1D3A]/5 rounded-xl" />}>
             <VerifyEmailContent />
           </Suspense>
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </div>
   );
 }

@@ -243,11 +243,11 @@ export default async function PropertyDetailPage({ params }: Props) {
     return (
       <>
         <Header />
-        <main className="min-h-[60vh] flex items-center justify-center">
+        <main className="min-h-[60vh] flex items-center justify-center bg-[#0B1D3A]">
           <div className="text-center">
-            <h1 className="text-2xl font-medium text-text mb-4">Immobile non trovato</h1>
-            <p className="text-text-muted mb-6">L&apos;immobile che stai cercando non esiste o non è più disponibile.</p>
-            <Link href="/cerca" className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/85 transition-colors">
+            <h1 className="font-heading text-2xl font-medium text-white mb-4">Immobile non trovato</h1>
+            <p className="text-white/60 mb-6">L&apos;immobile che stai cercando non esiste o non è più disponibile.</p>
+            <Link href="/cerca" className="px-6 py-3 bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A] rounded-lg font-medium hover:opacity-90 transition-opacity">
               Cerca altri immobili
             </Link>
           </div>
@@ -289,7 +289,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
       <Header />
-      <main className="bg-bg-soft min-h-screen pt-28 md:pt-32">
+      <main className="bg-[#F8F6F1] grain min-h-screen pt-28 md:pt-32">
         {/* Gallery (placeholder shown when no photos) */}
         <div className="max-w-7xl mx-auto px-4 pt-6">
           <PropertyGallery photos={property.photos ?? []} propertyType={property.type} />
@@ -298,14 +298,14 @@ export default async function PropertyDetailPage({ params }: Props) {
           {(property.videoUrl || property.virtualTourUrl) && (
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {property.videoUrl && (
-                <div className="bg-white rounded-xl p-4 border border-border">
-                  <h3 className="font-medium text-text mb-3 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <div className="bg-white rounded-3xl p-4 border border-[#C9A84C]/[0.08]">
+                  <h3 className="font-heading font-medium text-[#0B1D3A] mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-[#C9A84C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
                     </svg>
                     Video tour
                   </h3>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                  <div className="aspect-video rounded-2xl overflow-hidden bg-black">
                     <iframe
                       src={property.videoUrl}
                       className="w-full h-full"
@@ -317,15 +317,15 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </div>
               )}
               {property.virtualTourUrl && (
-                <div className="bg-white rounded-xl p-4 border border-border">
-                  <h3 className="font-medium text-text mb-3 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <div className="bg-white rounded-3xl p-4 border border-[#C9A84C]/[0.08]">
+                  <h3 className="font-heading font-medium text-[#0B1D3A] mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-[#C9A84C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
                     Virtual tour 360°
                   </h3>
-                  <div className="aspect-video rounded-lg overflow-hidden">
+                  <div className="aspect-video rounded-2xl overflow-hidden">
                     <iframe
                       src={property.virtualTourUrl}
                       className="w-full h-full"
@@ -341,20 +341,20 @@ export default async function PropertyDetailPage({ params }: Props) {
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* ── Breadcrumb ── */}
-          <nav className="flex items-center gap-2 text-sm text-text-muted mb-6">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/cerca" className="hover:text-primary transition-colors">Cerca</Link>
-            <span>/</span>
-            <Link href={`/cerca?city=${encodeURIComponent(property.city)}`} className="hover:text-primary transition-colors">{property.city}</Link>
-            <span>/</span>
-            <span className="text-text truncate max-w-[200px]">{property.title}</span>
+          <nav className="flex items-center gap-2 text-sm text-[#0B1D3A]/40 mb-6">
+            <Link href="/" className="hover:text-[#C9A84C] transition-colors">Home</Link>
+            <span className="text-[#0B1D3A]/20">/</span>
+            <Link href="/cerca" className="hover:text-[#C9A84C] transition-colors">Cerca</Link>
+            <span className="text-[#0B1D3A]/20">/</span>
+            <Link href={`/cerca?city=${encodeURIComponent(property.city)}`} className="hover:text-[#C9A84C] transition-colors">{property.city}</Link>
+            <span className="text-[#0B1D3A]/20">/</span>
+            <span className="text-[#0B1D3A]/60 truncate max-w-[200px]">{property.title}</span>
           </nav>
 
           {/* ── Header: Title + Price ── */}
           <div className="mb-8">
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+              <span className="px-3 py-1 bg-[#C9A84C]/10 text-[#C9A84C] rounded-full text-sm font-medium">
                 {getPropertyTypeLabel(property.type)}
               </span>
               {property.energyClass && (
@@ -366,14 +366,14 @@ export default async function PropertyDetailPage({ params }: Props) {
                 0% comm. venditore
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-light text-text tracking-tight mb-2">{property.title}</h1>
-            <p className="text-text-muted text-lg mb-4">
+            <h1 className="font-heading text-3xl md:text-4xl font-light text-[#0B1D3A] tracking-tight mb-2">{property.title}</h1>
+            <p className="text-[#0B1D3A]/50 text-lg mb-4">
               {property.address && `${property.address}, `}{property.city} ({property.province})
             </p>
             <div className="flex items-center gap-4">
               <div className="flex items-baseline gap-3">
-                <p className="text-4xl font-medium text-primary">{formatPrice(property.price)}</p>
-                <p className="text-lg text-text-muted">
+                <p className="text-4xl font-medium bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] bg-clip-text text-transparent">{formatPrice(property.price)}</p>
+                <p className="text-lg text-[#0B1D3A]/50">
                   {pricePerSqm.toLocaleString("it-IT")} &euro;/mq
                 </p>
               </div>
@@ -384,9 +384,9 @@ export default async function PropertyDetailPage({ params }: Props) {
           {/* ── Quick Stats Strip ── */}
           <div className="flex gap-3 overflow-x-auto pb-2 mb-8 -mx-4 px-4 scrollbar-thin">
             {quickStats.map((stat, i) => (
-              <div key={i} className="flex-none bg-white rounded-xl px-5 py-3 border border-border min-w-[120px] text-center">
-                <p className="text-lg font-medium text-text">{stat.value}</p>
-                <p className="text-xs text-text-muted mt-0.5">{stat.label}</p>
+              <div key={i} className="flex-none bg-white rounded-2xl px-5 py-3 border border-[#C9A84C]/[0.08] border-t-2 border-t-[#C9A84C]/30 min-w-[120px] text-center">
+                <p className="text-lg font-medium text-[#0B1D3A]">{stat.value}</p>
+                <p className="text-xs text-[#0B1D3A]/50 mt-0.5">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -397,55 +397,55 @@ export default async function PropertyDetailPage({ params }: Props) {
             <div className="lg:col-span-2 space-y-8">
               {/* Description */}
               {property.description && (
-                <div className="bg-white rounded-xl p-6 border border-border">
-                  <h2 className="font-medium text-xl text-text mb-4">Descrizione</h2>
-                  <div className="border-l-2 border-primary/20 pl-4">
-                    <p className="text-text-muted leading-relaxed whitespace-pre-line">{property.description}</p>
+                <div className="bg-white rounded-3xl p-6 border border-[#C9A84C]/[0.08]">
+                  <h2 className="font-heading font-medium text-xl text-[#0B1D3A] mb-4">Descrizione</h2>
+                  <div className="border-l-2 border-[#C9A84C]/30 pl-4">
+                    <p className="text-[#0B1D3A]/60 leading-relaxed whitespace-pre-line">{property.description}</p>
                   </div>
                 </div>
               )}
 
               {/* Costs & Fees */}
-              <div className="bg-white rounded-xl p-6 border border-border">
-                <h2 className="font-medium text-xl text-text mb-5">Costi e spese</h2>
-                <div className="divide-y divide-border">
+              <div className="bg-white rounded-3xl p-6 border border-[#C9A84C]/[0.08]">
+                <h2 className="font-heading font-medium text-xl text-[#0B1D3A] mb-5">Costi e spese</h2>
+                <div className="divide-y divide-[#C9A84C]/[0.08]">
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-text-muted">Prezzo immobile</span>
-                    <span className="font-medium text-text">{formatPrice(property.price)}</span>
+                    <span className="text-[#0B1D3A]/60">Prezzo immobile</span>
+                    <span className="font-medium text-[#0B1D3A]">{formatPrice(property.price)}</span>
                   </div>
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-text-muted">Prezzo al mq</span>
-                    <span className="font-medium text-text">{pricePerSqm.toLocaleString("it-IT")} &euro;/mq</span>
+                    <span className="text-[#0B1D3A]/60">Prezzo al mq</span>
+                    <span className="font-medium text-[#0B1D3A]">{pricePerSqm.toLocaleString("it-IT")} &euro;/mq</span>
                   </div>
                   {property.condominiumFees != null && property.condominiumFees > 0 && (
                     <div className="flex justify-between items-center py-3">
-                      <span className="text-text-muted">Spese condominiali</span>
-                      <span className="font-medium text-text">{property.condominiumFees.toLocaleString("it-IT")} &euro;/mese</span>
+                      <span className="text-[#0B1D3A]/60">Spese condominiali</span>
+                      <span className="font-medium text-[#0B1D3A]">{property.condominiumFees.toLocaleString("it-IT")} &euro;/mese</span>
                     </div>
                   )}
                   {property.extraCosts && (
                     <div className="py-3">
-                      <span className="text-text-muted block mb-1">Costi aggiuntivi</span>
-                      <p className="text-sm text-text">{property.extraCosts}</p>
+                      <span className="text-[#0B1D3A]/60 block mb-1">Costi aggiuntivi</span>
+                      <p className="text-sm text-[#0B1D3A]">{property.extraCosts}</p>
                     </div>
                   )}
-                  <div className="flex justify-between items-center py-3">
-                    <span className="text-text-muted">Commissione venditore</span>
+                  <div className="flex justify-between items-center py-3 bg-[#C9A84C]/5 -mx-6 px-6 rounded-xl">
+                    <span className="text-[#0B1D3A]/60">Commissione venditore</span>
                     <span className="font-medium text-success">0%</span>
                   </div>
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-text-muted">Commissione acquirente</span>
-                    <span className="font-medium text-text">2% &ndash; 2,5%</span>
+                    <span className="text-[#0B1D3A]/60">Commissione acquirente</span>
+                    <span className="font-medium text-[#0B1D3A]">2% &ndash; 2,5%</span>
                   </div>
                 </div>
-                <p className="text-xs text-text-muted mt-4">
+                <p className="text-xs text-[#0B1D3A]/40 mt-4">
                   La commissione acquirente viene concordata in fase di trattativa. Nessun costo nascosto, massima trasparenza.
                 </p>
               </div>
 
               {/* Features Grid */}
-              <div className="bg-white rounded-xl p-6 border border-border">
-                <h2 className="font-medium text-xl text-text mb-5">Caratteristiche</h2>
+              <div className="bg-white rounded-3xl p-6 border border-[#C9A84C]/[0.08]">
+                <h2 className="font-heading font-medium text-xl text-[#0B1D3A] mb-5">Caratteristiche</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {ALL_FEATURES.map((f) => {
                     const hasFeature = (property as Record<string, unknown>)[f.key] === true;
@@ -454,8 +454,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                         key={f.key}
                         className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm ${
                           hasFeature
-                            ? "bg-success/5 text-text"
-                            : "bg-gray-50 text-text-muted/50"
+                            ? "bg-[#C9A84C]/5 text-[#0B1D3A]"
+                            : "bg-gray-50 text-[#0B1D3A]/30"
                         }`}
                       >
                         {hasFeature ? (
@@ -463,7 +463,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         ) : (
-                          <svg className="w-4.5 h-4.5 text-text-muted/30 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4.5 h-4.5 text-[#0B1D3A]/15 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         )}
@@ -475,14 +475,14 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
 
               {/* Map */}
-              <div className="bg-white rounded-xl p-6 border border-border">
-                <h2 className="font-medium text-xl text-text mb-4">Posizione</h2>
+              <div className="bg-white rounded-3xl p-6 border border-[#C9A84C]/[0.08]">
+                <h2 className="font-heading font-medium text-xl text-[#0B1D3A] mb-4">Posizione</h2>
                 <PropertyMap lat={property.lat} lng={property.lng} city={property.city} />
               </div>
 
               {/* Nearby POI */}
-              <div className="bg-white rounded-xl p-6 border border-border">
-                <h2 className="font-medium text-xl text-text mb-4">Nelle vicinanze</h2>
+              <div className="bg-white rounded-3xl p-6 border border-[#C9A84C]/[0.08]">
+                <h2 className="font-heading font-medium text-xl text-[#0B1D3A] mb-4">Nelle vicinanze</h2>
                 <NearbyPOI lat={property.lat} lng={property.lng} />
               </div>
             </div>
@@ -490,27 +490,27 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Contact Form */}
-              <div className="bg-white rounded-xl p-6 border border-border sticky top-24">
+              <div className="bg-white rounded-3xl p-6 border border-[#C9A84C]/[0.08] sticky top-24">
                 <PropertyContactForm slug={property.slug} />
               </div>
 
               {/* Agency info */}
               {property.assignment?.agency && (
-                <div className="bg-white rounded-xl p-5 border border-border">
-                  <h3 className="font-medium text-primary-dark mb-3">Agenzia Partner</h3>
-                  <p className="font-medium text-text">{property.assignment.agency.name}</p>
+                <div className="bg-white rounded-3xl p-5 border border-[#C9A84C]/[0.08]">
+                  <h3 className="font-heading font-medium text-[#0B1D3A] mb-3">Agenzia Partner</h3>
+                  <p className="font-medium text-[#0B1D3A]">{property.assignment.agency.name}</p>
                   {property.assignment.agency.rating != null && property.assignment.agency.rating > 0 && (
                     <div className="flex items-center gap-1 mt-1">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className={`w-4 h-4 ${star <= Math.round(property.assignment!.agency.rating!) ? "text-accent" : "text-border"}`} fill="currentColor" viewBox="0 0 20 20">
+                        <svg key={star} className={`w-4 h-4 ${star <= Math.round(property.assignment!.agency.rating!) ? "text-[#C9A84C]" : "text-[#C9A84C]/20"}`} fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       ))}
-                      <span className="text-sm text-text-muted ml-1">{property.assignment.agency.rating}</span>
+                      <span className="text-sm text-[#0B1D3A]/50 ml-1">{property.assignment.agency.rating}</span>
                     </div>
                   )}
                   {property.assignment.agency.phone && (
-                    <p className="text-sm text-text-muted mt-1">{property.assignment.agency.phone}</p>
+                    <p className="text-sm text-[#0B1D3A]/50 mt-1">{property.assignment.agency.phone}</p>
                   )}
                 </div>
               )}
@@ -521,15 +521,16 @@ export default async function PropertyDetailPage({ params }: Props) {
           {/* ── Property Valuation ── */}
           <div className="mt-16 pt-12">
             <div className="text-center mb-8">
-              <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-3">Analisi</p>
+              <h2 className="font-heading font-light text-2xl md:text-3xl text-[#0B1D3A] tracking-tight">
                 Analisi di mercato
               </h2>
-              <p className="text-text-muted text-sm mt-2">
+              <p className="text-[#0B1D3A]/50 text-sm mt-2">
                 Come si posiziona questo immobile rispetto al mercato di {property.city}
               </p>
             </div>
             <div className="lg:max-w-3xl mx-auto">
-              <div className="bg-white rounded-2xl p-8 border border-border shadow-sm">
+              <div className="bg-white rounded-3xl p-8 border border-[#C9A84C]/[0.08] shadow-sm">
                 <PropertyValuation
                   city={property.city}
                   province={property.province}
@@ -543,12 +544,13 @@ export default async function PropertyDetailPage({ params }: Props) {
           </div>
 
           {/* ── Mortgage Calculator (full width, below valuation) ── */}
-          <div className="mt-16 pt-12 border-t border-border">
+          <div className="mt-16 pt-12 border-t border-[#C9A84C]/10">
             <div className="text-center mb-8">
-              <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-3">Mutuo</p>
+              <h2 className="font-heading font-light text-2xl md:text-3xl text-[#0B1D3A] tracking-tight">
                 Simula il tuo mutuo
               </h2>
-              <p className="text-text-muted text-sm mt-2">
+              <p className="text-[#0B1D3A]/50 text-sm mt-2">
                 Scopri quanto potrebbe costare la rata mensile per questo immobile
               </p>
             </div>
@@ -559,12 +561,13 @@ export default async function PropertyDetailPage({ params }: Props) {
 
           {/* ── Similar Properties ── */}
           {similarProperties.length > 0 && (
-            <div className="mt-16 pt-12 border-t border-border">
+            <div className="mt-16 pt-12 border-t border-[#C9A84C]/10">
               <div className="text-center mb-8">
-                <h2 className="font-light text-2xl md:text-3xl text-text tracking-tight">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-3">Scopri</p>
+                <h2 className="font-heading font-light text-2xl md:text-3xl text-[#0B1D3A] tracking-tight">
                   Immobili simili
                 </h2>
-                <p className="text-text-muted text-sm mt-2">
+                <p className="text-[#0B1D3A]/50 text-sm mt-2">
                   Altri immobili che potrebbero interessarti
                 </p>
               </div>
@@ -595,7 +598,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               <div className="text-center mt-8">
                 <Link
                   href={`/cerca?city=${encodeURIComponent(property.city)}`}
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-border rounded-lg text-sm font-medium text-primary-dark hover:bg-bg-soft transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-[#C9A84C]/30 rounded-lg text-sm font-medium text-[#C9A84C] hover:bg-[#C9A84C]/5 transition-colors"
                 >
                   Vedi tutti gli immobili a {property.city}
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
