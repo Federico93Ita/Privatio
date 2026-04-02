@@ -11,65 +11,78 @@ export default function ContattiPage() {
   return (
     <>
       <Header />
-      <main className="bg-bg-soft min-h-screen">
-        <section className="py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h1 className="text-3xl font-light tracking-[-0.03em] sm:text-4xl text-primary-dark mb-4">Contatti</h1>
-              <p className="text-lg text-text-muted">
-                Hai domande? Siamo qui per aiutarti. Scrivici e ti risponderemo il prima possibile.
-              </p>
-            </div>
+      <main>
+        {/* Hero */}
+        <section className="relative bg-[#0B1D3A] pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden grain">
+          <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-[#C9A84C]/[0.05] blur-[100px]" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8F6F1] to-transparent" />
 
+          <div className="relative max-w-4xl mx-auto px-4 text-center">
+            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-5">Contattaci</span>
+            <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white md:text-6xl mb-6">Come possiamo aiutarti?</h1>
+            <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
+              Hai domande? Siamo qui per aiutarti. Scrivici e ti risponderemo il prima possibile.
+            </p>
+          </div>
+        </section>
+
+        <section className="relative bg-[#F8F6F1] py-24 md:py-32">
+          <div className="max-w-4xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8">
               {/* Contact info */}
-              <div className="space-y-6">
-                <div className="bg-white rounded-xl p-6 border border-border">
-                  <h3 className="font-medium text-primary-dark mb-4">Informazioni di contatto</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <div className="space-y-5">
+                <div className="rounded-3xl bg-white p-7 border border-[#C9A84C]/[0.08] shadow-sm">
+                  <h3 className="font-heading text-lg font-normal text-[#0B1D3A] mb-5">Informazioni di contatto</h3>
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 bg-[#C9A84C]/10 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 text-[#C9A84C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-text-muted">Email</p>
-                        <p className="font-medium text-text">info@privatio.it</p>
+                        <p className="text-xs text-[#0B1D3A]/40 uppercase tracking-wide">Email</p>
+                        <p className="font-medium text-[#0B1D3A]">info@privatio.it</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <div className="flex items-center gap-4">
+                      <div className="w-11 h-11 bg-[#C9A84C]/10 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 text-[#C9A84C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm text-text-muted">Sede</p>
-                        <p className="font-medium text-text">Italia</p>
+                        <p className="text-xs text-[#0B1D3A]/40 uppercase tracking-wide">Sede</p>
+                        <p className="font-medium text-[#0B1D3A]">Italia</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl p-6 border border-border">
-                  <h3 className="font-medium text-primary-dark mb-3">Sei un venditore?</h3>
-                  <p className="text-text-muted text-sm mb-3">
+                <div className="group rounded-3xl bg-white p-7 border border-[#C9A84C]/[0.08] shadow-sm transition-all duration-300 hover:shadow-md hover:border-[#C9A84C]/20">
+                  <h3 className="font-heading text-lg font-normal text-[#0B1D3A] mb-2">Sei un venditore?</h3>
+                  <p className="text-sm text-[#0B1D3A]/50 mb-4 leading-relaxed">
                     Se vuoi vendere il tuo immobile senza pagare commissioni, inizia dal form di inserimento.
                   </p>
-                  <a href="/vendi" className="text-primary font-medium text-sm hover:underline">
-                    Inserisci il tuo immobile &rarr;
+                  <a href="/vendi" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#C9A84C] hover:text-[#B8943B] transition-colors group-hover:gap-2.5">
+                    Inserisci il tuo immobile
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                   </a>
                 </div>
 
-                <div className="bg-white rounded-xl p-6 border border-border">
-                  <h3 className="font-medium text-primary-dark mb-3">Sei un&apos;agenzia?</h3>
-                  <p className="text-text-muted text-sm mb-3">
+                <div className="group rounded-3xl bg-white p-7 border border-[#C9A84C]/[0.08] shadow-sm transition-all duration-300 hover:shadow-md hover:border-[#C9A84C]/20">
+                  <h3 className="font-heading text-lg font-normal text-[#0B1D3A] mb-2">Sei un&apos;agenzia?</h3>
+                  <p className="text-sm text-[#0B1D3A]/50 mb-4 leading-relaxed">
                     Scopri come entrare nel network Privatio e ricevere clienti venditori qualificati.
                   </p>
-                  <a href="/agenzie" className="text-primary font-medium text-sm hover:underline">
-                    Diventa partner &rarr;
+                  <a href="/agenzie" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#C9A84C] hover:text-[#B8943B] transition-colors group-hover:gap-2.5">
+                    Diventa partner
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                   </a>
                 </div>
               </div>

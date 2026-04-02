@@ -1555,14 +1555,15 @@ export default function VendiPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-bg-soft pt-24 pb-16 md:pt-28">
+      <main className="min-h-screen bg-[#F8F6F1] pt-24 pb-16 md:pt-28">
         <div className="mx-auto max-w-[700px] px-4 sm:px-6">
           {/* ---- Title ---- */}
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-light tracking-[-0.03em] text-text md:text-4xl">
+          <div className="mb-10 text-center">
+            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-3">Inserimento gratuito</span>
+            <h1 className="font-heading text-3xl font-normal tracking-[-0.02em] text-[#0B1D3A] md:text-4xl">
               Vendi il tuo immobile
             </h1>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-text-muted">
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#0B1D3A]/50">
               Inserisci i dati del tuo immobile. &Egrave; gratis e richiede solo
               pochi minuti.
             </p>
@@ -1585,19 +1586,19 @@ export default function VendiPage() {
                         <div
                           className={`h-0.5 flex-1 transition-colors ${
                             isCompleted || isActive
-                              ? "bg-primary"
-                              : "bg-border"
+                              ? "bg-[#C9A84C]"
+                              : "bg-[#0B1D3A]/10"
                           }`}
                         />
                       )}
                       {/* Circle */}
                       <div
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 ${
                           isActive
-                            ? "bg-primary text-white shadow-md shadow-primary/30"
+                            ? "bg-gradient-to-br from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A] shadow-md shadow-[#C9A84C]/30"
                             : isCompleted
-                              ? "bg-primary text-white"
-                              : "bg-bg-soft text-text-muted ring-1 ring-border"
+                              ? "bg-[#C9A84C] text-[#0B1D3A]"
+                              : "bg-white text-[#0B1D3A]/30 ring-1 ring-[#0B1D3A]/10"
                         }`}
                       >
                         {isCompleted ? (
@@ -1622,18 +1623,18 @@ export default function VendiPage() {
                       {i < visibleSteps.length - 1 && (
                         <div
                           className={`h-0.5 flex-1 transition-colors ${
-                            isCompleted ? "bg-primary" : "bg-border"
+                            isCompleted ? "bg-[#C9A84C]" : "bg-[#0B1D3A]/10"
                           }`}
                         />
                       )}
                     </div>
                     <span
-                      className={`mt-2 text-[11px] font-medium sm:text-xs ${
+                      className={`mt-2 text-[11px] font-medium sm:text-xs transition-colors ${
                         isActive
-                          ? "text-primary"
+                          ? "text-[#C9A84C]"
                           : isCompleted
-                            ? "text-primary-dark"
-                            : "text-text-muted"
+                            ? "text-[#0B1D3A]"
+                            : "text-[#0B1D3A]/30"
                       }`}
                     >
                       {s.label}
@@ -1648,10 +1649,10 @@ export default function VendiPage() {
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8"
+            className="rounded-3xl border border-[#C9A84C]/[0.08] bg-white p-6 shadow-sm sm:p-8"
           >
             {/* Step title */}
-            <h2 className="mb-6 text-lg font-medium text-primary-dark">
+            <h2 className="mb-6 font-heading text-xl font-normal text-[#0B1D3A]">
               {step === 1 && "L'immobile"}
               {step === 2 && "Il prezzo"}
               {step === 3 && "Le foto"}
@@ -1679,7 +1680,7 @@ export default function VendiPage() {
                 <button
                   type="button"
                   onClick={prev}
-                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-6 py-2.5 text-sm font-medium text-text-muted transition-colors hover:border-primary/40 hover:text-primary"
+                  className="inline-flex items-center gap-2 rounded-xl border border-[#0B1D3A]/10 bg-white px-6 py-2.5 text-sm font-medium text-[#0B1D3A]/50 transition-all hover:border-[#C9A84C]/30 hover:text-[#0B1D3A]"
                 >
                   <svg
                     className="h-4 w-4"
@@ -1705,7 +1706,7 @@ export default function VendiPage() {
                   type="button"
                   onClick={next}
                   disabled={step === 3 && photos.length < 3}
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-primary/85 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-6 py-2.5 text-sm font-medium text-[#0B1D3A] shadow-sm transition-all hover:shadow-lg hover:shadow-[#C9A84C]/20 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                 >
                   Avanti
                   <svg
@@ -1726,7 +1727,7 @@ export default function VendiPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-primary/85 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-6 py-2.5 text-sm font-medium text-[#0B1D3A] shadow-sm transition-all hover:shadow-lg hover:shadow-[#C9A84C]/20 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                 >
                   {submitting ? (
                     <>

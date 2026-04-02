@@ -87,23 +87,28 @@ export default function RegistratiPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-soft flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="relative min-h-screen flex items-center justify-center px-4 py-12 overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[#0B1D3A]" />
+      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.05] blur-[120px]" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#C9A84C]/[0.03] blur-[80px]" />
+
+      <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <span className="text-xl font-semibold tracking-[-0.03em] text-primary-dark">Privatio</span>
+            <span className="text-2xl font-semibold tracking-[-0.03em] bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] bg-clip-text text-transparent">Privatio</span>
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-border p-8">
-          <h1 className="text-2xl font-medium text-text mb-2">Registrati</h1>
-          <p className="text-sm text-text-muted mb-6">
+        <div className="rounded-3xl bg-white/[0.95] backdrop-blur-xl border border-white/20 p-8 shadow-2xl shadow-black/20">
+          <h1 className="font-heading text-2xl font-normal text-[#0B1D3A] mb-2">Registrati</h1>
+          <p className="text-sm text-[#0B1D3A]/50 mb-6">
             Crea il tuo account acquirente per salvare preferiti, ricerche e contattare i venditori.
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-error/10 border border-error/15 rounded-lg text-sm text-error">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
               {error}
             </div>
           )}
@@ -119,7 +124,7 @@ export default function RegistratiPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Mario Rossi"
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-[#0B1D3A]/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 transition-all bg-white"
               />
             </div>
             <div>
@@ -130,7 +135,7 @@ export default function RegistratiPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="email@esempio.it"
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-[#0B1D3A]/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 transition-all bg-white"
               />
             </div>
             <div>
@@ -141,7 +146,7 @@ export default function RegistratiPage() {
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 placeholder="+39 333 1234567"
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-[#0B1D3A]/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 transition-all bg-white"
               />
             </div>
             <div>
@@ -152,7 +157,7 @@ export default function RegistratiPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Min. 8 caratteri, 1 maiuscola, 1 numero, 1 speciale"
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-[#0B1D3A]/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 transition-all bg-white"
               />
               {/* Real-time password validation */}
               {password.length > 0 && (
@@ -189,7 +194,7 @@ export default function RegistratiPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 placeholder="Ripeti la password"
-                className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-[#0B1D3A]/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]/50 transition-all bg-white"
               />
             </div>
 
@@ -200,7 +205,7 @@ export default function RegistratiPage() {
                   type="checkbox"
                   checked={accettaTermini}
                   onChange={(e) => setAccettaTermini(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  className="mt-0.5 h-4 w-4 rounded border-[#0B1D3A]/20 text-[#C9A84C] accent-[#C9A84C] focus:ring-[#C9A84C]/30"
                 />
                 <span className="text-sm text-text">
                   Ho letto e accetto i{" "}
@@ -215,7 +220,7 @@ export default function RegistratiPage() {
                   type="checkbox"
                   checked={accettaPrivacy}
                   onChange={(e) => setAccettaPrivacy(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                  className="mt-0.5 h-4 w-4 rounded border-[#0B1D3A]/20 text-[#C9A84C] accent-[#C9A84C] focus:ring-[#C9A84C]/30"
                 />
                 <span className="text-sm text-text">
                   Ho letto e accetto l&apos;
@@ -230,7 +235,7 @@ export default function RegistratiPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors"
+              className="w-full py-3.5 bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A] rounded-xl font-medium disabled:opacity-50 hover:shadow-lg hover:shadow-[#C9A84C]/20 transition-all duration-300"
             >
               {loading ? "Registrazione in corso..." : "Crea Account"}
             </button>
@@ -241,16 +246,16 @@ export default function RegistratiPage() {
           </p>
         </div>
 
-        <div className="text-center mt-6 space-y-2">
-          <p className="text-sm text-text-muted">
+        <div className="text-center mt-8 space-y-2.5">
+          <p className="text-sm text-white/40">
             Hai gi&agrave; un account?{" "}
-            <Link href="/accedi" className="text-primary font-medium hover:underline">
+            <Link href="/accedi" className="text-[#C9A84C] font-medium hover:text-[#D4B65E] transition-colors">
               Accedi
             </Link>
           </p>
-          <p className="text-sm text-text-muted">
+          <p className="text-sm text-white/40">
             Vuoi vendere?{" "}
-            <Link href="/vendi" className="text-primary font-medium hover:underline">
+            <Link href="/vendi" className="text-[#C9A84C] font-medium hover:text-[#D4B65E] transition-colors">
               Inserisci il tuo immobile
             </Link>
           </p>
