@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #2563eb;
-  --color-primary-dark: #0f172a;
-  --color-accent: #f59e0b;
+  --color-primary: #0B1D3A;
+  --color-primary-dark: #071428;
+  --color-accent: #C9A84C;
   --color-bg: #ffffff;
-  --color-bg-soft: #fafafa;
+  --color-bg-soft: #F8F6F1;
   --color-text: #0f172a;
   --color-text-muted: #6b7280;
   --color-border: #f0f0f0;
   --color-success: #059669;
   --color-error: #dc2626;
 
-  --font-heading: "Inter", sans-serif;
+  --font-heading: "DM Serif Display", serif;
   --font-sans: "Inter", sans-serif;
 }
 
@@ -43,11 +43,11 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+  background: #C9A84C40;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
+  background: #C9A84C70;
 }
 
 /* Refined focus styles */

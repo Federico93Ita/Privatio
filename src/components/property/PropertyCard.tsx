@@ -96,7 +96,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             alt={title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
           <>
@@ -105,7 +105,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
               alt={title}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-full">
               Foto illustrativa
@@ -134,7 +134,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       {/* ---- Body ---- */}
       <div className="p-4 flex flex-col gap-2">
         {/* Title */}
-        <h3 className="font-medium text-text text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-medium text-text text-base leading-snug line-clamp-2 group-hover:text-[#C9A84C] transition-colors">
           {title}
         </h3>
 
@@ -144,7 +144,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </p>
 
         {/* Price */}
-        <p className="text-primary font-semibold text-xl">
+        <p className="text-[#C9A84C] font-semibold text-xl">
           {formatPrice(price)}
         </p>
 

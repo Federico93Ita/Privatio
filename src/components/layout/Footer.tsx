@@ -95,17 +95,17 @@ function MailIcon() {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-bg-soft">
+    <footer className="bg-[#071428] border-t border-white/10">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="sm:col-span-2 lg:col-span-2">
             <Link href="/" className="inline-flex items-center">
-              <span className="text-lg font-semibold tracking-[-0.03em] text-primary-dark">
+              <span className="text-lg font-semibold tracking-[-0.03em] text-[#C9A84C]">
                 Privatio
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-text-muted">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
               La prima piattaforma pensata per chi vende
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function Footer() {
           {/* Link Columns */}
           {footerColumns.map((column) => (
             <div key={column.title}>
-              <h3 className="text-xs font-medium tracking-wide text-text-muted">
+              <h3 className="text-xs font-medium tracking-wide text-[#C9A84C]/70">
                 {column.title}
               </h3>
               <ul className="mt-4 space-y-3">
@@ -121,7 +121,7 @@ export default function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-text-muted transition-colors hover:text-primary"
+                      className="text-sm text-white/50 transition-colors hover:text-[#C9A84C]"
                     >
                       {link.label}
                     </Link>
@@ -133,15 +133,15 @@ export default function Footer() {
         </div>
 
         {/* Contatti Section - displayed under columns on larger screens */}
-        <div className="mt-10 border-t border-border pt-8">
+        <div className="mt-10 border-t border-white/10 pt-8">
           <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-xs font-medium tracking-wide text-text-muted">
+              <h3 className="text-xs font-medium tracking-wide text-[#C9A84C]/70">
                 Contatti
               </h3>
               <a
                 href="mailto:info@privatio.it"
-                className="mt-2 inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-primary"
+                className="mt-2 inline-flex items-center gap-2 text-sm text-white/50 transition-colors hover:text-[#C9A84C]"
               >
                 <MailIcon />
                 info@privatio.it
@@ -153,7 +153,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-sm transition-colors hover:bg-primary hover:text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/50 transition-colors hover:bg-[#C9A84C] hover:text-[#0B1D3A]"
               >
                 <InstagramIcon />
               </a>
@@ -162,7 +162,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-text-muted shadow-sm transition-colors hover:bg-primary hover:text-white"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/50 transition-colors hover:bg-[#C9A84C] hover:text-[#0B1D3A]"
               >
                 <LinkedInIcon />
               </a>
@@ -172,15 +172,15 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-border">
+      <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-4">
-            <p className="text-xs text-text-muted">
+            <p className="text-xs text-white/30">
               {COMPANY.footerText(new Date().getFullYear())}
             </p>
             <button
               onClick={resetConsent}
-              className="text-xs text-text-muted/60 hover:text-text-muted transition-colors duration-200"
+              className="text-xs text-white/20 hover:text-white/40 transition-colors duration-200"
             >
               Gestisci cookie
             </button>

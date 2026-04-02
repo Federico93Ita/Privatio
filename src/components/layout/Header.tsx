@@ -49,15 +49,15 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/80 backdrop-blur-lg shadow-sm"
-            : "bg-white"
+            ? "bg-[#0B1D3A]/95 backdrop-blur-lg shadow-lg"
+            : "bg-transparent"
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center">
-              <span className="text-xl font-semibold tracking-[-0.03em] text-primary-dark">
+              <span className="text-xl font-semibold tracking-[-0.03em] text-white">
                 Privatio
               </span>
             </Link>
@@ -70,8 +70,8 @@ export default function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`text-sm transition-colors duration-200 hover:text-text ${
-                      isActive ? "text-text font-medium" : "text-text-muted"
+                    className={`text-sm transition-colors duration-200 hover:text-white ${
+                      isActive ? "text-[#C9A84C] font-medium" : "text-white/60"
                     }`}
                   >
                     {link.label}
@@ -85,7 +85,7 @@ export default function Header() {
               {isLoggedIn ? (
                 <Link
                   href={dashboardPath}
-                  className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
+                  className="inline-flex items-center justify-center rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-medium text-[#0B1D3A] shadow-sm transition-all duration-300 hover:bg-[#D4B65E]"
                 >
                   Dashboard
                 </Link>
@@ -93,13 +93,13 @@ export default function Header() {
                 <>
                   <Link
                     href="/accedi"
-                    className="text-sm text-text-muted transition-colors duration-200 hover:text-text"
+                    className="text-sm text-white/60 transition-colors duration-200 hover:text-white"
                   >
                     Accedi
                   </Link>
                   <Link
                     href="/vendi"
-                    className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/10 transition-all duration-300 hover:bg-primary/85"
+                    className="inline-flex items-center justify-center rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-medium text-[#0B1D3A] shadow-sm transition-all duration-300 hover:bg-[#D4B65E]"
                   >
                     Vendi Casa
                   </Link>
@@ -117,17 +117,17 @@ export default function Header() {
             >
               <div className="flex w-5 flex-col items-center gap-[5px]">
                 <motion.span
-                  className="block h-[2px] w-5 rounded-full bg-primary-dark"
+                  className="block h-[2px] w-5 rounded-full bg-white"
                   animate={mobileOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
                   transition={{ duration: 0.3 }}
                 />
                 <motion.span
-                  className="block h-[2px] w-5 rounded-full bg-primary-dark"
+                  className="block h-[2px] w-5 rounded-full bg-white"
                   animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
                   transition={{ duration: 0.2 }}
                 />
                 <motion.span
-                  className="block h-[2px] w-5 rounded-full bg-primary-dark"
+                  className="block h-[2px] w-5 rounded-full bg-white"
                   animate={mobileOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
                   transition={{ duration: 0.3 }}
                 />
