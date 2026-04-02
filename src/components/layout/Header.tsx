@@ -71,7 +71,7 @@ export default function Header() {
                     key={link.href}
                     href={link.href}
                     className={`text-sm transition-colors duration-200 hover:text-white ${
-                      isActive ? "text-[#C9A84C] font-medium" : "text-white/60"
+                      isActive ? "text-[#C9A84C] font-medium" : "text-white/80"
                     }`}
                   >
                     {link.label}
@@ -93,7 +93,7 @@ export default function Header() {
                 <>
                   <Link
                     href="/accedi"
-                    className="text-sm text-white/60 transition-colors duration-200 hover:text-white"
+                    className="text-sm text-white/80 transition-colors duration-200 hover:text-white"
                   >
                     Accedi
                   </Link>

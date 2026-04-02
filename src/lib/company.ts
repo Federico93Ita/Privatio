@@ -47,6 +47,9 @@ export const COMPANY = {
 
   /** Stringa per il footer: "© 2026 Privatio S.r.l. — P.IVA ..." */
   footerText(year: number): string {
+    if (this.piva === "da definire") {
+      return `© ${year} ${this.name}`;
+    }
     return `© ${year} ${this.name} — P.IVA ${this.piva}`;
   },
 

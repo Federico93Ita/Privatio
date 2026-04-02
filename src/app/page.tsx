@@ -11,9 +11,27 @@ import LeadSection from "@/components/home/LeadSection";
 import Link from "next/link";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "Privatio",
+  url: "https://privatio.it",
+  description: "La prima piattaforma immobiliare italiana dove il venditore non paga commissioni.",
+  areaServed: { "@type": "Country", name: "Italia" },
+  priceRange: "Gratuito per i venditori",
+  sameAs: [
+    "https://instagram.com/privatio.it",
+    "https://linkedin.com/company/privatio",
+  ],
+};
+
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <main id="main-content" className="overflow-hidden">
         <HeroSection />

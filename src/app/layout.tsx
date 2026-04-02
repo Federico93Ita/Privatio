@@ -40,7 +40,16 @@ export const metadata: Metadata = {
     description:
       "La prima piattaforma immobiliare italiana dove il venditore non paga commissioni.",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privatio — Vendi casa. Zero commissioni.",
+    description:
+      "La prima piattaforma immobiliare italiana dove il venditore non paga commissioni.",
+  },
   robots: { index: true, follow: true },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
