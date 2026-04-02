@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface POI {
   name: string;
@@ -20,48 +20,69 @@ const CATEGORIES = [
   { key: "hospital", label: "Sanità", icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" },
 ];
 
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function formatDistance(km: number): string {
-  if (km < 1) return `${Math.round(km * 1000)} m`;
-  return `${km.toFixed(1)} km`;
-}
-
 export default function NearbyPOI({ lat, lng }: NearbyPOIProps) {
   const [pois, setPois] = useState<Record<string, POI[]>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [activeTab, setActiveTab] = useState("school");
 
-  useEffect(() => {
-    async function fetchPOIs() {
-      try {
-        const res = await fetch(`/api/places?lat=${lat}&lng=${lng}`);
-        if (res.ok) {
-          const data = await res.json();
+  const fetchPOIs = useCallback(async (bustCache = false) => {
+    if (lat === 0 && lng === 0) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(false);
+
+    try {
+      const url = bustCache
+        ? `/api/places?lat=${lat}&lng=${lng}&t=${Date.now()}`
+        : `/api/places?lat=${lat}&lng=${lng}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data._error) {
+          setError(true);
+        } else {
           setPois(data);
         }
-      } catch {
-        // silent
-      } finally {
-        setLoading(false);
+      } else {
+        setError(true);
       }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
     }
-    fetchPOIs();
   }, [lat, lng]);
+
+  useEffect(() => {
+    fetchPOIs();
+  }, [fetchPOIs]);
 
   if (loading) {
     return (
       <div className="animate-pulse space-y-3">
         <div className="h-10 w-48 bg-border/50 rounded-lg" />
         <div className="h-20 bg-border/50 rounded-lg" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-6">
+        <svg className="w-8 h-8 text-text-muted mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+        <p className="text-sm text-text-muted mb-3">Dati temporaneamente non disponibili.</p>
+        <button
+          onClick={() => fetchPOIs(true)}
+          className="text-sm text-primary hover:text-primary-dark font-medium px-4 py-1.5 border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors"
+        >
+          Riprova
+        </button>
       </div>
     );
   }

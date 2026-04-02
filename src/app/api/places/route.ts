@@ -66,6 +66,47 @@ function formatType(tags: Record<string, string>): string {
   return labels[amenity] || amenity.replace(/_/g, " ");
 }
 
+function buildOverpassQuery(lat: number, lng: number): string {
+  return `[out:json][timeout:25];(
+    node["amenity"~"school|university"](around:3000,${lat},${lng});
+    way["amenity"~"school|university"](around:3000,${lat},${lng});
+    node["amenity"~"hospital|pharmacy|clinic|doctors"](around:3000,${lat},${lng});
+    way["amenity"~"hospital|clinic"](around:3000,${lat},${lng});
+    node["shop"~"supermarket|mall|convenience"](around:3000,${lat},${lng});
+    way["shop"~"supermarket|mall|convenience"](around:3000,${lat},${lng});
+    node["public_transport"~"station|stop_position|platform"](around:3000,${lat},${lng});
+    node["railway"~"station|halt|tram_stop"](around:3000,${lat},${lng});
+    node["amenity"="bus_station"](around:3000,${lat},${lng});
+    node["highway"="bus_stop"](around:3000,${lat},${lng});
+    way["railway"="station"](around:3000,${lat},${lng});
+    way["amenity"="bus_station"](around:3000,${lat},${lng});
+  );out center 100;`;
+}
+
+async function fetchOverpass(query: string): Promise<{ ok: boolean; data?: { elements: Record<string, unknown>[] } }> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const res = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `data=${encodeURIComponent(query)}`,
+      signal: controller.signal,
+      cache: "no-store",
+    });
+
+    if (!res.ok) return { ok: false };
+
+    const data = await res.json();
+    return { ok: true, data };
+  } catch {
+    return { ok: false };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /**
  * GET /api/places?lat=45.07&lng=7.69
  *
@@ -90,75 +131,67 @@ export async function GET(req: NextRequest) {
     hospital: [],
   };
 
-  try {
-    // Single Overpass query for all categories to avoid rate-limiting
-    const overpassQuery = `[out:json][timeout:25];(
-      node["amenity"~"school|university"](around:3000,${lat},${lng});
-      way["amenity"~"school|university"](around:3000,${lat},${lng});
-      node["amenity"~"hospital|pharmacy|clinic|doctors"](around:3000,${lat},${lng});
-      way["amenity"~"hospital|clinic"](around:3000,${lat},${lng});
-      node["shop"~"supermarket|mall|convenience"](around:3000,${lat},${lng});
-      way["shop"~"supermarket|mall|convenience"](around:3000,${lat},${lng});
-      node["public_transport"~"station|stop_position|platform"](around:3000,${lat},${lng});
-      node["railway"~"station|halt|tram_stop"](around:3000,${lat},${lng});
-      node["amenity"="bus_station"](around:3000,${lat},${lng});
-      node["highway"="bus_stop"](around:3000,${lat},${lng});
-      way["railway"="station"](around:3000,${lat},${lng});
-      way["amenity"="bus_station"](around:3000,${lat},${lng});
-    );out center 100;`;
+  const overpassQuery = buildOverpassQuery(lat, lng);
 
-    const res = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `data=${encodeURIComponent(overpassQuery)}`,
-      next: { revalidate: 86400 },
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.elements) {
-        // Deduplicate by name per category
-        const seen: Record<string, Set<string>> = {
-          school: new Set(), transit: new Set(), store: new Set(), hospital: new Set(),
-        };
-
-        const grouped: Record<string, (PlaceResult & { distKm: number })[]> = {
-          school: [], transit: [], store: [], hospital: [],
-        };
-
-        for (const el of data.elements) {
-          if (!el.tags?.name) continue;
-          const elLat = el.lat ?? el.center?.lat;
-          const elLon = el.lon ?? el.center?.lon;
-          if (!elLat || !elLon) continue;
-
-          const category = classifyElement(el.tags);
-          if (!category) continue;
-          if (seen[category].has(el.tags.name)) continue;
-          seen[category].add(el.tags.name);
-
-          const dist = haversine(lat, lng, elLat, elLon);
-          grouped[category].push({
-            name: el.tags.name,
-            type: formatType(el.tags),
-            distance: formatDist(dist),
-            lat: elLat,
-            lng: elLon,
-            distKm: dist,
-          });
-        }
-
-        for (const cat of Object.keys(results)) {
-          grouped[cat].sort((a, b) => a.distKm - b.distKm);
-          results[cat] = grouped[cat].slice(0, 5).map(({ distKm: _, ...rest }) => rest);
-        }
-      }
-    }
-  } catch {
-    // Return empty results on error
+  // Try once, retry on failure after 2s
+  let response = await fetchOverpass(overpassQuery);
+  if (!response.ok) {
+    await new Promise((r) => setTimeout(r, 2000));
+    response = await fetchOverpass(overpassQuery);
   }
 
+  if (!response.ok || !response.data?.elements) {
+    // Return error indicator — don't cache failed responses
+    return NextResponse.json(
+      { ...results, _error: true },
+      { headers: { "Cache-Control": "no-cache, no-store" } },
+    );
+  }
+
+  // Deduplicate by name per category
+  const seen: Record<string, Set<string>> = {
+    school: new Set(), transit: new Set(), store: new Set(), hospital: new Set(),
+  };
+
+  const grouped: Record<string, (PlaceResult & { distKm: number })[]> = {
+    school: [], transit: [], store: [], hospital: [],
+  };
+
+  for (const el of response.data.elements) {
+    const tags = el.tags as Record<string, string> | undefined;
+    if (!tags?.name) continue;
+    const elLat = (el.lat as number) ?? (el.center as { lat: number; lon: number } | undefined)?.lat;
+    const elLon = (el.lon as number) ?? (el.center as { lat: number; lon: number } | undefined)?.lon;
+    if (!elLat || !elLon) continue;
+
+    const category = classifyElement(tags);
+    if (!category) continue;
+    if (seen[category].has(tags.name)) continue;
+    seen[category].add(tags.name);
+
+    const dist = haversine(lat, lng, elLat, elLon);
+    grouped[category].push({
+      name: tags.name,
+      type: formatType(tags),
+      distance: formatDist(dist),
+      lat: elLat,
+      lng: elLon,
+      distKm: dist,
+    });
+  }
+
+  for (const cat of Object.keys(results)) {
+    grouped[cat].sort((a, b) => a.distKm - b.distKm);
+    results[cat] = grouped[cat].slice(0, 5).map(({ distKm: _, ...rest }) => rest);
+  }
+
+  const hasResults = Object.values(results).some((arr) => arr.length > 0);
+
   return NextResponse.json(results, {
-    headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=43200" },
+    headers: {
+      "Cache-Control": hasResults
+        ? "public, s-maxage=21600, stale-while-revalidate=10800"
+        : "no-cache, no-store",
+    },
   });
 }
