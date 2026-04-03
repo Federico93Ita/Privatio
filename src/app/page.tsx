@@ -4,10 +4,13 @@ import HeroSection from "@/components/home/HeroSection";
 import SavingsCalc from "@/components/property/SavingsCalc";
 import HowItWorks from "@/components/home/HowItWorks";
 import WhyPrivatio from "@/components/home/WhyPrivatio";
+import TrustBadges from "@/components/home/TrustBadges";
 import FeaturedProperties from "@/components/home/FeaturedProperties";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
+import HomeFAQ from "@/components/home/HomeFAQ";
 import AgencyCTA from "@/components/home/AgencyCTA";
 import LeadSection from "@/components/home/LeadSection";
+import MobileStickyBar from "@/components/ui/MobileStickyBar";
 import Link from "next/link";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
@@ -25,12 +28,55 @@ const jsonLd = {
   ],
 };
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Devo pagare qualcosa per vendere su Privatio?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "No, il servizio è completamente gratuito per il venditore. Né Privatio né l'agenzia convenzionata ti chiedono provvigioni. L'intero ricavato della vendita è tuo.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quanto tempo ci vuole per vendere casa con Privatio?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Inserire il tuo immobile richiede circa 5 minuti. Entro 24 ore ti mettiamo in contatto con un'agenzia partner nella tua zona, che si occuperà di tutto: visite, trattativa e documentazione.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Come guadagna Privatio?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Le agenzie partner pagano un abbonamento per essere presenti sulla piattaforma. Privatio non trattiene commissioni sulle vendite e non chiede nulla ai venditori.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Posso ritirare il mio annuncio?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sì, puoi ritirare il tuo annuncio in qualsiasi momento dalla tua dashboard. Nessun vincolo, nessuna penale.",
+      },
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <Header />
       <main id="main-content" className="overflow-hidden">
@@ -39,12 +85,17 @@ export default function HomePage() {
         {/* Savings Calculator */}
         <section id="risparmio" className="relative bg-white py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SavingsCalc />
+            <ScrollReveal>
+              <SavingsCalc />
+            </ScrollReveal>
           </div>
         </section>
 
         <HowItWorks />
         <WhyPrivatio />
+
+        {/* Trust Badges strip */}
+        <TrustBadges />
 
         {/* Featured Properties */}
         <section className="relative bg-[#F8F6F1] py-24 md:py-32 overflow-hidden">
@@ -77,10 +128,12 @@ export default function HomePage() {
         </section>
 
         <TestimonialsSection />
+        <HomeFAQ />
         <AgencyCTA />
         <LeadSection />
       </main>
       <Footer />
+      <MobileStickyBar />
     </>
   );
 }

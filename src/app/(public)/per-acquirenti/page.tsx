@@ -79,9 +79,20 @@ const FAQ = [
   { q: "Cosa succede se non mi piace nessun immobile?", a: "Puoi salvare i filtri di ricerca e attivare gli alert: ti avviseremo quando un nuovo immobile corrispondente viene pubblicato nella tua zona." },
 ];
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    { "@type": "Question", name: "Devo pagare per usare Privatio come acquirente?", acceptedAnswer: { "@type": "Answer", text: "No, la piattaforma è gratuita per gli acquirenti. Puoi cercare immobili, salvare preferiti e contattare le agenzie senza alcun costo." } },
+    { "@type": "Question", name: "Quanto costa la commissione per l'acquirente?", acceptedAnswer: { "@type": "Answer", text: "La commissione acquirente è del 2-2,5%, negoziata direttamente con l'agenzia partner. Nessun costo nascosto." } },
+    { "@type": "Question", name: "Gli immobili su Privatio sono verificati?", acceptedAnswer: { "@type": "Answer", text: "Sì, ogni immobile è gestito da agenzie iscritte al Registro Imprese con polizza RC professionale." } },
+  ],
+};
+
 export default function PerAcquirentiPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Header />
       <main>
         {/* Hero */}

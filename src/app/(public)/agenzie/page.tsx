@@ -86,9 +86,20 @@ const addons = [
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    { "@type": "Question", name: "Come funziona la lista d'attesa?", acceptedAnswer: { "@type": "Answer", text: "Compilando il modulo entri in lista d'attesa per la tua zona. Quando le iscrizioni apriranno nella tua area, sarai tra i primi a essere contattato. I posti sono limitati per ogni zona." } },
+    { "@type": "Question", name: "Quanto costa l'abbonamento?", acceptedAnswer: { "@type": "Answer", text: "Il prezzo dipende dalla zona: da €249/mese per zone rurali fino a €2.600/mese per centri storici. Nessun costo aggiuntivo sulle vendite." } },
+    { "@type": "Question", name: "Posso disdire in qualsiasi momento?", acceptedAnswer: { "@type": "Answer", text: "Sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard." } },
+  ],
+};
+
 export default function AgenziePage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Header />
       <main id="main-content">
         {/* Hero */}

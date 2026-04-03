@@ -85,7 +85,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       className={cn(
         "group block rounded-3xl overflow-hidden bg-white border border-black/[0.04]",
         "shadow-sm transition-all duration-500 ease-out",
-        "hover:shadow-xl hover:shadow-black/[0.06] hover:-translate-y-1"
+        "hover:shadow-xl hover:shadow-[#C9A84C]/[0.08] hover:-translate-y-1 hover:border-[#C9A84C]/15"
       )}
     >
       {/* ---- Photo ---- */}
@@ -113,8 +113,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </>
         )}
 
-        {/* Image gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Image gradient overlay + label */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <span className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-[#0B1D3A] text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 flex items-center gap-1 z-10">
+          Vedi dettagli
+          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </span>
 
         {/* Commission badge */}
         <span className="absolute top-3 left-3 bg-emerald-600/90 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-1.5 rounded-xl shadow-sm">

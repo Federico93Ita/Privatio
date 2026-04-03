@@ -90,18 +90,6 @@ const provinceOptions: SelectOption[] = Object.entries(PROVINCE_BY_REGION).flatM
   ]
 );
 
-const propertyTypeOptions: SelectOption[] = [
-  { value: "APPARTAMENTO", label: "Appartamento" },
-  { value: "VILLA", label: "Villa" },
-  { value: "CASA_INDIPENDENTE", label: "Casa Indipendente" },
-  { value: "ATTICO", label: "Attico" },
-  { value: "MANSARDA", label: "Mansarda" },
-  { value: "LOFT", label: "Loft" },
-  { value: "TERRENO", label: "Terreno" },
-  { value: "NEGOZIO", label: "Negozio" },
-  { value: "UFFICIO", label: "Ufficio" },
-];
-
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
@@ -117,8 +105,6 @@ export default function LeadForm() {
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [estimatedValue, setEstimatedValue] = useState("");
   const [privacy, setPrivacy] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
@@ -136,8 +122,6 @@ export default function LeadForm() {
           phone,
           city,
           province,
-          propertyType: propertyType || undefined,
-          estimatedValue: estimatedValue ? Number(estimatedValue) : undefined,
           source: "landing_page",
         }),
       });
@@ -163,29 +147,69 @@ export default function LeadForm() {
   /* ---- Success state ---- */
   if (status === "success") {
     return (
-      <div className="mx-auto max-w-2xl rounded-2xl border border-success/30 bg-success/5 p-8 text-center md:p-12">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
+      <div className="mx-auto max-w-2xl rounded-3xl border border-[#C9A84C]/20 bg-[#C9A84C]/[0.04] p-8 text-center md:p-12">
+        {/* Animated check circle */}
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#C9A84C]/20 to-[#D4B65E]/10 ring-4 ring-[#C9A84C]/10">
           <svg
-            className="h-8 w-8 text-success"
+            className="h-10 w-10 text-[#C9A84C]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth={2.5}
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M5 13l4 4L19 7"
+              d="M4.5 12.75l6 6 9-13.5"
             />
           </svg>
         </div>
-        <h3 className="font-light text-2xl tracking-[-0.03em] text-text md:text-3xl">
+
+        <h3 className="font-heading text-2xl font-normal tracking-[-0.02em] text-[#0B1D3A] md:text-3xl">
           Richiesta inviata!
         </h3>
-        <p className="mt-3 text-text-muted">
-          Grazie per averci contattato. Ti ricontatteremo entro 24 ore per
-          metterti in contatto con un&apos;agenzia partner nella tua zona.
-        </p>
+
+        {/* Mini timeline */}
+        <div className="mt-8 text-left max-w-sm mx-auto space-y-4">
+          <p className="text-sm font-medium text-[#0B1D3A]/70 mb-3">Ecco cosa succede ora:</p>
+          {[
+            { step: "1", text: "Riceviamo la tua richiesta", done: true },
+            { step: "2", text: "Troviamo l'agenzia nella tua zona", done: false },
+            { step: "3", text: "Ti contattiamo entro 24 ore", done: false },
+          ].map((item) => (
+            <div key={item.step} className="flex items-center gap-3">
+              <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                item.done
+                  ? "bg-[#C9A84C] text-white"
+                  : "border-2 border-[#C9A84C]/20 text-[#C9A84C]/50"
+              }`}>
+                {item.done ? (
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                ) : (
+                  item.step
+                )}
+              </div>
+              <p className={`text-sm ${item.done ? "text-[#0B1D3A] font-medium" : "text-[#0B1D3A]/50"}`}>
+                {item.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Secondary CTA */}
+        <div className="mt-8 pt-6 border-t border-[#C9A84C]/10">
+          <a
+            href="#risparmio"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#C9A84C] hover:text-[#B8943B] transition-colors"
+          >
+            Nel frattempo, scopri quanto risparmi
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+        </div>
       </div>
     );
   }
@@ -194,16 +218,16 @@ export default function LeadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-2xl space-y-6 rounded-2xl border border-border bg-white p-6 shadow-sm md:p-10"
+      className="mx-auto max-w-2xl space-y-5 rounded-3xl border border-[#C9A84C]/[0.08] bg-white p-6 shadow-sm md:p-10"
     >
       {/* Error banner */}
       {status === "error" && errorMessage && (
         <div
-          className="flex items-start gap-3 rounded-lg border border-error/30 bg-error/5 p-4"
+          className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4"
           role="alert"
         >
           <svg
-            className="mt-0.5 h-5 w-5 shrink-0 text-error"
+            className="mt-0.5 h-5 w-5 shrink-0 text-red-500"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -215,7 +239,7 @@ export default function LeadForm() {
               d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
             />
           </svg>
-          <p className="text-sm text-error">{errorMessage}</p>
+          <p className="text-sm text-red-600">{errorMessage}</p>
         </div>
       )}
 
@@ -230,28 +254,41 @@ export default function LeadForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <Input
-          label="Email"
-          name="email"
-          type="email"
-          placeholder="mario@email.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div>
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="mario@email.com"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <p className="mt-1 text-[11px] text-[#0B1D3A]/30 flex items-center gap-1">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            Non condividiamo la tua email con terzi
+          </p>
+        </div>
       </div>
 
       {/* Row: Telefono + Città */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <Input
-          label="Telefono"
-          name="phone"
-          type="tel"
-          placeholder="+39 333 1234567"
-          required
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+        <div>
+          <Input
+            label="Telefono"
+            name="phone"
+            type="tel"
+            placeholder="+39 333 1234567"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <p className="mt-1 text-[11px] text-[#0B1D3A]/30">
+            Ti contatteremo solo per la tua richiesta
+          </p>
+        </div>
         <Input
           label="Città dell'immobile"
           name="city"
@@ -263,38 +300,15 @@ export default function LeadForm() {
         />
       </div>
 
-      {/* Row: Provincia + Tipo */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <Select
-          label="Provincia"
-          name="province"
-          placeholder="Seleziona provincia"
-          options={provinceOptions}
-          required
-          value={province}
-          onChange={(e) => setProvince(e.target.value)}
-        />
-        <Select
-          label="Tipo di immobile"
-          name="propertyType"
-          placeholder="Seleziona tipo"
-          options={propertyTypeOptions}
-          value={propertyType}
-          onChange={(e) => setPropertyType(e.target.value)}
-        />
-      </div>
-
-      {/* Valore stimato */}
-      <Input
-        label="Valore stimato dell'immobile"
-        name="estimatedValue"
-        type="number"
-        placeholder="250000"
-        min={0}
-        step={1000}
-        helperText="Inserisci una stima approssimativa in euro"
-        value={estimatedValue}
-        onChange={(e) => setEstimatedValue(e.target.value)}
+      {/* Provincia */}
+      <Select
+        label="Provincia"
+        name="province"
+        placeholder="Seleziona provincia"
+        options={provinceOptions}
+        required
+        value={province}
+        onChange={(e) => setProvince(e.target.value)}
       />
 
       {/* Privacy */}
@@ -304,13 +318,13 @@ export default function LeadForm() {
           required
           checked={privacy}
           onChange={(e) => setPrivacy(e.target.checked)}
-          className="mt-1 h-4 w-4 shrink-0 rounded border-border text-primary accent-primary focus:ring-primary/40"
+          className="mt-1 h-4 w-4 shrink-0 rounded border-[#0B1D3A]/20 text-[#C9A84C] accent-[#C9A84C] focus:ring-[#C9A84C]/40"
         />
-        <span className="text-sm text-text-muted leading-relaxed">
+        <span className="text-sm text-[#0B1D3A]/50 leading-relaxed">
           Acconsento al trattamento dei miei dati personali ai sensi della{" "}
           <Link
             href="/privacy-policy"
-            className="font-medium text-primary underline hover:text-primary-dark"
+            className="font-medium text-[#C9A84C] underline hover:text-[#B8943B]"
             target="_blank"
           >
             Privacy Policy
@@ -330,8 +344,12 @@ export default function LeadForm() {
         Invia la tua richiesta
       </Button>
 
-      <p className="text-center text-xs text-text-muted">
-        Nessun costo, nessun impegno. Ti ricontattiamo entro 24 ore.
+      {/* Trust micro-copy */}
+      <p className="text-center text-xs text-[#0B1D3A]/30 flex items-center justify-center gap-1.5">
+        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+        </svg>
+        Nessun costo, nessun impegno. Dati crittografati e protetti.
       </p>
     </form>
   );

@@ -712,18 +712,68 @@ function CercaPageInner() {
                     </svg>
                   </div>
                   <h3 className="font-heading text-lg font-semibold text-[#0B1D3A] mb-1">
-                    Nessun immobile trovato
+                    Nessun immobile in questa zona
                   </h3>
-                  <p className="text-[#0B1D3A]/50 text-sm max-w-sm">
-                    Prova a modificare i filtri per ampliare la ricerca.
+                  <p className="text-[#0B1D3A]/50 text-sm max-w-md">
+                    Non abbiamo ancora immobili con questi criteri, ma puoi salvare la ricerca per essere avvisato quando ne arriveranno.
                   </p>
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    className="mt-4 rounded-lg bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-5 py-2.5 text-sm font-semibold text-[#0B1D3A] hover:opacity-90 transition-opacity"
-                  >
-                    Reset filtri
-                  </button>
+                  <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const activeFilters: Record<string, unknown> = {};
+                        if (filters.city) activeFilters.city = filters.city;
+                        if (filters.type) activeFilters.type = filters.type;
+                        if (filters.minPrice) activeFilters.minPrice = filters.minPrice;
+                        if (filters.maxPrice) activeFilters.maxPrice = filters.maxPrice;
+                        const name = filters.city
+                          ? `Alert ${filters.city}`
+                          : `Alert ${new Date().toLocaleDateString("it-IT")}`;
+                        try {
+                          const res = await fetch("/api/saved-searches", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ name, filters: activeFilters }),
+                          });
+                          if (res.ok) {
+                            setSaveSearchMsg("Alert attivato!");
+                            setTimeout(() => setSaveSearchMsg(null), 3000);
+                          } else if (res.status === 401) {
+                            setSaveSearchMsg("Accedi per attivare gli alert");
+                            setTimeout(() => setSaveSearchMsg(null), 3000);
+                          }
+                        } catch {
+                          setSaveSearchMsg("Errore di connessione");
+                          setTimeout(() => setSaveSearchMsg(null), 3000);
+                        }
+                      }}
+                      className="rounded-xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-5 py-2.5 text-sm font-semibold text-[#0B1D3A] hover:shadow-lg hover:shadow-[#C9A84C]/20 transition-all"
+                    >
+                      Attiva alert
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      className="rounded-xl border border-[#C9A84C]/20 px-5 py-2.5 text-sm font-medium text-[#0B1D3A]/60 hover:bg-[#C9A84C]/5 transition-colors"
+                    >
+                      Reset filtri
+                    </button>
+                  </div>
+                  {saveSearchMsg && (
+                    <span className="mt-3 text-xs text-[#C9A84C] font-medium">{saveSearchMsg}</span>
+                  )}
+                  <div className="mt-8 pt-6 border-t border-[#C9A84C]/10 w-full max-w-sm">
+                    <p className="text-xs text-[#0B1D3A]/30 mb-2">Vuoi vendere in questa zona?</p>
+                    <a
+                      href="/vendi"
+                      className="text-sm font-medium text-[#C9A84C] hover:text-[#B8943B] transition-colors inline-flex items-center gap-1"
+                    >
+                      Inserisci il tuo immobile
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               )}
 

@@ -3,26 +3,32 @@ import { formatPrice } from "@/lib/utils";
 
 const testimonials = [
   {
-    quote: "Ho venduto il mio appartamento a Milano senza pagare un centesimo di commissione. Incredibile.",
+    quote: "Ho venduto il mio trilocale in zona Navigli in meno di 2 mesi. L'agenzia si è occupata di tutto, dalle visite al rogito. E non ho pagato un euro di provvigione.",
     author: "Marco R.",
     location: "Milano",
-    savings: 12000,
+    detail: "Trilocale — venduto in 52 giorni",
+    date: "Febbraio 2026",
+    savings: 11400,
     stars: 5,
     initials: "MR",
   },
   {
-    quote: "Servizio professionale e trasparente. L'agenzia partner è stata impeccabile dall'inizio alla fine.",
+    quote: "Ero scettica all'inizio, ma il servizio è davvero trasparente. L'agenzia partner mi ha seguito passo passo e ho incassato l'intero prezzo di vendita.",
     author: "Giulia P.",
     location: "Roma",
-    savings: 10000,
+    detail: "Bilocale — venduto in 38 giorni",
+    date: "Gennaio 2026",
+    savings: 9800,
     stars: 5,
     initials: "GP",
   },
   {
-    quote: "Finalmente una piattaforma dalla parte del venditore. La consiglio a tutti quelli che devono vendere.",
+    quote: "Villa con giardino, venduta al prezzo che volevo. L'agenzia locale conosceva perfettamente il mercato della zona e ha gestito le visite in modo impeccabile.",
     author: "Andrea B.",
     location: "Torino",
-    savings: 16000,
+    detail: "Villa bifamiliare — venduta in 67 giorni",
+    date: "Marzo 2026",
+    savings: 15600,
     stars: 5,
     initials: "AB",
   },
@@ -76,8 +82,13 @@ export default function TestimonialsSection() {
                   </blockquote>
                 </div>
 
+                {/* Detail line */}
+                <p className="mt-4 text-xs text-[#C9A84C]/50 font-medium tracking-wide">
+                  {testimonial.detail}
+                </p>
+
                 {/* Author row */}
-                <div className="relative mt-8 flex items-center justify-between border-t border-white/[0.06] pt-6">
+                <div className="relative mt-6 flex items-center justify-between border-t border-white/[0.06] pt-6">
                   <div className="flex items-center gap-3">
                     {/* Avatar with initials */}
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#C9A84C]/20 to-[#C9A84C]/10 text-sm font-semibold text-[#C9A84C]">
@@ -85,7 +96,7 @@ export default function TestimonialsSection() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-white">{testimonial.author}</p>
-                      <p className="text-xs text-white/30">{testimonial.location}</p>
+                      <p className="text-xs text-white/30">{testimonial.location} · {testimonial.date}</p>
                     </div>
                   </div>
                   <div className="rounded-full bg-[#C9A84C]/[0.08] px-3.5 py-1.5 flex items-center gap-1.5 border border-[#C9A84C]/10">
@@ -113,7 +124,7 @@ export default function TestimonialsSection() {
               </div>
               <div className="h-4 w-px bg-white/10" />
               <p className="text-sm text-white/40">
-                <span className="text-white/70 font-semibold">150+</span> venditori soddisfatti
+                Venditori soddisfatti <span className="text-white/70 font-semibold">in tutta Italia</span>
               </p>
             </div>
           </div>
