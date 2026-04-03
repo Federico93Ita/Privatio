@@ -1801,7 +1801,7 @@ export default function VendiPage() {
               />
             </svg>
             <p className="text-sm font-medium text-primary-dark">
-              Stiamo pubblicando il tuo immobile...
+              Stiamo salvando il tuo immobile...
             </p>
           </div>
         </div>

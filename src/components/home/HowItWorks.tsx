@@ -24,7 +24,7 @@ const steps = [
   {
     num: "03",
     title: "Incassi il 100%",
-    description: "L'agenzia gestisce tutto: visite, trattativa, documentazione. Tu non paghi nessuna commissione.",
+    description: "L'agenzia pubblica l'annuncio su tutti i portali e gestisce visite, trattativa e documentazione. Tu non paghi nessuna commissione.",
     icon: (
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

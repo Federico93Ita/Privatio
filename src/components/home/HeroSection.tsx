@@ -45,8 +45,8 @@ export default function HeroSection() {
 
         <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-white/50 sm:text-xl">
           Perché pagare migliaia di euro di provvigioni? Su Privatio il
-          venditore non paga nulla. Un&apos;agenzia della tua zona gestisce
-          tutto, tu incassi il 100%.
+          venditore non paga nulla. Scegli tu l&apos;agenzia della tua zona,
+          lei gestisce tutto e tu incassi il 100%.
         </p>
 
         <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

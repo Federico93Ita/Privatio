@@ -23,8 +23,9 @@ export default function GraziePage() {
             Il tuo immobile è stato inserito con successo.
           </p>
           <p className="text-white/40 mb-8">
-            Il nostro team verificherà il tuo annuncio e ti metterà in contatto
-            con un&apos;agenzia partner nella tua zona. Riceverai una email di conferma a breve.
+            Nella tua dashboard trovi la lista delle agenzie partner nella tua zona.
+            Sei tu a scegliere quale contattare per vendere il tuo immobile.
+            Riceverai una email di conferma a breve.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

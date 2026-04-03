@@ -3,9 +3,9 @@ import LeadForm from "@/components/forms/LeadForm";
 
 const benefits = [
   { title: "Zero costi nascosti", desc: "Non paghi nulla. Mai. Nessuna sorpresa." },
-  { title: "Risposte in 24h", desc: "Ti ricontattiamo rapidamente per guidarti in ogni fase." },
+  { title: "Risposte rapide", desc: "Ti ricontattiamo per guidarti nella registrazione del tuo immobile." },
   { title: "Agenzie nella tua zona", desc: "Collaboriamo con professionisti locali verificati e qualificati." },
-  { title: "Supporto completo", desc: "Ti seguiamo dalla pubblicazione dell'annuncio fino al rogito." },
+  { title: "Supporto completo", desc: "Ti seguiamo dalla scelta dell'agenzia fino al rogito." },
 ];
 
 export default function LeadSection() {
@@ -24,7 +24,7 @@ export default function LeadSection() {
               Inizia ora, è gratuito
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base text-[#0B1D3A]/50 sm:text-lg leading-relaxed">
-              Compila il form e ti ricontatteremo entro 24 ore. Nessun costo, nessun impegno.
+              Compila il form e ti guideremo nel processo di vendita. Nessun costo, nessun impegno.
             </p>
           </div>
         </ScrollReveal>

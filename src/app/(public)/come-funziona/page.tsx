@@ -33,8 +33,8 @@ const steps = [
   {
     num: "03",
     title: "L'agenzia gestisce tutto",
-    desc: "L'agenzia partner si occupa di sopralluogo, foto professionali, pubblicazione annuncio, visite con acquirenti e trattativa.",
-    details: ["Sopralluogo e valutazione", "Pubblicazione su tutti i portali", "Gestione visite e trattativa"],
+    desc: "Dopo aver firmato il contratto, l'agenzia partner si occupa di sopralluogo, foto professionali, pubblicazione dell'annuncio su Privatio e tutti i portali, visite con acquirenti e trattativa.",
+    details: ["Sopralluogo e valutazione", "Pubblicazione su Privatio e tutti i portali dopo il contratto", "Gestione visite e trattativa"],
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />

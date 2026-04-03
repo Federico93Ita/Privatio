@@ -5,7 +5,7 @@ const benefits = [
   "I venditori nella tua zona possono trovarti e contattarti direttamente",
   "Abbonamento territoriale: investi nella tua zona e ricevi lead continui",
   "Dashboard dedicata per gestire immobili e visite",
-  "Supporto marketing e visibilità su tutti i portali",
+  "Pubblica gli annunci su Privatio e tutti i principali portali",
 ];
 
 export default function AgencyCTA() {

@@ -174,8 +174,8 @@ export default function LeadForm() {
           <p className="text-sm font-medium text-[#0B1D3A]/70 mb-3">Ecco cosa succede ora:</p>
           {[
             { step: "1", text: "Riceviamo la tua richiesta", done: true },
-            { step: "2", text: "Troviamo l'agenzia nella tua zona", done: false },
-            { step: "3", text: "Ti contattiamo entro 24 ore", done: false },
+            { step: "2", text: "Ti guidiamo nella registrazione del tuo immobile", done: false },
+            { step: "3", text: "Scegli l'agenzia della tua zona dalla dashboard", done: false },
           ].map((item) => (
             <div key={item.step} className="flex items-center gap-3">
               <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${

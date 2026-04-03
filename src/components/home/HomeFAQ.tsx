@@ -13,7 +13,7 @@ const faqs = [
   {
     question: "Quanto tempo ci vuole?",
     answer:
-      "Inserire il tuo immobile richiede circa 5 minuti. Entro 24 ore ti mettiamo in contatto con un'agenzia partner nella tua zona, che si occuperà di tutto: visite, trattativa e documentazione.",
+      "Inserire il tuo immobile richiede circa 5 minuti. Nella tua dashboard trovi subito la lista delle agenzie partner nella tua zona: sei tu a scegliere quale contattare. L'agenzia si occuperà di tutto: pubblicazione, visite, trattativa e documentazione.",
   },
   {
     question: "Come guadagna Privatio?",
