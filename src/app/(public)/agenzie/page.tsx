@@ -45,8 +45,8 @@ const piani = [
     name: "Zona Base",
     subtitle: "Comuni piccoli e rurali",
     tiers: [
-      { label: "Cluster rurale (< 5.000 ab.)", price: 249, example: "Area Monferrato Nord" },
-      { label: "Comune singolo (5k\u201320k ab.)", price: 499, example: "Nizza Monferrato" },
+      { label: "Cluster rurale (< 5.000 ab.)", price: 249, founderPrice: 224, example: "Area Monferrato Nord" },
+      { label: "Comune singolo (5k\u201320k ab.)", price: 499, founderPrice: 449, example: "Nizza Monferrato" },
     ],
     features: ["Fino a 3 zone operative", "Notifica nuovi immobili 24h", "Profilo agenzia in piattaforma", "Dashboard di gestione completa", "Max 3\u20134 agenzie per zona"],
     cta: "Inizia con Zona Base",
@@ -56,8 +56,8 @@ const piani = [
     name: "Zona Urbana",
     subtitle: "Centri medi e periferie citt\u00e0",
     tiers: [
-      { label: "Comune 20k\u2013100k ab.", price: 499, example: "Asti, Moncalieri" },
-      { label: "Quartiere periferico citt\u00e0", price: 999, example: "Torino \u2014 Mirafiori Sud" },
+      { label: "Comune 20k\u2013100k ab.", price: 499, founderPrice: 449, example: "Asti, Moncalieri" },
+      { label: "Quartiere periferico citt\u00e0", price: 999, founderPrice: 899, example: "Torino \u2014 Mirafiori Sud" },
     ],
     features: ["Fino a 3 zone operative", "Notifica nuovi immobili 8h", "Visibilit\u00e0 locale garantita", "Statistiche avanzate e report", "Max 4\u20136 agenzie per zona"],
     cta: "Scegli Zona Urbana",
@@ -67,8 +67,8 @@ const piani = [
     name: "Zona Premium",
     subtitle: "Centri storici e zone pregio",
     tiers: [
-      { label: "Quartiere semicentrale", price: 999, example: "Torino \u2014 San Salvario" },
-      { label: "Centro storico / zona top", price: 2600, example: "Torino \u2014 Centro / Crocetta" },
+      { label: "Quartiere semicentrale", price: 999, founderPrice: 899, example: "Torino \u2014 San Salvario" },
+      { label: "Centro storico / zona top", price: 2600, founderPrice: 2340, example: "Torino \u2014 Centro / Crocetta" },
     ],
     features: ["Fino a 3 zone operative", "Notifica istantanea immobili", "Prima posizione nelle ricerche", "Branding premium e supporto", "Max 4\u20137 agenzie per zona"],
     cta: "Scegli Zona Premium",
@@ -91,7 +91,7 @@ const faqJsonLd = {
   "@type": "FAQPage",
   mainEntity: [
     { "@type": "Question", name: "Come funziona la lista d'attesa?", acceptedAnswer: { "@type": "Answer", text: "Compilando il modulo entri in lista d'attesa per la tua zona. Quando le iscrizioni apriranno nella tua area, sarai tra i primi a essere contattato. I posti sono limitati per ogni zona." } },
-    { "@type": "Question", name: "Quanto costa l'abbonamento?", acceptedAnswer: { "@type": "Answer", text: "Il prezzo dipende dalla zona: da €249/mese per zone rurali fino a €2.600/mese per centri storici. Nessun costo aggiuntivo sulle vendite." } },
+    { "@type": "Question", name: "Quanto costa l'abbonamento?", acceptedAnswer: { "@type": "Answer", text: "Il prezzo dipende dalla zona: da €224/mese per zone rurali fino a €2.340/mese per centri storici. Prezzo Fondatore bloccato per sempre con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite." } },
     { "@type": "Question", name: "Posso disdire in qualsiasi momento?", acceptedAnswer: { "@type": "Answer", text: "Sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard." } },
   ],
 };
@@ -166,11 +166,24 @@ export default function AgenziePage() {
               <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">Piani</span>
               <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">Scegli la tua zona</h2>
               <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/50 leading-relaxed">
-                Un prezzo per zona, nessuna sorpresa. Selezioni il territorio e vedi il prezzo esatto.
+                Prezzo Fondatore bloccato per sempre. I primi 3 mesi sono offerti da noi.
               </p>
             </div>
 
-            <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+            {/* Founder offer banner */}
+            <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-[#C9A84C]/20 bg-gradient-to-r from-[#C9A84C]/[0.06] to-[#D4B65E]/[0.04] p-5 sm:p-6 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <svg className="h-5 w-5 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                </svg>
+                <p className="text-sm font-semibold text-[#0B1D3A]">
+                  Offerta Fondatore — <span className="text-[#C9A84C]">3 mesi gratuiti</span> + prezzo bloccato per sempre al <span className="text-[#C9A84C]">-10%</span>
+                </p>
+              </div>
+              <p className="text-xs text-[#0B1D3A]/40">Per le prime agenzie che si iscrivono. Posti limitati per zona.</p>
+            </div>
+
+            <div className="mx-auto mt-10 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
               {piani.map((plan) => (
                 <div
                   key={plan.name}
@@ -194,14 +207,23 @@ export default function AgenziePage() {
 
                   <div className="mt-5 space-y-2">
                     {plan.tiers.map((tier) => (
-                      <div key={tier.label} className="rounded-2xl bg-[#F8F6F1] px-4 py-3 flex items-baseline justify-between gap-2">
-                        <span className="text-[11px] text-[#0B1D3A]/40 leading-tight">{tier.label}</span>
-                        <span className="text-sm font-bold text-[#0B1D3A] whitespace-nowrap">
-                          &euro;{tier.price.toLocaleString("it-IT")}
-                          <span className="text-[10px] font-normal text-[#0B1D3A]/40">/mese</span>
-                        </span>
+                      <div key={tier.label} className="rounded-2xl bg-[#F8F6F1] px-4 py-3">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[11px] text-[#0B1D3A]/40 leading-tight">{tier.label}</span>
+                          <div className="flex items-baseline gap-2 whitespace-nowrap">
+                            <span className="text-xs text-[#0B1D3A]/30 line-through">
+                              &euro;{tier.price.toLocaleString("it-IT")}
+                            </span>
+                            <span className="text-sm font-bold text-[#0B1D3A]">
+                              &euro;{tier.founderPrice.toLocaleString("it-IT")}
+                              <span className="text-[10px] font-normal text-[#0B1D3A]/40">/mese</span>
+                            </span>
+                            <span className="text-[9px] font-semibold text-[#C9A84C] bg-[#C9A84C]/10 rounded-full px-1.5 py-0.5">-10%</span>
+                          </div>
+                        </div>
                       </div>
                     ))}
+                    <p className="text-[10px] text-[#C9A84C]/70 text-center font-medium mt-1">+ 3 mesi gratuiti</p>
                   </div>
 
                   <ul className="mt-6 space-y-3 flex-grow">
@@ -244,7 +266,7 @@ export default function AgenziePage() {
             </div>
 
             <p className="text-center text-xs text-[#0B1D3A]/30 mt-10">
-              Tutti i prezzi sono + IVA. Lo sconto annuale si applica al canone base, non agli add-on.
+              Tutti i prezzi sono + IVA. Prezzo Fondatore bloccato per sempre per chi si iscrive durante il lancio. I primi 3 mesi sono gratuiti.
             </p>
           </div>
         </section>
