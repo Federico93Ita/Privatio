@@ -17,11 +17,11 @@ const faqs = [
   },
   {
     q: "Quanto costa l'abbonamento?",
-    a: "Il prezzo dipende dalla zona: da \u20AC224/mese per zone rurali fino a \u20AC2.340/mese per i centri storici. Questi sono i Prezzi Fondatore, riservati a chi si iscrive durante il lancio, bloccati per sempre con uno sconto del 10%. In pi\u00F9, i primi 3 mesi sono completamente gratuiti. Nessun costo aggiuntivo sulle vendite.",
+    a: "Il prezzo dipende dalla zona: da \u20AC224/mese per zone rurali fino a \u20AC2.340/mese per i centri storici. Questi sono i Prezzi Fondatore, riservati a chi si iscrive durante il lancio, bloccati per il primo anno con uno sconto del 10%. In pi\u00F9, i primi 3 mesi sono completamente gratuiti. Nessun costo aggiuntivo sulle vendite.",
   },
   {
     q: "Cosa succede dopo i 3 mesi gratuiti?",
-    a: "Dopo i 3 mesi gratuiti, parte l'abbonamento mensile al Prezzo Fondatore che hai bloccato all'iscrizione. Puoi disdire in qualsiasi momento, senza vincoli e senza penali.",
+    a: "Dopo i 3 mesi gratuiti, parte l'abbonamento mensile al Prezzo Fondatore (-10%) che resta bloccato per 12 mesi dall'iscrizione. Puoi disdire in qualsiasi momento, senza vincoli e senza penali.",
   },
   {
     q: "Posso scegliere piu zone?",

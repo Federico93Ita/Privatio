@@ -91,7 +91,7 @@ const faqJsonLd = {
   "@type": "FAQPage",
   mainEntity: [
     { "@type": "Question", name: "Come funziona la lista d'attesa?", acceptedAnswer: { "@type": "Answer", text: "Compilando il modulo entri in lista d'attesa per la tua zona. Quando le iscrizioni apriranno nella tua area, sarai tra i primi a essere contattato. I posti sono limitati per ogni zona." } },
-    { "@type": "Question", name: "Quanto costa l'abbonamento?", acceptedAnswer: { "@type": "Answer", text: "Il prezzo dipende dalla zona: da €224/mese per zone rurali fino a €2.340/mese per centri storici. Prezzo Fondatore bloccato per sempre con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite." } },
+    { "@type": "Question", name: "Quanto costa l'abbonamento?", acceptedAnswer: { "@type": "Answer", text: "Il prezzo dipende dalla zona: da €224/mese per zone rurali fino a €2.340/mese per centri storici. Prezzo Fondatore bloccato per 12 mesi con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite." } },
     { "@type": "Question", name: "Posso disdire in qualsiasi momento?", acceptedAnswer: { "@type": "Answer", text: "Sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard." } },
   ],
 };
@@ -166,7 +166,7 @@ export default function AgenziePage() {
               <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">Piani</span>
               <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">Scegli la tua zona</h2>
               <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/50 leading-relaxed">
-                Prezzo Fondatore bloccato per sempre. I primi 3 mesi sono offerti da noi.
+                Prezzo Fondatore bloccato per 12 mesi. I primi 3 mesi sono offerti da noi.
               </p>
             </div>
 
@@ -177,7 +177,7 @@ export default function AgenziePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
                 </svg>
                 <p className="text-sm font-semibold text-[#0B1D3A]">
-                  Offerta Fondatore — <span className="text-[#C9A84C]">3 mesi gratuiti</span> + prezzo bloccato per sempre al <span className="text-[#C9A84C]">-10%</span>
+                  Offerta Fondatore — <span className="text-[#C9A84C]">3 mesi gratuiti</span> + prezzo bloccato 12 mesi al <span className="text-[#C9A84C]">-10%</span>
                 </p>
               </div>
               <p className="text-xs text-[#0B1D3A]/40">Per le prime agenzie che si iscrivono. Posti limitati per zona.</p>
@@ -266,7 +266,7 @@ export default function AgenziePage() {
             </div>
 
             <p className="text-center text-xs text-[#0B1D3A]/30 mt-10">
-              Tutti i prezzi sono + IVA. Prezzo Fondatore bloccato per sempre per chi si iscrive durante il lancio. I primi 3 mesi sono gratuiti.
+              Tutti i prezzi sono + IVA. Prezzo Fondatore bloccato per 12 mesi per chi si iscrive durante il lancio. I primi 3 mesi sono gratuiti.
             </p>
           </div>
         </section>
