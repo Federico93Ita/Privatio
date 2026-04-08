@@ -53,21 +53,23 @@ export default function HowItWorks() {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-0">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8 items-stretch">
           {steps.map((step, i) => (
-            <ScrollReveal key={step.num} delay={i * 0.15}>
-              <div className="relative group">
+            <ScrollReveal key={step.num} delay={i * 0.15} className="h-full">
+              <div className="relative group h-full">
                 {/* Connecting line between steps (desktop only) */}
                 {i < 2 && (
-                  <div className="absolute top-16 left-[calc(50%+40px)] right-0 hidden md:block">
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute top-20 left-full hidden md:block w-8 -translate-x-1/2"
+                  >
                     <div className="h-px w-full bg-gradient-to-r from-[#C9A84C]/30 to-[#C9A84C]/5" />
                   </div>
                 )}
 
-                <div className="relative rounded-3xl bg-white p-8 md:p-10 text-center shadow-sm border border-[#C9A84C]/[0.08] transition-all duration-500 hover:shadow-xl hover:shadow-[#C9A84C]/[0.06] hover:-translate-y-1 group-hover:border-[#C9A84C]/20">
+                <div className="relative flex h-full flex-col rounded-3xl bg-white p-8 md:p-10 text-center shadow-sm border border-[#C9A84C]/[0.08] transition-all duration-500 hover:shadow-xl hover:shadow-[#C9A84C]/[0.06] hover:-translate-y-1 group-hover:border-[#C9A84C]/20">
                   {/* Step number — large, decorative */}
-                  <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center">
-                    {/* Background ring */}
+                  <div className="relative mx-auto mb-6 flex h-20 w-20 shrink-0 items-center justify-center">
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#C9A84C]/10 to-[#C9A84C]/5 transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-1 rounded-full bg-white" />
                     <span className="relative text-2xl font-semibold bg-gradient-to-br from-[#C9A84C] to-[#B8943B] bg-clip-text text-transparent">
@@ -76,14 +78,14 @@ export default function HowItWorks() {
                   </div>
 
                   {/* Icon */}
-                  <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0B1D3A]/[0.03] text-[#0B1D3A]/40 transition-colors duration-300 group-hover:bg-[#C9A84C]/10 group-hover:text-[#C9A84C]">
+                  <div className="mx-auto mb-5 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#0B1D3A]/[0.03] text-[#0B1D3A]/40 transition-colors duration-300 group-hover:bg-[#C9A84C]/10 group-hover:text-[#C9A84C]">
                     {step.icon}
                   </div>
 
-                  <h3 className="mb-3 font-heading text-xl font-normal text-[#0B1D3A]">
+                  <h3 className="mb-3 font-heading text-xl font-normal text-[#0B1D3A] min-h-[3.5rem] flex items-center justify-center">
                     {step.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-[#0B1D3A]/50 max-w-[280px] mx-auto">
+                  <p className="text-sm leading-relaxed text-[#0B1D3A]/50 max-w-[280px] mx-auto flex-1">
                     {step.description}
                   </p>
                 </div>

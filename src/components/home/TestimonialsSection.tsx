@@ -57,10 +57,10 @@ export default function TestimonialsSection() {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 items-stretch">
           {testimonials.map((testimonial, i) => (
-            <ScrollReveal key={testimonial.author} delay={i * 0.15}>
-              <div className="group relative flex flex-col justify-between rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8 transition-all duration-500 hover:bg-white/[0.07] hover:border-white/[0.12] overflow-hidden md:p-9">
+            <ScrollReveal key={testimonial.author} delay={i * 0.15} className="h-full">
+              <div className="group relative h-full flex flex-col justify-between rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8 transition-all duration-500 hover:bg-white/[0.07] hover:border-white/[0.12] overflow-hidden md:p-9">
                 {/* Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#C9A84C]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
 

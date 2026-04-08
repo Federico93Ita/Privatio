@@ -67,10 +67,10 @@ export default function WhyPrivatio() {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6 items-stretch">
           {features.map((feature, i) => (
-            <ScrollReveal key={feature.title} delay={i * 0.1}>
-              <div className="group relative rounded-3xl border border-transparent bg-white p-8 shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-1 hover:border-[#C9A84C]/15 overflow-hidden">
+            <ScrollReveal key={feature.title} delay={i * 0.1} className="h-full">
+              <div className="group relative h-full flex flex-col rounded-3xl border border-transparent bg-white p-8 shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-1 hover:border-[#C9A84C]/15 overflow-hidden">
                 {/* Gradient background on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${feature.accent} opacity-0 transition-opacity duration-500 group-hover:opacity-100 rounded-3xl`} />
 
