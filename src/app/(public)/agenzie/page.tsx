@@ -61,7 +61,7 @@ const piani = [
     ],
     features: ["Fino a 3 zone operative", "Notifica nuovi immobili 8h", "Visibilit\u00e0 locale garantita", "Statistiche avanzate e report", "Max 4\u20136 agenzie per zona"],
     cta: "Scegli Zona Urbana",
-    highlighted: true,
+    highlighted: false,
   },
   {
     name: "Zona Premium",
@@ -187,19 +187,8 @@ export default function AgenziePage() {
               {piani.map((plan) => (
                 <div
                   key={plan.name}
-                  className={`relative flex flex-col rounded-3xl bg-white p-7 shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-1 overflow-hidden ${
-                    plan.highlighted ? "border-2 border-[#C9A84C] ring-4 ring-[#C9A84C]/10" : "border border-[#C9A84C]/[0.08]"
-                  }`}
+                  className="relative flex h-full flex-col rounded-3xl bg-white p-7 shadow-sm border border-[#C9A84C]/[0.08] transition-all duration-500 hover:shadow-xl hover:shadow-black/[0.04] hover:-translate-y-1 hover:border-[#C9A84C]/20 overflow-hidden"
                 >
-                  {plan.highlighted && (
-                    <>
-                      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#C9A84C]/0 via-[#C9A84C] to-[#C9A84C]/0" />
-                      <span className="absolute -top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-4 py-1 text-xs font-semibold text-[#0B1D3A]">
-                        Consigliato
-                      </span>
-                    </>
-                  )}
-
                   <div>
                     <h3 className="font-heading text-xl font-normal text-[#0B1D3A]">{plan.name}</h3>
                     <p className="text-xs text-[#0B1D3A]/40 mt-1">{plan.subtitle}</p>
@@ -239,11 +228,7 @@ export default function AgenziePage() {
 
                   <a
                     href="#registrazione"
-                    className={`mt-7 block w-full rounded-2xl py-3 text-center text-sm font-semibold transition-all duration-300 ${
-                      plan.highlighted
-                        ? "bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] text-[#0B1D3A] shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                        : "border border-[#C9A84C]/30 text-[#0B1D3A] hover:bg-[#C9A84C]/5 hover:border-[#C9A84C]/50"
-                    }`}
+                    className="mt-7 block w-full rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] py-3 text-center text-sm font-semibold text-[#0B1D3A] shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                   >
                     {plan.cta}
                   </a>
