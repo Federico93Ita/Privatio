@@ -20,10 +20,17 @@ interface StatCard {
 }
 
 interface Agency {
+  id?: string;
   name: string;
   phone: string;
   email: string;
   rating: number;
+  logoUrl?: string | null;
+  tagline?: string | null;
+  specializations?: string[];
+  uniqueSellingPoints?: string[];
+  responseTimeHours?: number | null;
+  profileCompletedAt?: string | null;
 }
 
 interface Lead {
@@ -301,16 +308,32 @@ function AgencyCard({ agency }: { agency: Agency | null }) {
     );
   }
 
+  const usp = (agency.uniqueSellingPoints || []).slice(0, 3);
+  const spec = (agency.specializations || []).slice(0, 3);
+  const hasRichProfile = !!agency.profileCompletedAt && !!agency.id;
+
   return (
     <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
       <h3 className="mb-4 text-lg font-medium text-primary-dark">Agenzia Partner</h3>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
-            {agency.name.charAt(0)}
-          </div>
-          <div>
-            <p className="font-semibold text-text">{agency.name}</p>
+          {agency.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={agency.logoUrl}
+              alt={agency.name}
+              className="h-12 w-12 rounded-full object-contain bg-white border border-border"
+            />
+          ) : (
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
+              {agency.name.charAt(0)}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-text truncate">{agency.name}</p>
+            {agency.tagline && (
+              <p className="text-xs text-text-muted truncate">{agency.tagline}</p>
+            )}
             <div className="flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <StarIcon key={i} filled={i < agency.rating} />
@@ -319,6 +342,33 @@ function AgencyCard({ agency }: { agency: Agency | null }) {
             </div>
           </div>
         </div>
+        {usp.length > 0 && (
+          <ul className="space-y-1 text-sm text-text">
+            {usp.map((p, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-primary">✓</span>
+                <span className="line-clamp-1">{p}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {spec.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {spec.map((s, i) => (
+              <span
+                key={i}
+                className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
+        {agency.responseTimeHours && (
+          <p className="text-xs text-text-muted">
+            ⚡ Risponde entro {agency.responseTimeHours}h
+          </p>
+        )}
         <div className="space-y-1.5 text-sm text-text-muted">
           <p className="flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -334,6 +384,14 @@ function AgencyCard({ agency }: { agency: Agency | null }) {
             {agency.email}
           </p>
         </div>
+        {hasRichProfile && (
+          <Link
+            href={`/dashboard/venditore/agenzie/${agency.id}`}
+            className="mt-2 inline-flex items-center justify-center w-full rounded-lg border border-primary px-3 py-2 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition"
+          >
+            Vedi profilo completo →
+          </Link>
+        )}
       </div>
     </div>
   );

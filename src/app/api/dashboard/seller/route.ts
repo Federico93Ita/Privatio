@@ -37,11 +37,17 @@ export async function GET() {
         include: {
           agency: {
             select: {
+              id: true,
               name: true,
               phone: true,
               email: true,
               logoUrl: true,
               rating: true,
+              tagline: true,
+              specializations: true,
+              uniqueSellingPoints: true,
+              responseTimeHours: true,
+              profileCompletedAt: true,
               agents: {
                 select: { id: true, name: true },
                 take: 1,

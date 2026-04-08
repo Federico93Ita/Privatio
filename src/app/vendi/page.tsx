@@ -1499,7 +1499,7 @@ export default function VendiPage() {
                 className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
               />
               <span className="text-sm text-text">
-                Acconsento alla trasmissione automatica dei miei dati alle agenzie della zona se non contatto nessuna agenzia entro 48 ore
+                Se non scelgo un&apos;agenzia entro <strong>48 ore</strong>, acconsento espressamente a che i miei dati di contatto (nome, email, telefono) e la descrizione del mio immobile siano condivisi con le agenzie partner Privatio attive nella mia zona, così potranno ricontattarmi direttamente. Posso scegliere prima delle 48 ore per evitare la condivisione, o revocare il consenso in qualsiasi momento scrivendo a privacy@privatio.it.
                 <span className="ml-0.5 text-error">*</span>
               </span>
             </label>

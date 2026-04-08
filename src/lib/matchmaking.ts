@@ -110,6 +110,172 @@ export async function assignAgencyToProperty(propertyId: string) {
   return assignment;
 }
 
+/**
+ * Fallback 48h: per ogni immobile pubblicato da più di 48h che NON ha
+ * ancora un'assignment scelta dal venditore (ma con consenso GDPR),
+ * condivide i contatti del venditore con tutte le agenzie con profilo
+ * completo attive nella zona, e invia notifica al venditore.
+ *
+ * Eseguito ogni ora via Vercel Cron.
+ */
+export async function checkFallback48h() {
+  const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+  const candidates = await prisma.property.findMany({
+    where: {
+      status: "PUBLISHED",
+      assignment: null,
+      fallbackConsentAt: { not: null },
+      publishedAt: { lte: cutoff },
+      zoneId: { not: null },
+    },
+    include: {
+      seller: true,
+      photos: { take: 1, orderBy: { order: "asc" } },
+      fallbackContacts: true,
+    },
+  });
+
+  let processedProperties = 0;
+  let notifiedAgencies = 0;
+
+  for (const property of candidates) {
+    if (!property.zoneId) continue;
+
+    // Trova agenzie attive in zona con profilo completo
+    const territories = await prisma.territoryAssignment.findMany({
+      where: {
+        zoneId: property.zoneId,
+        isActive: true,
+        agency: {
+          isActive: true,
+          profileCompletedAt: { not: null },
+        },
+      },
+      include: { agency: true },
+    });
+
+    if (territories.length === 0) continue;
+
+    const alreadyNotified = new Set(property.fallbackContacts.map((c) => c.agencyId));
+    const newAgencies = territories
+      .map((t) => t.agency)
+      .filter((a) => !alreadyNotified.has(a.id));
+
+    if (newAgencies.length === 0) continue;
+
+    for (const agency of newAgencies) {
+      await prisma.propertyFallbackContact.create({
+        data: { propertyId: property.id, agencyId: agency.id },
+      });
+
+      const email = agencyFallbackNotificationEmail({
+        agencyName: agency.name,
+        sellerName: property.seller.name || "Venditore",
+        sellerEmail: property.seller.email,
+        sellerPhone: property.seller.phone || "",
+        propertyTitle: property.title,
+        propertyAddress: `${property.address}, ${property.city}`,
+        propertyDescription: property.description || "",
+        propertyPhoto: property.photos[0]?.url || null,
+      });
+      await sendEmail({ to: agency.email, ...email });
+      notifiedAgencies++;
+    }
+
+    // Email al venditore solo alla prima notifica
+    if (alreadyNotified.size === 0) {
+      const sellerEmail = sellerFallbackNotificationEmail(
+        property.seller.name || "Venditore",
+        newAgencies.length
+      );
+      await sendEmail({ to: property.seller.email, ...sellerEmail });
+    }
+
+    processedProperties++;
+  }
+
+  return { processedProperties, notifiedAgencies };
+}
+
+function agencyFallbackNotificationEmail(opts: {
+  agencyName: string;
+  sellerName: string;
+  sellerEmail: string;
+  sellerPhone: string;
+  propertyTitle: string;
+  propertyAddress: string;
+  propertyDescription: string;
+  propertyPhoto: string | null;
+}) {
+  const e = (s: string) =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  return {
+    subject: `Nuovo contatto venditore: ${opts.propertyTitle}`,
+    html: `
+      <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #0B1D3A; padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">Privatio</h1>
+          <p style="color: #C9A84C; margin: 8px 0 0;">Nuovo contatto venditore disponibile</p>
+        </div>
+        <div style="padding: 30px; background: white;">
+          <p>Ciao ${e(opts.agencyName)},</p>
+          <p>Un venditore della tua zona <strong>non ha scelto nessuna agenzia entro 48 ore</strong>.
+          Come previsto dal consenso espresso al momento della pubblicazione, ti condividiamo
+          i suoi contatti per permetterti di ricontattarlo direttamente.</p>
+          ${opts.propertyPhoto ? `<img src="${e(opts.propertyPhoto)}" alt="" style="width:100%; max-width:540px; border-radius:12px; margin:16px 0;" />` : ""}
+          <h3 style="color: #0B1D3A; margin-top: 24px;">Immobile</h3>
+          <p style="margin: 4px 0;"><strong>${e(opts.propertyTitle)}</strong></p>
+          <p style="color: #64748b; margin: 4px 0;">${e(opts.propertyAddress)}</p>
+          ${opts.propertyDescription ? `<p style="color: #64748b; line-height: 1.6;">${e(opts.propertyDescription).slice(0, 500)}</p>` : ""}
+          <h3 style="color: #0B1D3A; margin-top: 24px;">Contatto venditore</h3>
+          <p style="margin: 4px 0;"><strong>Nome:</strong> ${e(opts.sellerName)}</p>
+          <p style="margin: 4px 0;"><strong>Email:</strong> <a href="mailto:${e(opts.sellerEmail)}">${e(opts.sellerEmail)}</a></p>
+          ${opts.sellerPhone ? `<p style="margin: 4px 0;"><strong>Telefono:</strong> ${e(opts.sellerPhone)}</p>` : ""}
+          <p style="color: #64748b; font-size: 13px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+            Privacy: il venditore ha espressamente acconsentito alla condivisione dei suoi dati con le agenzie partner Privatio della sua zona, in caso di mancata scelta entro 48 ore. Tratta i suoi dati nel rispetto del GDPR.
+          </p>
+        </div>
+      </div>
+    `,
+  };
+}
+
+function sellerFallbackNotificationEmail(sellerName: string, agencyCount: number) {
+  const e = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return {
+    subject: "Le agenzie della tua zona ti contatteranno",
+    html: `
+      <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #0B1D3A; padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">Privatio</h1>
+        </div>
+        <div style="padding: 30px; background: white;">
+          <p>Ciao ${e(sellerName)},</p>
+          <p>Sono passate <strong>48 ore</strong> dalla pubblicazione del tuo immobile e non hai ancora scelto un'agenzia partner.</p>
+          <p>Come avevi acconsentito al momento della pubblicazione, abbiamo condiviso i tuoi contatti con
+          <strong>${agencyCount} ${agencyCount === 1 ? "agenzia partner" : "agenzie partner"}</strong> attive nella tua zona, così potranno ricontattarti direttamente.</p>
+          <p>Puoi sempre tornare in dashboard e scegliere tu l'agenzia che preferisci:</p>
+          <p style="text-align: center; margin: 24px 0;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/venditore"
+               style="background: #C9A84C; color: #0B1D3A; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+              Vai in dashboard
+            </a>
+          </p>
+          <p style="color: #64748b; font-size: 13px;">
+            Ricorda: con Privatio non paghi nessuna commissione. Se vuoi revocare il consenso alla condivisione, contattaci a privacy@privatio.it.
+          </p>
+        </div>
+      </div>
+    `,
+  };
+}
+
 async function notifyAdminNoZoneFound(propertyId: string, propertyTitle: string) {
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail) return;

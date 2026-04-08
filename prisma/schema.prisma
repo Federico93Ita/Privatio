@@ -9,37 +9,37 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  phone         String?
-  password      String?
-  role          Role      @default(SELLER)
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  properties    Property[]
-  agency        Agency?   @relation(fields: [agencyId], references: [id])
-  agencyId      String?
-  sessions      Session[]
-  accounts      Account[]
-  sentMessages      Message[] @relation("SentMessages")
-  receivedMessages  Message[] @relation("ReceivedMessages")
-  uploadedDocuments Document[] @relation("UploadedDocuments")
-  favorites         Favorite[]
-  savedSearches     SavedSearch[]
-  reviews           Review[]
-  notifications     Notification[]
+  id                 String         @id @default(cuid())
+  email              String         @unique
+  name               String?
+  phone              String?
+  password           String?
+  role               Role           @default(SELLER)
+  emailVerified      DateTime?
+  image              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  properties         Property[]
+  agency             Agency?        @relation(fields: [agencyId], references: [id])
+  agencyId           String?
+  sessions           Session[]
+  accounts           Account[]
+  sentMessages       Message[]      @relation("SentMessages")
+  receivedMessages   Message[]      @relation("ReceivedMessages")
+  uploadedDocuments  Document[]     @relation("UploadedDocuments")
+  favorites          Favorite[]
+  savedSearches      SavedSearch[]
+  reviews            Review[]
+  notifications      Notification[]
   // Two-Factor Authentication
-  twoFactorEnabled  Boolean   @default(false)
-  twoFactorSecret   String?
+  twoFactorEnabled   Boolean        @default(false)
+  twoFactorSecret    String?
   // Consent tracking
   termsAcceptedAt    DateTime?
   privacyAcceptedAt  DateTime?
   fase2ConsentAt     DateTime?
   clausoleApprovedAt DateTime?
-  marketingConsent   Boolean   @default(false)
+  marketingConsent   Boolean        @default(false)
   termsVersion       String?
   termsAcceptedIp    String?
 }
@@ -71,36 +71,57 @@ model Account {
 }
 
 model Agency {
-  id               String    @id @default(cuid())
-  name             String
-  email            String    @unique
-  phone            String
-  address          String
-  city             String
-  province         String
-  lat              Float?
-  lng              Float?
-  coverageRadius   Int?
-  plan             AgencyPlan @default(BASE)
-  isActive         Boolean   @default(false)
-  stripeCustomerId String?
-  stripeSubId      String?
-  trialEndsAt      DateTime?  // Free trial expiry date
-  trialUsed        Boolean   @default(false)
-  logoUrl          String?
-  description      String?   @db.Text
-  rating           Float?    @default(0)
-  reviewCount      Int       @default(0)
+  id                       String                    @id @default(cuid())
+  name                     String
+  email                    String                    @unique
+  phone                    String
+  address                  String
+  city                     String
+  province                 String
+  lat                      Float?
+  lng                      Float?
+  coverageRadius           Int?
+  plan                     AgencyPlan                @default(BASE)
+  isActive                 Boolean                   @default(false)
+  stripeCustomerId         String?
+  stripeSubId              String?
+  trialEndsAt              DateTime? // Free trial expiry date
+  trialUsed                Boolean                   @default(false)
+  logoUrl                  String?
+  description              String?                   @db.Text
+  rating                   Float?                    @default(0)
+  reviewCount              Int                       @default(0)
+  // Profilo agenzia (vetrina commerciale visibile ai venditori)
+  tagline                  String?
+  coverImageUrl            String?
+  videoUrl                 String?
+  foundedYear              Int?
+  teamSize                 Int?
+  responseTimeHours        Int?
+  transactionsCount        Int?
+  specializations          String[]
+  languages                String[]
+  serviceAreas             String[]
+  gallery                  String[]
+  certifications           String[]
+  awards                   String[]
+  uniqueSellingPoints      String[]
+  website                  String?
+  instagramUrl             String?
+  facebookUrl              String?
+  linkedinUrl              String?
+  whatsappNumber           String?
+  profileCompletedAt       DateTime?
   // Fatturazione elettronica
-  ragioneSociale   String?
-  partitaIva       String?
-  codiceFiscale    String?
-  pec              String?
-  codiceSdi        String?   @default("0000000")
-  invoiceAddress   String?
-  invoiceCity      String?
-  invoiceProvince  String?
-  invoiceCap       String?
+  ragioneSociale           String?
+  partitaIva               String?
+  codiceFiscale            String?
+  pec                      String?
+  codiceSdi                String?                   @default("0000000")
+  invoiceAddress           String?
+  invoiceCity              String?
+  invoiceProvince          String?
+  invoiceCap               String?
   // Accettazione contratto di convenzionamento
   contractAcceptedAt       DateTime?
   privacyAcceptedAt        DateTime?
@@ -109,12 +130,26 @@ model Agency {
   registroAcceptedAt       DateTime?
   contractVersion          String?
   contractAcceptedIp       String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  agents           User[]
-  assignments      PropertyAssignment[]
-  reviews          Review[]
-  territories      TerritoryAssignment[]
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  agents                   User[]
+  assignments              PropertyAssignment[]
+  reviews                  Review[]
+  territories              TerritoryAssignment[]
+  fallbackContacts         PropertyFallbackContact[]
+}
+
+model PropertyFallbackContact {
+  id         String   @id @default(cuid())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agencyId   String
+  notifiedAt DateTime @default(now())
+
+  @@unique([propertyId, agencyId])
+  @@index([propertyId])
+  @@index([agencyId])
 }
 
 enum AgencyPlan {
@@ -130,59 +165,61 @@ enum ZoneClass {
 }
 
 model Property {
-  id            String         @id @default(cuid())
-  slug          String         @unique
-  title         String
-  description   String?        @db.Text
-  type          PropertyType
-  status        PropertyStatus @default(DRAFT)
-  price         Int
-  surface       Int
-  rooms         Int
-  bathrooms     Int?
-  floor         Int?
-  totalFloors   Int?
-  hasGarage          Boolean  @default(false)
-  hasGarden          Boolean  @default(false)
-  hasBalcony         Boolean  @default(false)
-  hasElevator        Boolean  @default(false)
-  hasParkingSpace    Boolean  @default(false)
-  hasCellar          Boolean  @default(false)
-  hasTerrace         Boolean  @default(false)
-  hasPool            Boolean  @default(false)
-  hasAirConditioning Boolean  @default(false)
-  isFurnished        Boolean  @default(false)
-  hasConcierge       Boolean  @default(false)
-  hasAlarm           Boolean  @default(false)
+  id                 String                    @id @default(cuid())
+  slug               String                    @unique
+  title              String
+  description        String?                   @db.Text
+  type               PropertyType
+  status             PropertyStatus            @default(DRAFT)
+  price              Int
+  surface            Int
+  rooms              Int
+  bathrooms          Int?
+  floor              Int?
+  totalFloors        Int?
+  hasGarage          Boolean                   @default(false)
+  hasGarden          Boolean                   @default(false)
+  hasBalcony         Boolean                   @default(false)
+  hasElevator        Boolean                   @default(false)
+  hasParkingSpace    Boolean                   @default(false)
+  hasCellar          Boolean                   @default(false)
+  hasTerrace         Boolean                   @default(false)
+  hasPool            Boolean                   @default(false)
+  hasAirConditioning Boolean                   @default(false)
+  isFurnished        Boolean                   @default(false)
+  hasConcierge       Boolean                   @default(false)
+  hasAlarm           Boolean                   @default(false)
   energyClass        String?
   yearBuilt          Int?
   condominiumFees    Int?
-  extraCosts         String?  @db.Text
+  extraCosts         String?                   @db.Text
   condition          String?
   heatingType        String?
-  videoUrl           String?  // YouTube or Vimeo embed URL
-  virtualTourUrl     String?  // Matterport, 3DVista, etc.
-  address       String
-  city          String
-  province      String
-  cap           String
-  lat           Float
-  lng           Float
-  zone          Zone?          @relation("PropertyZone", fields: [zoneId], references: [id])
-  zoneId        String?
-  photos        PropertyPhoto[]
-  seller        User           @relation(fields: [sellerId], references: [id])
-  sellerId      String
-  assignment    PropertyAssignment?
-  contract      Contract?
-  visits        Visit[]
-  leads         BuyerLead[]
-  documents     Document[]
-  favorites     Favorite[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  publishedAt   DateTime?
-  viewCount     Int            @default(0)
+  videoUrl           String? // YouTube or Vimeo embed URL
+  virtualTourUrl     String? // Matterport, 3DVista, etc.
+  address            String
+  city               String
+  province           String
+  cap                String
+  lat                Float
+  lng                Float
+  zone               Zone?                     @relation("PropertyZone", fields: [zoneId], references: [id])
+  zoneId             String?
+  photos             PropertyPhoto[]
+  seller             User                      @relation(fields: [sellerId], references: [id])
+  sellerId           String
+  assignment         PropertyAssignment?
+  contract           Contract?
+  visits             Visit[]
+  leads              BuyerLead[]
+  documents          Document[]
+  favorites          Favorite[]
+  fallbackContacts   PropertyFallbackContact[]
+  fallbackConsentAt  DateTime?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  publishedAt        DateTime?
+  viewCount          Int                       @default(0)
 
   @@index([city, status])
   @@index([status])
@@ -241,17 +278,17 @@ enum AssignmentStatus {
 }
 
 model Contract {
-  id           String   @id @default(cuid())
-  property     Property @relation(fields: [propertyId], references: [id])
-  propertyId   String   @unique
-  type         String   @default("ESCLUSIVA_90_GIORNI")
-  duration     Int      @default(90)
+  id           String    @id @default(cuid())
+  property     Property  @relation(fields: [propertyId], references: [id])
+  propertyId   String    @unique
+  type         String    @default("ESCLUSIVA_90_GIORNI")
+  duration     Int       @default(90)
   signedAt     DateTime?
   expiresAt    DateTime?
-  sellerSigned Boolean  @default(false)
-  agencySigned Boolean  @default(false)
+  sellerSigned Boolean   @default(false)
+  agencySigned Boolean   @default(false)
   documentUrl  String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
 
   @@index([expiresAt])
 }
@@ -320,21 +357,21 @@ enum LeadStatus {
 }
 
 model AgencyLead {
-  id              String     @id @default(cuid())
-  agencyName      String
-  contactName     String
-  email           String
-  phone           String
-  address         String?
-  city            String
-  province        String
-  agentCount      Int?
-  message         String?    @db.Text
-  preferredZones  Json?
-  status          LeadStatus @default(NEW)
-  approvalToken   String?
-  approvedAt      DateTime?
-  createdAt       DateTime   @default(now())
+  id             String     @id @default(cuid())
+  agencyName     String
+  contactName    String
+  email          String
+  phone          String
+  address        String?
+  city           String
+  province       String
+  agentCount     Int?
+  message        String?    @db.Text
+  preferredZones Json?
+  status         LeadStatus @default(NEW)
+  approvalToken  String?
+  approvedAt     DateTime?
+  createdAt      DateTime   @default(now())
 }
 
 model Message {
@@ -426,9 +463,9 @@ model VerificationToken {
 }
 
 model Zone {
-  id             String     @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String
-  slug           String     @unique
+  slug           String    @unique
   zoneClass      ZoneClass
   region         String
   province       String
@@ -437,28 +474,28 @@ model Zone {
   municipalities String[]
 
   // Dati di mercato (ISTAT/OMI/NTN)
-  population     Int        @default(0)
-  ntn            Float      @default(0)
-  marketScore    Int        @default(1)
+  population     Int    @default(0)
+  ntn            Float  @default(0)
+  marketScore    Int    @default(1)
   avgPricePerSqm Float?
 
   // Pricing semplificato: 1 prezzo, 1 limite per zona
-  monthlyPrice   Int        @default(0)   // centesimi EUR
-  maxAgencies    Int        @default(4)
+  monthlyPrice Int @default(0) // centesimi EUR
+  maxAgencies  Int @default(4)
 
   // Zone adiacenti per espansione territoriale
   adjacentZoneIds String[]
 
-  lat            Float?
-  lng            Float?
-  boundary       Json?
+  lat      Float?
+  lng      Float?
+  boundary Json?
 
-  isActive       Boolean    @default(true)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  territories    TerritoryAssignment[]
-  properties     Property[] @relation("PropertyZone")
+  territories TerritoryAssignment[]
+  properties  Property[]            @relation("PropertyZone")
 
   @@index([province])
   @@index([region])
@@ -487,7 +524,7 @@ model Complaint {
   referenceNumber String          @unique
   name            String
   email           String
-  userType        String          // "venditore" | "agenzia" | "acquirente"
+  userType        String // "venditore" | "agenzia" | "acquirente"
   subject         String
   description     String          @db.Text
   status          ComplaintStatus @default(RECEIVED)
@@ -512,7 +549,7 @@ model Notification {
   type      NotificationType
   title     String
   body      String
-  href      String?          // Deep link to relevant page
+  href      String? // Deep link to relevant page
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
 
@@ -521,22 +558,22 @@ model Notification {
 }
 
 enum NotificationType {
-  LEAD_RECEIVED       // New buyer lead on a property
-  PROPERTY_ASSIGNED   // Property assigned to agency
-  VISIT_SCHEDULED     // Visit scheduled
-  VISIT_CONFIRMED     // Visit confirmed
-  CONTRACT_SIGNED     // Contract signed
-  PAYMENT_FAILED      // Subscription payment failed
+  LEAD_RECEIVED // New buyer lead on a property
+  PROPERTY_ASSIGNED // Property assigned to agency
+  VISIT_SCHEDULED // Visit scheduled
+  VISIT_CONFIRMED // Visit confirmed
+  CONTRACT_SIGNED // Contract signed
+  PAYMENT_FAILED // Subscription payment failed
   TERRITORY_ACTIVATED // Territory subscription activated
-  SYSTEM              // Generic system notification
+  SYSTEM // Generic system notification
 }
 
 model AuditLog {
   id        String   @id @default(cuid())
-  action    String   // e.g. "property.publish", "agency.approve", "user.delete"
-  userId    String?  // who performed the action
-  targetId  String?  // entity affected
-  details   Json?    // additional context
+  action    String // e.g. "property.publish", "agency.approve", "user.delete"
+  userId    String? // who performed the action
+  targetId  String? // entity affected
+  details   Json? // additional context
   ip        String?
   createdAt DateTime @default(now())
 

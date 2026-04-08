@@ -221,6 +221,7 @@ const sidebarConfig: Record<Role, SidebarItem[]> = {
   ],
   agency: [
     { href: "/dashboard/agenzia", label: "Dashboard", icon: <GridIcon /> },
+    { href: "/dashboard/agenzia/profilo", label: "Profilo Vetrina", icon: <UserIcon /> },
     { href: "/dashboard/agenzia/territori", label: "Territori", icon: <Icon d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" /> },
     { href: "/dashboard/agenzia/appuntamenti", label: "Appuntamenti", icon: <CalendarIcon /> },
     { href: "/dashboard/agenzia/messaggi", label: "Messaggi", icon: <MessageIcon /> },

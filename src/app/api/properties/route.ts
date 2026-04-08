@@ -259,6 +259,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // GDPR consent for 48h fallback (data sharing with zone agencies)
+    const accettaFase2 = formData.get("accettaFase2") === "true";
+
     // Create property in a transaction
     const property = await prisma.$transaction(async (tx) => {
       const created = await tx.property.create({
@@ -268,6 +271,7 @@ export async function POST(req: NextRequest) {
           slug: `draft-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           sellerId: session.user.id,
           status: "DRAFT",
+          fallbackConsentAt: accettaFase2 ? new Date() : null,
         },
       });
 
