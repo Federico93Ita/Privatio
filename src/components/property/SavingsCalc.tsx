@@ -86,9 +86,9 @@ export default function SavingsCalc() {
         </div>
 
         {/* ---- Comparison columns ---- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
           {/* Traditional agency */}
-          <div className="relative rounded-3xl border border-red-100 bg-gradient-to-br from-red-50/50 to-white p-7 space-y-3 text-center overflow-hidden">
+          <div className="relative flex h-full flex-col justify-between rounded-3xl border border-red-100 bg-gradient-to-br from-red-50/50 to-white p-7 space-y-3 text-center overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-400/50 to-transparent" />
             <p className="text-sm font-medium text-[#0B1D3A]/50 uppercase tracking-wide">
               Agenzia tradizionale
@@ -102,7 +102,7 @@ export default function SavingsCalc() {
           </div>
 
           {/* Privatio */}
-          <div className="relative rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50/50 to-white p-7 space-y-3 text-center overflow-hidden">
+          <div className="relative flex h-full flex-col justify-between rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50/50 to-white p-7 space-y-3 text-center overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
             <p className="text-sm font-medium text-[#0B1D3A]/50 uppercase tracking-wide">
               Con Privatio

@@ -83,7 +83,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     <Link
       href={`/immobile/${slug}`}
       className={cn(
-        "group block rounded-3xl overflow-hidden bg-white border border-black/[0.04]",
+        "group flex h-full flex-col rounded-3xl overflow-hidden bg-white border border-black/[0.04]",
         "shadow-sm transition-all duration-500 ease-out",
         "hover:shadow-xl hover:shadow-[#C9A84C]/[0.08] hover:-translate-y-1 hover:border-[#C9A84C]/15"
       )}
@@ -141,7 +141,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       </div>
 
       {/* ---- Body ---- */}
-      <div className="p-5 flex flex-col gap-2.5">
+      <div className="p-5 flex flex-1 flex-col gap-2.5">
         {/* Title */}
         <h3 className="font-medium text-[#0B1D3A] text-base leading-snug line-clamp-2 group-hover:text-[#C9A84C] transition-colors duration-300">
           {title}

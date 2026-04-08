@@ -23,7 +23,7 @@ export default function FeaturedProperties() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
@@ -68,7 +68,7 @@ export default function FeaturedProperties() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
       {properties.slice(0, 6).map((property) => (
         <PropertyCard key={property.id} property={property} />
       ))}
