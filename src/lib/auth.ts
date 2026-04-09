@@ -37,6 +37,14 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Credenziali non valide");
         }
 
+        if (user.status && user.status !== "ACTIVE") {
+          throw new Error(
+            user.status === "BANNED"
+              ? "Account bloccato. Contatta il supporto."
+              : "Account sospeso. Contatta il supporto."
+          );
+        }
+
         return {
           id: user.id,
           email: user.email,

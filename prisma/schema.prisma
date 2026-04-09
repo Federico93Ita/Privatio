@@ -42,6 +42,17 @@ model User {
   marketingConsent   Boolean        @default(false)
   termsVersion       String?
   termsAcceptedIp    String?
+  // Moderation
+  status             AccountStatus  @default(ACTIVE)
+  suspendedAt        DateTime?
+  suspendedReason    String?
+  suspendedBy        String?
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
 }
 
 enum Role {
@@ -137,6 +148,11 @@ model Agency {
   reviews                  Review[]
   territories              TerritoryAssignment[]
   fallbackContacts         PropertyFallbackContact[]
+  // Moderation
+  status                   AccountStatus             @default(ACTIVE)
+  suspendedAt              DateTime?
+  suspendedReason          String?
+  suspendedBy              String?
 }
 
 model PropertyFallbackContact {
@@ -220,6 +236,9 @@ model Property {
   updatedAt          DateTime                  @updatedAt
   publishedAt        DateTime?
   viewCount          Int                       @default(0)
+  moderationNote     String?                   @db.Text
+  moderatedAt        DateTime?
+  moderatedBy        String?
 
   @@index([city, status])
   @@index([status])
@@ -441,6 +460,9 @@ model Review {
   agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   agencyId  String
   createdAt DateTime @default(now())
+  isHidden  Boolean  @default(false)
+  hiddenReason String?
+  hiddenAt  DateTime?
 
   @@unique([userId, agencyId])
   @@index([agencyId])
@@ -530,6 +552,8 @@ model Complaint {
   status          ComplaintStatus @default(RECEIVED)
   createdAt       DateTime        @default(now())
   resolvedAt      DateTime?
+  assignedToId    String?
+  resolutionNote  String?         @db.Text
 
   @@index([status])
   @@index([email])
