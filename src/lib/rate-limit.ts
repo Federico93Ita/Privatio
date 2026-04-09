@@ -189,6 +189,8 @@ export const RATE_LIMITS = {
   upload: { id: "upload", limit: 10, windowSeconds: 60 } as RateLimitConfig,
   /** Messages: 30 requests per minute */
   message: { id: "message", limit: 30, windowSeconds: 60 } as RateLimitConfig,
+  /** Chatbot AI: 20 requests per 5 minutes per IP */
+  chatbot: { id: "chatbot", limit: 20, windowSeconds: 300 } as RateLimitConfig,
 } as const;
 
 /**
