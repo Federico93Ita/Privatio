@@ -214,7 +214,7 @@ export function leadReceivedEmail(name: string) {
 }
 
 export function welcomeEmail(name: string) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.it";
   return {
     subject: "Benvenuto su Privatio — Ecco come funziona!",
     html: `

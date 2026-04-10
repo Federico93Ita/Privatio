@@ -72,7 +72,7 @@ Marketplace immobiliare italiano dove i venditori pubblicano immobili gratis e l
 - `/dashboard/agenzia` Dashboard agenzia
 
 ## URL & Riferimenti
-- **Produzione**: https://privatio.vercel.app
+- **Produzione**: https://privatio.it
 - **GitHub**: https://github.com/Federico93Ita/Privatio
 - **Vercel**: https://vercel.com/federicos-projects-c77c6a95/privatio
 

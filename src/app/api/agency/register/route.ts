@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     // Notify admin of new agency registration
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.vercel.app";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.it";
       try {
         await sendEmail({
           to: adminEmail,

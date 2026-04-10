@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Notify admin
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.vercel.app";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://privatio.it";
 
       // Build zone preferences section for admin email
       const zones = parsed.data.preferredZones;
