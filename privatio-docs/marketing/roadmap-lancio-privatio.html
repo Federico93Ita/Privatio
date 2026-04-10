@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap Lancio Privatio — Guida Step-by-Step</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface-2: #1a1a24;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-muted: #8888a0;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.1);
+    --amber: #f59e0b;
+    --amber-bg: rgba(245,158,11,0.1);
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.1);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59,130,246,0.1);
+    --purple: #a855f7;
+    --purple-bg: rgba(168,85,247,0.1);
+    --cyan: #06b6d4;
+    --cyan-bg: rgba(6,182,212,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0a0a1a 50%, #1a0a2e 100%);
+    padding: 80px 40px 60px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(168,85,247,0.06) 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, -10px); }
+  }
+  .hero h1 {
+    font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; position: relative;
+    background: linear-gradient(135deg, #e8e8f0, #818cf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero .subtitle { font-size: 1.15rem; color: var(--text-muted); margin-top: 12px; position: relative; }
+  .hero .meta-badges { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; position: relative; }
+  .meta-badge { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 16px; font-size: 0.8rem; color: var(--text-muted); }
+  .meta-badge strong { color: var(--text); }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+  .progress-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px 32px; margin-bottom: 40px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .progress-header h3 { font-size: 0.95rem; font-weight: 600; }
+  .progress-count { color: var(--accent-light); font-weight: 600; font-size: 0.9rem; }
+  .progress-bar { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
+
+  .budget-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .budget-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .budget-card .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .budget-card .amount { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
+  .budget-card.legal .amount { color: var(--amber); }
+  .budget-card.tech .amount { color: var(--blue); }
+  .budget-card.marketing .amount { color: var(--green); }
+  .budget-card.hiring .amount { color: var(--cyan); }
+  .budget-card.total .amount { color: var(--purple); }
+
+  .timeline-visual { display: flex; gap: 4px; margin: 0 0 40px; overflow-x: auto; padding-bottom: 8px; }
+  .timeline-month { flex: 1; min-width: 90px; text-align: center; padding: 12px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border); background: var(--surface); }
+  .timeline-month .month-label { color: var(--text-muted); }
+  .timeline-month .month-focus { margin-top: 6px; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; }
+  .tl-legal { background: var(--amber-bg); color: var(--amber); }
+  .tl-tech { background: var(--blue-bg); color: var(--blue); }
+  .tl-launch { background: var(--green-bg); color: var(--green); }
+  .tl-scale { background: var(--purple-bg); color: var(--purple); }
+  .tl-grow { background: var(--red-bg); color: var(--red); }
+  .tl-hire { background: var(--cyan-bg); color: var(--cyan); }
+
+  .phase { margin-bottom: 32px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); transition: border-color 0.3s; }
+  .phase:hover { border-color: rgba(99,102,241,0.3); }
+  .phase-header { padding: 24px 28px; cursor: pointer; display: flex; align-items: center; gap: 16px; user-select: none; transition: background 0.2s; }
+  .phase-header:hover { background: var(--surface-2); }
+  .phase-number { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+  .phase-number.p1 { background: var(--amber-bg); color: var(--amber); }
+  .phase-number.p2 { background: var(--blue-bg); color: var(--blue); }
+  .phase-number.p3 { background: var(--green-bg); color: var(--green); }
+  .phase-number.p4 { background: var(--purple-bg); color: var(--purple); }
+  .phase-number.p5 { background: var(--cyan-bg); color: var(--cyan); }
+  .phase-number.p6 { background: var(--red-bg); color: var(--red); }
+  .phase-info { flex: 1; }
+  .phase-title { font-size: 1.15rem; font-weight: 700; }
+  .phase-timing { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+  .phase-budget-tag { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
+  .phase-toggle { font-size: 1.4rem; transition: transform 0.3s; color: var(--text-muted); }
+  .phase.open .phase-toggle { transform: rotate(180deg); }
+  .phase-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+  .phase.open .phase-body { max-height: 12000px; }
+  .phase-content { padding: 0 28px 28px; border-top: 1px solid var(--border); }
+
+  .why-box { background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.04)); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 20px 0; font-size: 0.9rem; color: var(--text-muted); }
+  .why-box strong { color: var(--text); }
+
+  .step-group { margin-top: 20px; }
+  .step-group-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; }
+
+  .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(42,42,58,0.5); cursor: pointer; }
+  .check-item:last-child { border-bottom: none; }
+  .check-box { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.75rem; }
+  .check-item.done .check-box { background: var(--green); border-color: var(--green); color: white; }
+  .check-item.done .check-text { text-decoration: line-through; opacity: 0.5; }
+  .check-text { flex: 1; }
+  .check-text .title { font-weight: 500; font-size: 0.92rem; }
+  .check-text .detail { font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; line-height: 1.6; }
+  .cost-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; white-space: nowrap; margin-top: 2px; }
+  .cost-tag.free { background: var(--green-bg); color: var(--green); }
+  .cost-tag.low { background: var(--blue-bg); color: var(--blue); }
+  .cost-tag.medium { background: var(--amber-bg); color: var(--amber); }
+  .cost-tag.high { background: var(--red-bg); color: var(--red); }
+
+  .tip-box { border-radius: 10px; padding: 16px 20px; margin: 16px 0; font-size: 0.85rem; line-height: 1.6; }
+  .tip-box.warning { background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2); }
+  .tip-box.success { background: var(--green-bg); border: 1px solid rgba(34,197,94,0.2); }
+  .tip-box.info { background: var(--blue-bg); border: 1px solid rgba(59,130,246,0.2); }
+  .tip-box .tip-title { font-weight: 700; margin-bottom: 4px; }
+  .tip-box.warning .tip-title { color: var(--amber); }
+  .tip-box.success .tip-title { color: var(--green); }
+  .tip-box.info .tip-title { color: var(--blue); }
+
+  .decision-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 16px 0; }
+  .decision-box h4 { font-size: 0.9rem; margin-bottom: 10px; color: var(--accent-light); }
+  .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; }
+  .decision-option { background: var(--surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
+  .decision-option .opt-title { font-weight: 600; margin-bottom: 4px; }
+  .decision-option .opt-desc { color: var(--text-muted); font-size: 0.78rem; }
+
+  .comparison-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.82rem; }
+  .comparison-table th, .comparison-table td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+  .comparison-table th { background: var(--surface-2); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .comparison-table td { background: var(--surface); }
+  .comparison-table .winner { color: var(--green); font-weight: 600; }
+  .comparison-table .loser { color: var(--text-muted); }
+
+  .footer { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  @media (max-width: 700px) {
+    .hero { padding: 50px 20px 40px; }
+    .hero h1 { font-size: 1.8rem; }
+    .phase-header { padding: 16px 18px; }
+    .phase-content { padding: 0 18px 18px; }
+    .decision-grid { grid-template-columns: 1fr; }
+    .budget-summary { grid-template-columns: 1fr 1fr; }
+    .comparison-table { font-size: 0.75rem; }
+    .comparison-table th, .comparison-table td { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Roadmap Lancio Privatio</h1>
+  <p class="subtitle">Da zero a revenue — percorso SRL con piano hiring progressivo</p>
+  <div class="meta-badges">
+    <span class="meta-badge"><strong>Forma:</strong> SRL (innovativa o classica)</span>
+    <span class="meta-badge"><strong>Budget:</strong> €5k – 15k / 6 mesi</span>
+    <span class="meta-badge"><strong>Team target:</strong> Founder + 2 collaboratori</span>
+    <span class="meta-badge"><strong>Mercato:</strong> Italia — Real Estate B2B</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- PROGRESS -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <h3>Progresso Generale</h3>
+      <span class="progress-count" id="progressCount">0 / 0 completati</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline-visual">
+    <div class="timeline-month">
+      <div class="month-label">Mese 1</div>
+      <div class="month-focus tl-legal">SRL & Legale</div>
+    </div>
+    <div class="timeline-month">
+      <div class="month-label">Mese 2</div>
+      <div class="month-focus tl-tech">Validazione & Tech</div>
+    </div>
+    <div class="timeline-month">
+      <div class="month-label">Mese 3</div>
+      <div class="month-focus tl-launch">Soft Launch</div>
+    </div>
+    <div class="timeline-month">
+      <div class="month-label">Mese 4</div>
+      <div class="month-focus tl-hire">1° Collaboratore</div>
+    </div>
+    <div class="timeline-month">
+      <div class="month-label">Mese 5</div>
+      <div class="month-focus tl-scale">Scaling & Marketing</div>
+    </div>
+    <div class="timeline-month">
+      <div class="month-label">Mese 6</div>
+      <div class="month-focus tl-grow">2° Collaboratore & Revenue</div>
+    </div>
+  </div>
+
+  <!-- BUDGET -->
+  <div class="budget-summary">
+    <div class="budget-card legal">
+      <div class="label">SRL & Legale</div>
+      <div class="amount">€3.000 – 4.500</div>
+    </div>
+    <div class="budget-card tech">
+      <div class="label">Tech & Strumenti</div>
+      <div class="amount">€500 – 1.000</div>
+    </div>
+    <div class="budget-card marketing">
+      <div class="label">Marketing & Vendita</div>
+      <div class="amount">€2.000 – 5.000</div>
+    </div>
+    <div class="budget-card hiring">
+      <div class="label">Collaboratori (dal mese 4)</div>
+      <div class="amount">€2.500 – 6.000</div>
+    </div>
+    <div class="budget-card total">
+      <div class="label">Totale stimato 6 mesi</div>
+      <div class="amount">€8.000 – 16.500</div>
+    </div>
+  </div>
+
+
+  <!-- ===================== FASE 1: SRL ===================== -->
+  <div class="phase open" data-phase="1">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number p1">1</div>
+      <div class="phase-info">
+        <div class="phase-title">Costituzione SRL & Setup Legale</div>
+        <div class="phase-timing">Mese 1 — Settimane 1-4</div>
+      </div>
+      <div class="phase-budget-tag">€3.000 – 4.500</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="why-box">
+          <strong>Perché SRL e non forfettario?</strong> Con il pricing di Privatio (€249-2.600/mese per zona), bastano ~15 agenzie per superare il tetto forfettario di €85k. Inoltre il forfettario non permette di assumere dipendenti né di avere soci/investitori. La SRL è l'unica strada che scala.
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">A. SRL Innovativa vs SRL Classica — la scelta</div>
+
+          <table class="comparison-table">
+            <tr>
+              <th></th>
+              <th>SRL Startup Innovativa</th>
+              <th>SRL Classica</th>
+            </tr>
+            <tr>
+              <td><strong>Costo notaio</strong></td>
+              <td>€1.000-2.000 (obbligatorio dal 2021)</td>
+              <td>€1.500-3.000</td>
+            </tr>
+            <tr>
+              <td><strong>Capitale minimo</strong></td>
+              <td>Anche €1 (SRL semplificata possibile)</td>
+              <td>Anche €1 (SRL semplificata possibile)</td>
+            </tr>
+            <tr>
+              <td><strong>Diritto CCIAA annuale</strong></td>
+              <td class="winner">Esente per 5 anni (~€200/anno risparmiati)</td>
+              <td class="loser">€200/anno</td>
+            </tr>
+            <tr>
+              <td><strong>Bolli su atti</strong></td>
+              <td class="winner">Esente</td>
+              <td class="loser">Dovuti</td>
+            </tr>
+            <tr>
+              <td><strong>Investitori</strong></td>
+              <td class="winner">Detrazione 30-50% per chi investe</td>
+              <td class="loser">Nessuna agevolazione</td>
+            </tr>
+            <tr>
+              <td><strong>Assunzioni flessibili</strong></td>
+              <td class="winner">Contratti a termine più liberi, work-for-equity</td>
+              <td class="loser">Regole standard</td>
+            </tr>
+            <tr>
+              <td><strong>Fail-fast (liquidazione)</strong></td>
+              <td class="winner">Procedura semplificata gratuita</td>
+              <td class="loser">Procedura standard (costa)</td>
+            </tr>
+            <tr>
+              <td><strong>Requisiti</strong></td>
+              <td>Oggetto sociale innovativo, R&D o laureati, no distribuzione utili, no quotata, &lt;5 anni, fatturato &lt;5M</td>
+              <td>Nessun requisito speciale</td>
+            </tr>
+            <tr>
+              <td><strong>Tassazione</strong></td>
+              <td>IRES 24% + IRAP 3,9% (uguale)</td>
+              <td>IRES 24% + IRAP 3,9% (uguale)</td>
+            </tr>
+          </table>
+
+          <div class="tip-box success">
+            <div class="tip-title">Consiglio: parti come SRL Startup Innovativa</div>
+            Privatio ha un oggetto sociale chiaramente innovativo (marketplace immobiliare con esclusività territoriale), usi tecnologia proprietaria, e probabilmente soddisfi il requisito R&D (la piattaforma stessa è il prodotto tech). Il notaio costa uguale, ma risparmi su CCIAA, bolli, e soprattutto hai le agevolazioni per investitori se un domani le cerchi. E se fallisci, la liquidazione è più semplice e gratuita.
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">B. Passi operativi per la costituzione</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Trova un notaio (possibilmente in videoconferenza)</div>
+              <div class="detail">Dal 2021 l'atto notarile è obbligatorio anche per le startup innovative, ma può essere fatto in videoconferenza. Chiedi preventivi a 2-3 notai. Specifica che vuoi una SRL startup innovativa: alcuni notai fanno prezzi calmierati perché sanno che le startup hanno budget limitati. Range: €1.000-2.000 + imposte (~€500).</div>
+            </div>
+            <div class="cost-tag medium">€1.500-2.500</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Prepara statuto e atto costitutivo</div>
+              <div class="detail">Il notaio li redige, ma tu devi decidere: <strong>oggetto sociale</strong> (ampio ma con focus tech/innovazione — es. "sviluppo e gestione di piattaforme digitali per il settore immobiliare"), <strong>sede legale</strong> (può essere casa tua per risparmiare), <strong>capitale sociale</strong> (€1-10.000 — parti con €1.000-5.000, il minimo per essere credibili), <strong>quote</strong> (100% tue per ora). Se prevedi un co-founder futuro, lo statuto deve prevedere clausole di ingresso soci.</div>
+            </div>
+            <div class="cost-tag free">Incluso nel notaio</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Apri conto corrente business e versa il capitale</div>
+              <div class="detail">Il capitale va versato prima dell'atto notarile (almeno il 25% se &gt;€10k, o tutto se è sotto). Opzioni economiche: <strong>Qonto</strong> (€9/mese, ottimo per startup), <strong>Revolut Business</strong> (€0-25/mese), <strong>Hype Business</strong>. Evita le banche tradizionali: costano di più e sono lente. Il conto sarà intestato alla SRL dopo la costituzione.</div>
+            </div>
+            <div class="cost-tag low">€0-9/mese</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Iscrizione al Registro Imprese + Sezione Speciale Startup</div>
+              <div class="detail">Il notaio si occupa dell'iscrizione al Registro Imprese. Tu devi poi iscriverti alla <strong>sezione speciale delle startup innovative</strong> tramite la piattaforma startup.registroimprese.it. Serve: autocertificazione dei requisiti, compilazione del modulo online, PEC della società, firma digitale. L'iscrizione è gratuita e attiva tutte le agevolazioni.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Trova un commercialista specializzato in SRL/startup</div>
+              <div class="detail">Una SRL è più complessa del forfettario: bilancio annuale, dichiarazione dei redditi società, IVA trimestrale, gestione buste paga collaboratori. Servizi come <strong>FidoCommercialista</strong> (da €199/mese tutto incluso) o <strong>Fiscozen Business</strong> sono ottimi per startup. Altrimenti un commercialista tradizionale: €2.000-3.000/anno. Chiedi esplicitamente se conosce le agevolazioni startup innovativa.</div>
+            </div>
+            <div class="cost-tag medium">€2.000-3.000/anno</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">PEC e firma digitale della società</div>
+              <div class="detail">Obbligatorie per tutte le SRL. PEC: Aruba (€5/anno), Register (€5/anno), Legalmail (€25/anno). Firma digitale: Aruba (€36 per 3 anni), InfoCert, Namirial. Se non hai già una firma digitale personale, comprala — ti serve sia per la costituzione che per la gestione ordinaria.</div>
+            </div>
+            <div class="cost-tag low">€40-60</div>
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">C. Documenti legali della piattaforma</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Termini di Servizio (T&C) della piattaforma</div>
+              <div class="detail">Ora intestati alla SRL, non a te come persona fisica. Devono coprire: limitazione responsabilità (Privatio è intermediario, non parte nella compravendita), politica refund abbonamenti, clausola di recesso agenzie, proprietà intellettuale, foro competente. Usa <strong>iubenda.com</strong> (da €29/anno) per una base, poi fai revisionare da un legale.</div>
+            </div>
+            <div class="cost-tag low">€29-500</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Privacy Policy, Cookie Policy (GDPR) e Registro Trattamenti</div>
+              <div class="detail">Titolare del trattamento: la SRL (non tu). Menzionare trasferimenti extra-UE (Vercel/Supabase → Standard Contractual Clauses). Cookie policy per GA4 e Meta Pixel. Il Registro dei Trattamenti (art. 30 GDPR) è un semplice foglio Excel: template gratuito sul sito del Garante.</div>
+            </div>
+            <div class="cost-tag low">€29/anno</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Contratto di abbonamento per le agenzie</div>
+              <div class="detail">Documento B2B separato dai T&C. Deve specificare: durata e rinnovo (mensile), obblighi dell'agenzia, esclusività della zona e cosa significa, SLA della piattaforma, clausola di uscita (preavviso 30 giorni), responsabilità sui contenuti degli annunci. Fai revisionare i draft che hai già da un avvocato (€200-500 una tantum).</div>
+            </div>
+            <div class="cost-tag low">€200-500</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Setup Stripe Billing + fatturazione elettronica</div>
+              <div class="detail">Stripe collegato al conto della SRL. Fatturazione elettronica obbligatoria: <strong>FattureInCloud</strong> (da €6/mese, ha integrazione Stripe diretta) o incluso nel pacchetto del commercialista. Flusso: agenzia paga → Stripe → fattura automatica → SdI.</div>
+            </div>
+            <div class="cost-tag low">€6/mese</div>
+          </div>
+        </div>
+
+        <div class="tip-box warning">
+          <div class="tip-title">⚠ INPS come amministratore SRL: pianifica subito</div>
+          Come amministratore unico della SRL, se percepisci un compenso sei iscritto alla Gestione Separata INPS (~33% sul compenso). Se operi attivamente nel business (e lo farai), la CCIAA potrebbe iscriverti d'ufficio alla Gestione Commercianti con minimale ~€4.200/anno. Il commercialista deve consigliarti su questo PRIMA della costituzione — è un costo fisso importante da mettere a budget.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FASE 2: VALIDAZIONE ===================== -->
+  <div class="phase" data-phase="2">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number p2">2</div>
+      <div class="phase-info">
+        <div class="phase-title">Validazione Mercato & Preparazione Tech</div>
+        <div class="phase-timing">Mese 1-2 — In parallelo alla Fase 1</div>
+      </div>
+      <div class="phase-budget-tag">€300 – 800</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="why-box">
+          <strong>Non spendere un euro in marketing prima di aver validato.</strong> Il 90% delle startup fallisce per mancanza di product-market fit. Devi capire se le agenzie PAGHERANNO prima di bruciare budget. Questa fase ti costa quasi nulla e ti salva da errori da migliaia di euro.
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">A. Validazione del mercato (costo quasi zero)</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Intervista 15-20 agenzie immobiliari nella tua zona</div>
+              <div class="detail">Non vendere nulla. Chiedi: "Quanto spendete al mese in portali? Immobiliare.it, Idealista, Casa.it — quanto vi costano? Siete soddisfatti del ROI? Cosa vorreste di diverso?" Se 8+ su 15 dicono "sì, proverei un'alternativa sotto i €500", hai validazione. Registra le risposte in un foglio — ti serviranno per il pitch.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Mappa il posizionamento competitivo</div>
+              <div class="detail">Immobiliare.it: agenzie pagano €200-1.500/mese, zero esclusività. Idealista: simile. Casa.it: più economico. Il tuo vantaggio unico è l'esclusività territoriale — nessun altro portale la offre. Prepara un pitch in una frase: "Con noi non competi con 15 agenzie nella stessa pagina. La tua zona è solo tua."</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Trova 3-5 agenzie beta tester (1 mese gratis in cambio di feedback)</div>
+              <div class="detail">Offri 30 giorni gratuiti in cambio di: feedback settimanale, almeno 10 annunci caricati, e una testimonianza se soddisfatti. Non sminuire il valore: "Vi regalo un mese perché siete i primi — poi si paga, e il prezzo per voi resterà bloccato". Queste agenzie diventano le tue case study.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="tip-box success">
+            <div class="tip-title">Regola anti-flop #1: se nessuno prova nemmeno gratis, fermati</div>
+            Se non trovi 3 agenzie disposte a provare gratuitamente, il problema è la value proposition, non il marketing. Aggiusta il pitch prima di spendere un euro in ads.
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">B. Setup tecnico per il lancio</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Configura Stripe Billing + webhook per attivazione zone</div>
+              <div class="detail">Flusso: agenzia si abbona → Stripe webhook → attiva zona → email di conferma via Resend. Testa con carte di test. Implementa anche la cancellazione: webhook subscription_deleted → disattiva zona. Questo è il core business — deve funzionare perfettamente.</div>
+            </div>
+            <div class="cost-tag free">Tempo tuo</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Email transazionali via Resend + dominio proprio</div>
+              <div class="detail">noreply@privatio.it — conferma registrazione, conferma abbonamento, notifica nuova richiesta di contatto, reminder scadenza. Free tier Resend: 3.000 email/mese, più che sufficiente. Configura SPF/DKIM/DMARC per evitare lo spam.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Google Analytics 4 + Meta Pixel + eventi chiave</div>
+              <div class="detail">Traccia: visualizzazione annuncio, click "contatta agenzia", inizio registrazione, completamento pagamento. Senza dati non saprai cosa funziona. Il Meta Pixel ti serve per retargeting futuro — installalo ora anche se non fai ads ancora.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Dominio privatio.it + email professionale</div>
+              <div class="detail">Compra il .it (dà fiducia in Italia), configura su Vercel. Email: Google Workspace (€5.75/mese per info@privatio.it) o Zoho Mail (gratis). Serve per email fredde, fatturazione, e comunicazione con le agenzie.</div>
+            </div>
+            <div class="cost-tag low">€10-70/anno</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Landing page B2B dedicata per le agenzie</div>
+              <div class="detail">Separata dalla home pubblica. Contenuto: proposta di valore ("L'unico portale dove la tua agenzia è l'unica nella zona"), pricing trasparente, screenshot dashboard, form "Prenota una demo". Questa pagina è dove porterai TUTTO il traffico B2B. Deve convertire.</div>
+            </div>
+            <div class="cost-tag free">Tempo tuo</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================== FASE 3: SOFT LAUNCH ===================== -->
+  <div class="phase" data-phase="3">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number p3">3</div>
+      <div class="phase-info">
+        <div class="phase-title">Soft Launch & Prime Agenzie Paganti</div>
+        <div class="phase-timing">Mese 3 — Settimane 9-12</div>
+      </div>
+      <div class="phase-budget-tag">€500 – 2.000</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="why-box">
+          <strong>Obiettivo:</strong> convertire i beta in paganti + aggiungere 5-10 agenzie totali. Non fare un lancio "alla grande" — fai un lancio silenzioso, raccogli feedback, aggiusta. Ogni agenzia pagante in questa fase vale 10x un follower su Instagram.
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">A. Conversione beta → paganti</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Call individuali con ogni beta tester a fine prova</div>
+              <div class="detail">Chiedi: "Cosa ha funzionato? Cosa manca? Quanti contatti avete ricevuto?" Se hanno ricevuto anche solo 2-3 lead, il ROI a €249-499/mese è evidente. Proponi: "Il prezzo è €X/mese, ma voi che siete stati i primi avete il prezzo bloccato 12 mesi".</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Raccogli testimonianze e case study</div>
+              <div class="detail">Screenshot dei risultati, una frase quotabile, permesso di usare il logo. Queste diventano le social proof più potenti per le agenzie successive. Anche un semplice "Con Privatio abbiamo ricevuto 5 contatti nel primo mese senza fare nulla" è oro.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="tip-box warning">
+            <div class="tip-title">⚠ Se nessun beta converte — STOP</div>
+            Non andare avanti se i primi 5 non pagano. Le cause: non porti lead (il problema più comune), piattaforma con frizioni, o esclusività non percepita come valore. Aggiusta prima di scalare.
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">B. Outreach diretto (il canale #1 nel real estate)</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Lista di 200 agenzie target nella tua regione</div>
+              <div class="detail">Google Maps + "agenzia immobiliare [città]". Raccogli: nome, telefono, email, indirizzo. Priorità: agenzie piccole-medie (1-5 agenti) — sono quelle più frustrate con i costi dei portali grandi e più aperte a provare.</div>
+            </div>
+            <div class="cost-tag free">Tempo tuo</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Email fredde personalizzate (20-30/giorno)</div>
+              <div class="detail">Oggetto: "Agenzia [Nome] — siete l'unica agenzia nella vostra zona?" Corpo: 5 righe max, link alla landing B2B. Non spam: personalizza ogni email, manda con il tuo dominio. Segui con telefonata dopo 3 giorni se non rispondono.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Visite fisiche alle agenzie (il canale più efficace in assoluto)</div>
+              <div class="detail">Nel real estate la vendita si fa di persona. Porta: tablet con demo live, one-pager stampato (A4 fronte-retro), biglietto da visita. 3-5 visite al giorno. Il tasso di conversione delle visite fisiche è 5-10x quello delle email nel B2B immobiliare. Questo è il tuo superpotere da solo founder.</div>
+            </div>
+            <div class="cost-tag low">€100-300</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Eventi FIAIP/FIMAA locali</div>
+              <div class="detail">Le associazioni di categoria organizzano incontri e corsi. Partecipa come ospite, fai networking, distribuisci il one-pager. È dove si incontrano le agenzie che contano. Costo: spesso gratuito o €50-100.</div>
+            </div>
+            <div class="cost-tag low">€0-100</div>
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">C. Generare traffico per le agenzie (il VERO prodotto)</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">SEO locale: pagine indicizzabili per ogni zona</div>
+              <div class="detail">"Vendita case [Zona] — Privatio". Google porta traffico organico gratuito di chi cerca "case in vendita [zona]". È il canale più sostenibile e il motivo per cui le agenzie restano: perché porti lead a costo zero nel tempo.</div>
+            </div>
+            <div class="cost-tag free">Tempo tuo</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Google Ads per zona (quando hai almeno 3-5 agenzie attive)</div>
+              <div class="detail">Budget: €5-15/giorno per zona. Keyword: "case in vendita [città]", "appartamenti [quartiere]". Se porti lead a €5-15 ciascuno, le agenzie non cancellano più. Traccia rigorosamente il costo per lead.</div>
+            </div>
+            <div class="cost-tag medium">€300-900/mese</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================== FASE 4: PRIMO COLLABORATORE ===================== -->
+  <div class="phase" data-phase="4">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number p4">4</div>
+      <div class="phase-info">
+        <div class="phase-title">Marketing & Primo Collaboratore</div>
+        <div class="phase-timing">Mese 4 — Solo se hai agenzie paganti</div>
+      </div>
+      <div class="phase-budget-tag">€2.000 – 5.000</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="why-box">
+          <strong>Trigger per il primo collaboratore:</strong> quando passi più del 50% del tuo tempo a gestire le agenzie esistenti invece di acquisirne di nuove, hai bisogno di aiuto. Tipicamente succede intorno alle 8-12 agenzie. Il primo hire non è un developer — è qualcuno che gestisce le relazioni con le agenzie.
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">A. Il primo collaboratore: Assistenza Agenzie</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Profilo: Account Manager / Customer Success (part-time)</div>
+              <div class="detail">Cosa fa: risponde alle agenzie, le aiuta a caricare annunci, gestisce i problemi, fa le call mensili di check-in, raccoglie feedback. Ti libera tempo per vendere e sviluppare. Cerca qualcuno con esperienza nel settore immobiliare — conosce il linguaggio e le dinamiche.</div>
+            </div>
+            <div class="cost-tag free">Definizione ruolo</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Formula contrattuale: collaborazione a P.IVA o Co.Co.Co.</div>
+              <div class="detail"><strong>P.IVA</strong>: il collaboratore fattura alla tua SRL. Nessun contributo a tuo carico, massima flessibilità. Costo: €800-1.500/mese per 20h/settimana. <strong>Co.Co.Co.</strong>: più tutelato per il collaboratore, ma tu paghi i contributi INPS (~33%) sulla parte a tuo carico. Costo reale: €1.000-2.000/mese. <strong>Non assumere a tempo indeterminato</strong> finché non hai MRR stabile sopra €10k.</div>
+            </div>
+            <div class="cost-tag medium">€800-2.000/mese</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Alternativa: work-for-equity (vantaggio startup innovativa)</div>
+              <div class="detail">Se sei SRL startup innovativa, puoi offrire <strong>work-for-equity</strong>: il collaboratore lavora in cambio di quote della società, senza costi fiscali immediati né per te né per lui (la quota non è tassata come reddito al momento dell'assegnazione). Funziona bene con qualcuno che crede nel progetto. Attenzione: dare equity significa dare potere decisionale — non farlo con leggerezza. Un vesting di 2-4 anni con cliff di 6-12 mesi è standard.</div>
+            </div>
+            <div class="cost-tag free">€0 cash (equity)</div>
+          </div>
+
+          <div class="tip-box info">
+            <div class="tip-title">Dove trovare il primo collaboratore</div>
+            LinkedIn (annuncio gratuito), gruppi Facebook di professionisti immobiliari, o ex-agenti immobiliari che vogliono cambiare ruolo. Un ex-agente conosce il settore, parla la lingua delle agenzie, e ha già una rete di contatti. Spesso è la scelta migliore.
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">B. Marketing strutturato (ora ha senso)</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Instagram & TikTok: contenuti immobiliari locali (B2C)</div>
+              <div class="detail">3-4 post/settimana: tour virtuali degli immobili, "Le 5 zone più richieste di [città]", consigli per acquirenti. Non vendere Privatio — vendi il sogno della casa. Usa Canva per i template. Hashtag locali: #caseinvendita[città].</div>
+            </div>
+            <div class="cost-tag free">Tempo tuo</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Facebook/Instagram Ads geolocalizzati (B2C)</div>
+              <div class="detail">Target: 28-55 anni, interesse "immobiliare" o "mutui", nella zona delle agenzie attive. Budget: €10-20/giorno. Carousel con immobili reali dalla piattaforma. CTA: "Scopri le case nella tua zona". Traccia il percorso: click → annuncio → contatto agenzia.</div>
+            </div>
+            <div class="cost-tag medium">€300-600/mese</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">LinkedIn: contenuti B2B per titolari di agenzia</div>
+              <div class="detail">2-3 post/settimana: insight mercato (dati OMI), case study delle agenzie su Privatio, riflessioni sul futuro dei portali. LinkedIn è dove scrollano i titolari di agenzia. Posizionati come "il fondatore che sta cambiando le regole".</div>
+            </div>
+            <div class="cost-tag free">Tempo tuo</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Micro-influencer locali (€100-300/reel)</div>
+              <div class="detail">Creator 10k-50k follower che parlano di lifestyle o della tua città. "Ti pago €150 per un reel dove mostri un immobile su Privatio." Costo per visualizzazione 10x inferiore a un macro-influencer, e il traffico è geolocalizzato — esattamente quello che serve.</div>
+            </div>
+            <div class="cost-tag low">€200-600</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Programma referral per agenzie</div>
+              <div class="detail">1 mese gratis all'agenzia che ne porta un'altra pagante. Le agenzie si parlano tra loro — è il canale di acquisizione più economico in assoluto. Codice referral semplice da tracciare.</div>
+            </div>
+            <div class="cost-tag free">Costo: 1 mese abbonamento</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================== FASE 5: SECONDO COLLABORATORE ===================== -->
+  <div class="phase" data-phase="5">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number p5">5</div>
+      <div class="phase-info">
+        <div class="phase-title">Secondo Collaboratore (Tech) & Scaling</div>
+        <div class="phase-timing">Mese 5-6 — Quando MRR > €5k</div>
+      </div>
+      <div class="phase-budget-tag">€1.500 – 4.000</div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+        <div class="why-box">
+          <strong>Trigger per il secondo collaboratore:</strong> quando hai un backlog di feature richieste dalle agenzie che non riesci a sviluppare perché sei impegnato nella vendita. Oppure quando un bug in produzione ti blocca l'acquisizione di nuovi clienti. Il secondo hire è il developer.
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">A. Il secondo collaboratore: Developer</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Profilo: Full-stack developer Next.js/React (part-time o freelance)</div>
+              <div class="detail">Cosa fa: sviluppa le feature richieste dalle agenzie, fix bug, ottimizza performance e SEO tecnico, implementa il report mensile automatico, migliora la dashboard agenzie. Stack: Next.js, Supabase, Vercel — deve conoscere il tuo stack. Non serve un senior da €500/giorno: un mid-level motivato a €200-350/giorno per 2-3 giorni/settimana è perfetto.</div>
+            </div>
+            <div class="cost-tag medium">€1.600-4.200/mese</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Formula: freelance a P.IVA (2-3 giorni/settimana)</div>
+              <div class="detail">Contratto a progetto o a giornate. Nessun costo contributivo per te. Il freelance fattura alla SRL. Vantaggio: puoi scalare le giornate su/giù in base al carico. Se il business cresce, offri più giorni. Se rallenta, riduci senza drammi contrattuali.</div>
+            </div>
+            <div class="cost-tag free">Flessibilità</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div name="check-box" class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Alternativa: work-for-equity per un CTO part-time</div>
+              <div class="detail">Se trovi un developer che crede nel progetto, il work-for-equity è potente: quote della SRL (5-15%) con vesting di 3-4 anni. Il developer lavora 1-2 giorni/settimana "gratis" in cambio di equity. Funziona solo se la persona è davvero motivata e capace — non dare equity a qualcuno che ti serve solo per 3 mesi.</div>
+            </div>
+            <div class="cost-tag free">€0 cash (equity)</div>
+          </div>
+
+          <div class="tip-box info">
+            <div class="tip-title">Dove trovare developer freelance in Italia</div>
+            Italiani: <strong>Malt.it</strong>, <strong>Fiverr Pro</strong>, gruppi Telegram/Discord di developer italiani, <strong>LinkedIn</strong>. Internazionali (più economici): <strong>Toptal</strong>, <strong>Upwork</strong>. Per il tuo stack (Next.js/Supabase), cerca in community specifiche come il Discord di Vercel o Supabase.
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">B. Metriche & Ottimizzazione</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Dashboard metriche settimanale (Google Sheet basta)</div>
+              <div class="detail"><strong>MRR</strong> (l'unica metrica che conta), <strong>Churn rate</strong> (&gt;10% = problema di prodotto), <strong>CAC</strong> (costo acquisizione agenzia, target: sotto €300), <strong>Lead per agenzia</strong> (determina se restano). Aggiorna ogni lunedì mattina.</div>
+            </div>
+            <div class="cost-tag free">Gratis</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Report mensile automatico per ogni agenzia</div>
+              <div class="detail">"Questo mese: 45 visualizzazioni dei tuoi annunci, 12 click su 'contatta', 8 messaggi ricevuti." Quando l'agenzia VEDE il valore in numeri, non cancella. Automatizza con cron job + Resend. Questa feature riduce il churn più di qualsiasi sconto.</div>
+            </div>
+            <div class="cost-tag free">Tempo dev</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Call mensile con ogni agenzia pagante</div>
+              <div class="detail">15 minuti al mese con ciascuna. "Quanti contatti? Quali buoni? Cosa miglioro?" Doppio effetto: feedback reale + l'agenzia si sente seguita (motivo #1 per cui non cancellano). Con il collaboratore customer success, può farlo lui — tu intervieni solo per le agenzie chiave.</div>
+            </div>
+            <div class="cost-tag free">Tempo</div>
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">C. Espansione & Finanziamenti</div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Espansione "città per città" — domina una prima di passare alla successiva</div>
+              <div class="detail">10 agenzie in 1 città &gt; 1 agenzia in 10 città. Scegli la prossima città in base a: richieste inbound, densità di agenzie, vicinanza geografica. La densità crea network effect e rende il marketplace funzionante per gli acquirenti.</div>
+            </div>
+            <div class="cost-tag free">Strategia</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Candidati a bandi e finanziamenti (ora hai traction)</div>
+              <div class="detail"><strong>Smart&Start di Invitalia</strong>: fino a €1,5M a tasso zero (serve SRL innovativa — ce l'hai!). <strong>Bandi regionali digitalizzazione</strong>: variano per regione, €10-50k. <strong>SELFIEmployment</strong>: prestiti fino a €50k a tasso zero. La traction (agenzie paganti, MRR) rende la tua domanda molto più forte. Non candidarti senza numeri reali da mostrare.</div>
+            </div>
+            <div class="cost-tag free">Ricerca</div>
+          </div>
+
+          <div class="check-item" onclick="toggleCheck(this)">
+            <div class="check-box">✓</div>
+            <div class="check-text">
+              <div class="title">Quando convertire i collaboratori in dipendenti?</div>
+              <div class="detail">Trigger: <strong>MRR stabile sopra €15-20k per almeno 3 mesi consecutivi</strong>. A quel punto puoi sostenere i costi di 1-2 dipendenti (stipendio + ~40% contributi/TFR). Prima di quel punto, i collaboratori a P.IVA o co.co.co. ti danno la flessibilità di cui hai bisogno. La startup innovativa ti permette contratti a termine più flessibili rispetto a una SRL classica.</div>
+            </div>
+            <div class="cost-tag free">Decisione</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================== FASE 6: SCENARIO AL MESE 6 ===================== -->
+  <div class="phase" data-phase="6">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number p6">6</div>
+      <div class="phase-info">
+        <div class="phase-title">Dove Dovresti Essere al Mese 6</div>
+        <div class="phase-timing">Check-point & decisioni strategiche</div>
+      </div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content">
+
+        <div class="decision-box">
+          <h4>Scenario al mese 6</h4>
+          <div class="decision-grid">
+            <div class="decision-option">
+              <div class="opt-title" style="color: var(--green);">🟢 Ottimo: 15+ agenzie, €5k+ MRR</div>
+              <div class="opt-desc">Funziona. Investi MRR in Google Ads per più lead. Candidati a Smart&Start. Considera di portare i collaboratori a tempo pieno. Espandi nella seconda città.</div>
+            </div>
+            <div class="decision-option">
+              <div class="opt-title" style="color: var(--amber);">🟡 Ok: 8-15 agenzie, €2-5k MRR</div>
+              <div class="opt-desc">Direzione giusta ma lenta. Focus: ridurre churn e aumentare lead per agenzia. Rallenta marketing, investi nel prodotto. Non espandere geograficamente ancora.</div>
+            </div>
+            <div class="decision-option">
+              <div class="opt-title" style="color: var(--red);">🔴 Critico: &lt;8 agenzie, alto churn</div>
+              <div class="opt-desc">Parla con chi ha cancellato. Il problema è quasi sempre: non porti lead. Redireziona tutto il budget su SEO + Google Ads, non su brand o social.</div>
+            </div>
+            <div class="decision-option">
+              <div class="opt-title" style="color: var(--text-muted);">💀 Pivot: nessuno paga dopo 3 mesi</div>
+              <div class="opt-desc">Il modello non funziona così. Pivot: cambia pricing, target, o value proposition. Non buttare altri soldi. Il vantaggio della SRL innovativa: liquidazione semplificata e gratuita se decidi di chiudere.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-group">
+          <div class="step-group-title">Piano hiring progressivo — riepilogo</div>
+        </div>
+
+        <table class="comparison-table">
+          <tr>
+            <th>Quando</th>
+            <th>Chi</th>
+            <th>Formula</th>
+            <th>Costo/mese</th>
+            <th>Trigger</th>
+          </tr>
+          <tr>
+            <td>Mese 1-3</td>
+            <td><strong>Solo tu</strong></td>
+            <td>Founder</td>
+            <td>€0</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Mese 4</td>
+            <td><strong>Customer Success</strong></td>
+            <td>P.IVA o Co.Co.Co. part-time</td>
+            <td>€800-2.000</td>
+            <td>8+ agenzie, il 50%+ del tuo tempo va in assistenza</td>
+          </tr>
+          <tr>
+            <td>Mese 5-6</td>
+            <td><strong>Developer</strong></td>
+            <td>Freelance P.IVA 2-3gg/sett</td>
+            <td>€1.600-4.200</td>
+            <td>Backlog feature che non riesci a sviluppare</td>
+          </tr>
+          <tr>
+            <td>Mese 9-12</td>
+            <td><strong>Assunzioni vere</strong></td>
+            <td>Tempo determinato o indeterminato</td>
+            <td>€2.500-4.000 cad.</td>
+            <td>MRR stabile &gt;€15k per 3 mesi</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===================== REGOLE ANTI-FLOP ===================== -->
+  <div class="phase" data-phase="rules">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-number" style="background: linear-gradient(135deg, var(--amber-bg), var(--red-bg)); color: var(--red);">!</div>
+      <div class="phase-info">
+        <div class="phase-title">Le 10 Regole Anti-Flop</div>
+        <div class="phase-timing">Tienile sempre a mente</div>
+      </div>
+      <div class="phase-toggle">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-content" style="padding-top: 20px;">
+
+        <div class="tip-box warning" style="margin-top:0;">
+          <div class="tip-title">1. Non spendere in marketing prima di avere clienti paganti</div>
+          Il marketing amplifica ciò che funziona. Se il prodotto non converte, il marketing amplifica il fallimento.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">2. Il tuo vero prodotto è il traffico, non la piattaforma</div>
+          Le agenzie pagano Immobiliare.it non perché è bello, ma perché porta clienti. Se non porti lead, non pagheranno te.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">3. Non assumere a tempo indeterminato prima di €15k MRR stabile</div>
+          I collaboratori a P.IVA o co.co.co. ti danno lo stesso output senza il rischio di costi fissi insostenibili. La SRL innovativa ti dà il work-for-equity come arma in più.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">4. Concentrati geograficamente: 1 città alla volta</div>
+          15 agenzie in 1 città = marketplace funzionante. 1 agenzia in 15 città = zero network effect.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">5. Parla con i clienti ogni settimana</div>
+          Con 10-20 agenzie puoi parlare con tutti. Questa è la tua superpotenza rispetto ai portali grandi.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">6. Churn > Acquisizione</div>
+          Perdere 2 agenzie e acquisirne 3 non è crescere — è correre sul tapis roulant. Riduci il churn a &lt;5% prima di scalare.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">7. Vendi prima di costruire feature extra</div>
+          Ogni feature senza richiesta di un cliente è tempo sprecato. Le agenzie vogliono lead, non bottoni.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">8. Il prezzo non è il problema — il valore percepito sì</div>
+          Le agenzie spendono già €500-1.500/mese in portali. €249/mese per esclusività è un affare — SE porti lead.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">9. Misura tutto, decidi sui dati</div>
+          Ogni euro deve avere un CAC misurabile. Se un canale non converte in 30 giorni, taglialo.
+        </div>
+        <div class="tip-box warning">
+          <div class="tip-title">10. La velocità è il tuo vantaggio competitivo</div>
+          Sei piccolo, ma decidi in 5 minuti dove Immobiliare.it ci mette 5 mesi. Muoviti veloce, sbaglia veloce, correggi veloce.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Piano strategico per <strong>Privatio SRL (Startup Innovativa)</strong> — Marzo 2026<br>
+    Budget stimato: €8.000 – 16.500 per i primi 6 mesi · Team: founder + 2 collaboratori progressivi · Target: 15+ agenzie, €5k+ MRR al mese 6
+  </div>
+
+</div>
+
+<script>
+  function togglePhase(header) {
+    header.closest('.phase').classList.toggle('open');
+  }
+  function toggleCheck(item) {
+    item.classList.toggle('done');
+    updateProgress();
+    saveState();
+  }
+  function updateProgress() {
+    var total = document.querySelectorAll('.check-item').length;
+    var done = document.querySelectorAll('.check-item.done').length;
+    document.getElementById('progressCount').textContent = done + ' / ' + total + ' completati';
+    document.getElementById('progressFill').style.width = (total > 0 ? (done / total * 100) : 0) + '%';
+  }
+  function saveState() {
+    var items = document.querySelectorAll('.check-item');
+    var state = [];
+    items.forEach(function(item, i) { if (item.classList.contains('done')) state.push(i); });
+    try { localStorage.setItem('privatio-roadmap-v2', JSON.stringify(state)); } catch(e) {}
+  }
+  function loadState() {
+    try {
+      var state = JSON.parse(localStorage.getItem('privatio-roadmap-v2') || '[]');
+      var items = document.querySelectorAll('.check-item');
+      state.forEach(function(i) { if (items[i]) items[i].classList.add('done'); });
+    } catch(e) {}
+  }
+  loadState();
+  updateProgress();
+</script>
+
+</body>
+</html>
