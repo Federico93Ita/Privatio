@@ -4,7 +4,7 @@ import { getToken } from "next-auth/jwt";
 
 /* ─── Maintenance / Coming-Soon gate ─── */
 const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === "true";
-const MAINTENANCE_SECRET = process.env.MAINTENANCE_SECRET || "privatio2026";
+const MAINTENANCE_SECRET = process.env.MAINTENANCE_SECRET;
 
 /* ─── Protected route patterns ─── */
 const PROTECTED_PATTERNS = [
@@ -32,8 +32,8 @@ export async function middleware(req: NextRequest) {
       pathname.startsWith("/images/");
 
     if (!isExempt) {
-      // ?access=SECRET → set cookie & continue
-      if (searchParams.get("access") === MAINTENANCE_SECRET) {
+      // ?access=SECRET → set cookie & continue (only if secret is configured)
+      if (MAINTENANCE_SECRET && searchParams.get("access") === MAINTENANCE_SECRET) {
         const res = NextResponse.redirect(new URL(pathname, req.url));
         res.cookies.set("privatio_access", MAINTENANCE_SECRET, {
           httpOnly: true,
@@ -44,8 +44,8 @@ export async function middleware(req: NextRequest) {
         return res;
       }
 
-      // Valid cookie → allow
-      if (req.cookies.get("privatio_access")?.value !== MAINTENANCE_SECRET) {
+      // Valid cookie → allow (only if secret is configured)
+      if (!MAINTENANCE_SECRET || req.cookies.get("privatio_access")?.value !== MAINTENANCE_SECRET) {
         // Everyone else → coming soon
         return NextResponse.rewrite(new URL("/coming-soon", req.url));
       }

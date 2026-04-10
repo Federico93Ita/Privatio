@@ -13,7 +13,7 @@ export default function TerminiPage() {
       <main className="py-16 bg-bg-soft">
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl font-light tracking-[-0.03em] text-primary-dark mb-2">Termini e Condizioni di Servizio</h1>
-          <p className="text-sm text-text-muted mb-8">Utente Venditore &mdash; Versione 1.0 &mdash; Marzo 2026</p>
+          <p className="text-sm text-text-muted mb-8">Utente Venditore &mdash; Versione 1.1 &mdash; Aprile 2026</p>
           <div className="bg-white rounded-xl p-8 border border-border prose prose-slate max-w-none text-[15px]">
 
             {/* PREMESSE */}
@@ -335,6 +335,23 @@ export default function TerminiPage() {
               modalit&agrave; previste dall&apos;Art. 8.
             </p>
 
+            {/* ART. 9-bis: FORZA MAGGIORE */}
+            <h2 className="text-lg font-medium text-text mt-8">Art. 9-bis &mdash; Forza maggiore</h2>
+            <p className="text-text-muted">
+              <strong>9-bis.1.</strong> Privatio non sar&agrave; responsabile per ritardi, interruzioni o inadempimenti
+              nell&apos;erogazione del servizio causati da eventi di forza maggiore, intesi come eventi imprevedibili,
+              inevitabili e al di fuori del ragionevole controllo di Privatio, ivi inclusi a titolo esemplificativo:
+              calamit&agrave; naturali, pandemie, atti di guerra o terrorismo, provvedimenti delle autorit&agrave;,
+              interruzioni prolungate della fornitura di energia elettrica o delle reti di telecomunicazione,
+              cyberattacchi su larga scala, guasti dei fornitori di servizi cloud.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>9-bis.2.</strong> In caso di evento di forza maggiore, Privatio ne dar&agrave; comunicazione tempestiva
+              ai Venditori tramite e-mail o avviso sulla Piattaforma, indicando la durata prevista dell&apos;interruzione.
+              Se l&apos;evento si protrae per oltre 30 (trenta) giorni consecutivi, ciascuna parte potr&agrave; recedere
+              dal rapporto senza responsabilit&agrave;.
+            </p>
+
             {/* DISPOSIZIONI FINALI */}
             <h2 className="text-lg font-medium text-text mt-8 pt-4 border-t border-border">Disposizioni Finali</h2>
 
@@ -397,7 +414,7 @@ export default function TerminiPage() {
                 {" "}<strong>Art. 5-bis</strong> (Usi vietati della Piattaforma); <strong>Art. 6</strong> (Limitazione di responsabilit&agrave;
                 e tetto quantitativo); <strong>Art. 6-bis</strong> (Manleva e indennit&agrave;); <strong>Art. 7</strong> (Propriet&agrave;
                 intellettuale e licenza); <strong>Art. 8</strong> (Durata e recesso); <strong>Art. 9</strong> (Modifiche ai Termini);
-                {" "}<strong>Art. 10</strong> (Legge applicabile, mediazione obbligatoria e foro competente).
+                {" "}<strong>Art. 9-bis</strong> (Forza maggiore); <strong>Art. 10</strong> (Legge applicabile, mediazione obbligatoria e foro competente).
               </p>
             </div>
 

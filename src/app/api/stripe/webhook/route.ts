@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe, highestPlan } from "@/lib/stripe";
 import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, BILLING_FROM, territoryActivatedEmail, subscriptionCanceledEmail, paymentFailedEmail, subscriptionRenewedEmail } from "@/lib/email";
 import { notifyAgency } from "@/lib/notifications";
 import Stripe from "stripe";
 
@@ -160,25 +160,8 @@ export async function POST(req: NextRequest) {
         }
 
         if (isActive && event.type === "customer.subscription.created") {
-          await sendEmail({
-            to: agency.email,
-            subject: "Territorio attivato — Privatio",
-            html: `
-              <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-                  <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
-                </div>
-                <div style="padding: 30px; background: white;">
-                  <h2 style="color: #059669;">Territorio attivato!</h2>
-                  <p style="color: #6b7280; line-height: 1.6;">Il tuo territorio è ora attivo. Puoi iniziare a ricevere immobili nella tua zona.</p>
-                  <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/territori"
-                     style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500; margin-top: 16px;">
-                    Vedi i tuoi territori
-                  </a>
-                </div>
-              </div>
-            `,
-          });
+          const template = territoryActivatedEmail();
+          await sendEmail({ to: agency.email, from: BILLING_FROM, ...template });
         }
       }
       break;
@@ -211,22 +194,8 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        await sendEmail({
-          to: agency.email,
-          subject: "Abbonamento disattivato — Privatio",
-          html: `
-            <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
-              </div>
-              <div style="padding: 30px; background: white;">
-                <h2 style="color: #0f172a;">Abbonamento disattivato</h2>
-                <p style="color: #6b7280; line-height: 1.6;">Il tuo abbonamento Privatio è stato disattivato. I tuoi territori non sono più attivi.</p>
-                <p style="color: #6b7280; line-height: 1.6;">Puoi riattivare i tuoi territori in qualsiasi momento dalla dashboard.</p>
-              </div>
-            </div>
-          `,
-        });
+        const cancelTemplate = subscriptionCanceledEmail();
+        await sendEmail({ to: agency.email, from: BILLING_FROM, ...cancelTemplate });
       }
       break;
     }
@@ -257,26 +226,8 @@ export async function POST(req: NextRequest) {
           href: "/dashboard/agenzia/fatturazione",
         });
 
-        await sendEmail({
-          to: agency.email,
-          subject: "Pagamento fallito — Privatio",
-          html: `
-            <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
-              </div>
-              <div style="padding: 30px; background: white;">
-                <h2 style="color: #dc2626;">Pagamento non riuscito</h2>
-                <p style="color: #6b7280; line-height: 1.6;">Il pagamento del tuo abbonamento Privatio non è andato a buon fine.</p>
-                <p style="color: #6b7280; line-height: 1.6;">Aggiorna il tuo metodo di pagamento per continuare a utilizzare la piattaforma.</p>
-                <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/fatturazione"
-                   style="display: inline-block; background: #2563eb; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 500; margin-top: 16px;">
-                  Aggiorna pagamento
-                </a>
-              </div>
-            </div>
-          `,
-        });
+        const failedTemplate = paymentFailedEmail();
+        await sendEmail({ to: agency.email, from: BILLING_FROM, ...failedTemplate });
       }
       break;
     }
@@ -297,6 +248,10 @@ export async function POST(req: NextRequest) {
           where: { id: agency.id },
           data: { billingStatus: "ACTIVE", isActive: true },
         });
+
+        // Send renewal confirmation email (only when recovering from non-ACTIVE)
+        const renewedTemplate = subscriptionRenewedEmail();
+        await sendEmail({ to: agency.email, from: BILLING_FROM, ...renewedTemplate });
       }
       break;
     }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buyerLeadSchema } from "@/lib/validations";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, buyerLeadAgencyNotificationEmail, buyerLeadConfirmationEmail } from "@/lib/email";
 import { notifyAgency } from "@/lib/notifications";
 
 export async function POST(
@@ -53,48 +53,20 @@ export async function POST(
         href: "/dashboard/agenzia",
       });
 
-      await sendEmail({
-        to: property.assignment.agency.email,
-        subject: `Nuova richiesta per: ${property.title}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2>Nuova richiesta informazioni</h2>
-            <p><strong>Immobile:</strong> ${property.title}</p>
-            <p><strong>Nome:</strong> ${parsed.data.name}</p>
-            <p><strong>Email:</strong> ${parsed.data.email}</p>
-            ${parsed.data.phone ? `<p><strong>Telefono:</strong> ${parsed.data.phone}</p>` : ""}
-            ${parsed.data.message ? `<p><strong>Messaggio:</strong> ${parsed.data.message}</p>` : ""}
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia">Gestisci nella dashboard</a>
-          </div>
-        `,
-      });
+      const agencyTemplate = buyerLeadAgencyNotificationEmail(
+        property.assignment.agency.name,
+        property.title,
+        parsed.data.name,
+        parsed.data.email,
+        parsed.data.phone || "",
+        parsed.data.message
+      );
+      await sendEmail({ to: property.assignment.agency.email, ...agencyTemplate });
     }
 
     // Confirmation to buyer
-    await sendEmail({
-      to: parsed.data.email,
-      subject: "Richiesta inviata — Privatio",
-      html: `
-        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
-          </div>
-          <div style="padding: 30px; background: white;">
-            <h2 style="color: #0f172a;">Ciao ${parsed.data.name}!</h2>
-            <p style="color: #64748b; line-height: 1.6;">
-              La tua richiesta per <strong>${property.title}</strong> è stata inviata con successo.
-              L'agenzia partner ti contatterà al più presto.
-            </p>
-            <div style="background: #f0f9ff; border-left: 4px solid #2563eb; padding: 16px; margin: 20px 0;">
-              <p style="margin: 0; color: #64748b; font-size: 14px;">
-                <strong>Commissione acquirente:</strong> 2% - 2.5% sul prezzo di vendita.
-                Nessuna sorpresa, massima trasparenza.
-              </p>
-            </div>
-          </div>
-        </div>
-      `,
-    });
+    const buyerTemplate = buyerLeadConfirmationEmail(parsed.data.name, property.title);
+    await sendEmail({ to: parsed.data.email, ...buyerTemplate });
 
     return NextResponse.json({ lead: { id: lead.id } }, { status: 201 });
   } catch (error) {

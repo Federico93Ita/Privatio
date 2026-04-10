@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, visitStatusUpdateEmail } from "@/lib/email";
 import { formatDateTime } from "@/lib/utils";
 
 export async function POST(
@@ -67,23 +67,13 @@ export async function POST(
 
     // Notify buyer
     const dateFormatted = formatDateTime(updatedVisit.scheduledAt);
-    const statusText = status === "CONFIRMED" ? "confermata" : "annullata";
-
-    await sendEmail({
-      to: updatedVisit.buyerEmail,
-      subject: `Visita ${statusText} — ${dateFormatted}`,
-      html: `
-        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -0.5px;">Privatio</h1>
-          </div>
-          <div style="padding: 30px; background: white;">
-            <h2 style="color: #0f172a;">Visita ${statusText}</h2>
-            <p style="color: #6b7280; line-height: 1.6;">La visita per <strong>${updatedVisit.property.title}</strong> del <strong>${dateFormatted}</strong> è stata ${statusText}.</p>
-          </div>
-        </div>
-      `,
-    });
+    const template = visitStatusUpdateEmail(
+      updatedVisit.buyerName,
+      updatedVisit.property.title,
+      dateFormatted,
+      status === "CONFIRMED" ? "confirmed" : "cancelled"
+    );
+    await sendEmail({ to: updatedVisit.buyerEmail, ...template });
 
     return NextResponse.json({ visit: updatedVisit });
   } catch (error) {

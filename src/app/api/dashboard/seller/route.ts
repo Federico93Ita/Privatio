@@ -148,12 +148,9 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    const stack = error instanceof Error ? error.stack?.slice(0, 500) : undefined;
-    console.error("Seller dashboard error msg:", msg);
-    if (stack) console.error("Seller dashboard stack:", stack);
+    console.error("Seller dashboard error:", error);
     return NextResponse.json(
-      { error: "Errore nel caricamento dashboard", detail: msg },
+      { error: "Errore nel caricamento dashboard" },
       { status: 500 }
     );
   }

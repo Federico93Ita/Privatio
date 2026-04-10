@@ -47,11 +47,31 @@ interface Visit {
   status: "pending" | "confirmed";
 }
 
+interface ZoneAgency {
+  id: string;
+  name: string;
+  slug?: string | null;
+  logoUrl?: string | null;
+  rating: number;
+  tagline?: string | null;
+  specializations?: string[];
+  uniqueSellingPoints?: string[];
+  responseTimeHours?: number | null;
+  city?: string | null;
+  phone?: string | null;
+  plan: string;
+  activeProperties: number;
+  profileCompleted: boolean;
+}
+
 interface DashboardData {
   property: {
+    id: string;
+    slug: string;
     title: string;
     address: string;
     currentStage: string;
+    status: string;
   } | null;
   stats: {
     views: number;
@@ -468,6 +488,185 @@ function UpcomingVisits({ visits }: { visits: Visit[] }) {
   );
 }
 
+function ZoneAgenciesList({
+  propertySlug,
+  onChosen,
+}: {
+  propertySlug: string;
+  onChosen: () => void;
+}) {
+  const [agencies, setAgencies] = useState<ZoneAgency[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [choosing, setChoosing] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/properties/${propertySlug}/agencies`)
+      .then((r) => r.json())
+      .then((d) => setAgencies(d.agencies || []))
+      .catch(() => setError("Errore nel caricamento agenzie"))
+      .finally(() => setLoading(false));
+  }, [propertySlug]);
+
+  const handleChoose = async (agencyId: string) => {
+    if (choosing) return;
+    setChoosing(agencyId);
+    setError(null);
+    try {
+      const res = await fetch(`/api/properties/${propertySlug}/choose-agency`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agencyId }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Errore nella scelta");
+        return;
+      }
+      onChosen();
+    } catch {
+      setError("Errore di connessione");
+    } finally {
+      setChoosing(null);
+    }
+  };
+
+  const planLabels: Record<string, string> = {
+    PREMIUM: "Premium",
+    URBANA: "Urbana",
+    BASE: "Base",
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
+        <h3 className="mb-4 text-lg font-medium text-primary-dark">
+          Agenzie nella tua zona
+        </h3>
+        <div className="flex items-center gap-3 text-text-muted">
+          <SpinnerIcon />
+          <p className="text-sm">Caricamento agenzie...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (agencies.length === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
+        <h3 className="mb-4 text-lg font-medium text-primary-dark">
+          Agenzie nella tua zona
+        </h3>
+        <p className="text-sm text-text-muted">
+          Al momento non ci sono agenzie partner attive nella tua zona.
+          Entro 48 ore dalla pubblicazione, le agenzie disponibili potranno contattarti direttamente.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
+      <h3 className="mb-2 text-lg font-medium text-primary-dark">
+        Scegli un&apos;agenzia partner
+      </h3>
+      <p className="mb-4 text-sm text-text-muted">
+        Seleziona l&apos;agenzia che preferisci. Ricever&agrave; le informazioni del tuo immobile
+        e ti contatter&agrave; per organizzare un sopralluogo.
+      </p>
+      {error && (
+        <div className="mb-4 rounded-lg border border-error/30 bg-error/5 p-3 text-sm text-error">
+          {error}
+        </div>
+      )}
+      <div className="space-y-4">
+        {agencies.map((agency) => (
+          <div
+            key={agency.id}
+            className="flex flex-col gap-4 rounded-xl border border-border bg-bg-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="flex items-start gap-3 min-w-0 flex-1">
+              {agency.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={agency.logoUrl}
+                  alt={agency.name}
+                  className="h-12 w-12 shrink-0 rounded-full object-contain bg-white border border-border"
+                />
+              ) : (
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
+                  {agency.name.charAt(0)}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-text truncate">{agency.name}</p>
+                  <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                    {planLabels[agency.plan] || agency.plan}
+                  </span>
+                </div>
+                {agency.tagline && (
+                  <p className="text-xs text-text-muted truncate">{agency.tagline}</p>
+                )}
+                <div className="mt-1 flex items-center gap-2">
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <StarIcon key={i} filled={i < agency.rating} />
+                    ))}
+                    <span className="ml-1 text-xs text-text-muted">{agency.rating}/5</span>
+                  </div>
+                  {agency.responseTimeHours && (
+                    <span className="text-xs text-text-muted">
+                      · Risponde entro {agency.responseTimeHours}h
+                    </span>
+                  )}
+                </div>
+                {agency.specializations && agency.specializations.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {agency.specializations.slice(0, 3).map((s, i) => (
+                      <span
+                        key={i}
+                        className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 sm:self-center">
+              {agency.slug && (
+                <a
+                  href={`/agenzia/${agency.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg border border-primary/20 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
+                >
+                  Vedi profilo
+                </a>
+              )}
+              <button
+                onClick={() => handleChoose(agency.id)}
+                disabled={choosing !== null}
+                className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50"
+              >
+                {choosing === agency.id ? (
+                  <span className="flex items-center gap-2">
+                    <SpinnerIcon /> Invio...
+                  </span>
+                ) : (
+                  "Scegli questa agenzia"
+                )}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-white px-6 py-16 text-center">
@@ -586,8 +785,17 @@ export default function SellerDashboardPage() {
                 {/* Stats Row */}
                 <StatsGrid stats={data.stats} />
 
-                {/* Agency Card */}
-                <AgencyCard agency={data.agency} />
+                {/* Agency: show chooser if no assignment, card if assigned */}
+                {data.agency ? (
+                  <AgencyCard agency={data.agency} />
+                ) : data.property.slug ? (
+                  <ZoneAgenciesList
+                    propertySlug={data.property.slug}
+                    onChosen={() => window.location.reload()}
+                  />
+                ) : (
+                  <AgencyCard agency={null} />
+                )}
 
                 {/* Recent Activity + Upcoming Visits */}
                 <div className="grid gap-4 lg:grid-cols-2">

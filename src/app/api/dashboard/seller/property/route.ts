@@ -68,6 +68,7 @@ export async function PUT(req: NextRequest) {
 
     const property = await prisma.property.findFirst({
       where: { sellerId: session.user.id },
+      include: { assignment: true },
       orderBy: { createdAt: "desc" },
     });
 
@@ -79,6 +80,14 @@ export async function PUT(req: NextRequest) {
     if (property.status === "SOLD" || property.status === "WITHDRAWN") {
       return NextResponse.json(
         { error: "Non è possibile modificare un immobile venduto o ritirato" },
+        { status: 400 }
+      );
+    }
+
+    // Block edits once an agency has been assigned
+    if (property.assignment) {
+      return NextResponse.json(
+        { error: "Non è possibile modificare l'immobile dopo l'assegnazione a un'agenzia" },
         { status: 400 }
       );
     }

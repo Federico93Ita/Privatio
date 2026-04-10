@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -16,6 +17,9 @@ const deleteSchema = z.object({
  */
 export async function DELETE(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(RATE_LIMITS.auth, req);
+    if (limited) return limited;
+
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
@@ -61,6 +65,18 @@ export async function DELETE(req: NextRequest) {
 
       // Delete documents uploaded by user
       await tx.document.deleteMany({ where: { uploaderId: user.id } });
+
+      // Delete favorites
+      await tx.favorite.deleteMany({ where: { userId: user.id } });
+
+      // Delete saved searches
+      await tx.savedSearch.deleteMany({ where: { userId: user.id } });
+
+      // Delete reviews
+      await tx.review.deleteMany({ where: { userId: user.id } });
+
+      // Delete notifications
+      await tx.notification.deleteMany({ where: { userId: user.id } });
 
       // Delete verification tokens
       await tx.verificationToken.deleteMany({

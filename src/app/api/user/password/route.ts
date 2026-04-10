@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -12,6 +13,9 @@ const changePasswordSchema = z.object({
 
 export async function PUT(req: NextRequest) {
   try {
+    const limited = await applyRateLimit(RATE_LIMITS.auth, req);
+    if (limited) return limited;
+
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });

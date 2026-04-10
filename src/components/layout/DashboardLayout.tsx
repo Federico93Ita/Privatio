@@ -238,6 +238,7 @@ const sidebarConfig: Record<Role, SidebarItem[]> = {
     { href: "/admin/reclami", label: "Reclami", icon: <Icon d="M3 8l9-5 9 5v8l-9 5-9-5V8z" /> },
     { href: "/admin/audit", label: "Audit log", icon: <Icon d="M4 6h16M4 12h16M4 18h7" /> },
     { href: "/admin/assign", label: "Segnalazioni", icon: <Icon d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" /> },
+    { href: "/admin/email", label: "Email", icon: <Icon d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> },
   ],
 };
 

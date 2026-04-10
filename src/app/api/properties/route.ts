@@ -8,6 +8,7 @@ import { generateSlug } from "@/lib/utils";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { geocodeAddress } from "@/lib/geocode";
 import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { sendEmail, sellerWelcomeEmail } from "@/lib/email";
 
 // GET /api/properties — Public listing with filters
 export async function GET(req: NextRequest) {
@@ -87,10 +88,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error("Properties list error msg:", msg);
+    console.error("Properties list error:", error);
     return NextResponse.json(
-      { error: "Errore nel caricamento immobili", detail: msg },
+      { error: "Errore nel caricamento immobili" },
       { status: 500 }
     );
   }
@@ -332,6 +332,18 @@ export async function POST(req: NextRequest) {
       if (photoRecords.length > 0) {
         await prisma.propertyPhoto.createMany({ data: photoRecords });
       }
+    }
+
+    // Send welcome email to seller
+    const seller = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, email: true },
+    });
+    if (seller) {
+      const template = sellerWelcomeEmail(seller.name || "Venditore");
+      sendEmail({ to: seller.email, ...template }).catch((err) =>
+        console.error("sellerWelcomeEmail error:", err)
+      );
     }
 
     return NextResponse.json(

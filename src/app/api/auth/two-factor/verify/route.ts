@@ -3,12 +3,16 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { verifyTwoFactorToken } from "@/lib/two-factor";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
  * POST /api/auth/two-factor/verify — Verify a TOTP code and enable 2FA
  * Body: { code: "123456" }
  */
 export async function POST(req: NextRequest) {
+  const limited = await applyRateLimit(RATE_LIMITS.otp, req);
+  if (limited) return limited;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });

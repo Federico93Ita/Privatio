@@ -189,23 +189,52 @@ export default function PrivacyPolicyPage() {
               Per segnalare un incidente di sicurezza: <strong>privacy@privatio.it</strong>.
             </p>
 
-            {/* 11. DPIA */}
-            <h2 className="text-lg font-medium text-text mt-8">11. Valutazione d&apos;impatto (DPIA)</h2>
+            {/* 11. DECISIONI AUTOMATIZZATE */}
+            <h2 className="text-lg font-medium text-text mt-8">11. Processi decisionali automatizzati e profilazione</h2>
+            <p className="text-text-muted">
+              <strong>11.1.</strong> La Piattaforma utilizza un meccanismo automatizzato di assegnazione (matchmaking) che, decorso
+              il termine di 48 ore senza che il Venditore abbia contattato un&apos;agenzia, trasmette automaticamente i dati
+              dell&apos;immobile e del Venditore alle agenzie convenzionate nella zona, secondo i seguenti criteri: piano di
+              abbonamento dell&apos;agenzia, carico di lavoro corrente e valutazione media degli utenti.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>11.2.</strong> Tale meccanismo <strong>non produce effetti giuridici significativi</strong> sul Venditore ai sensi
+              dell&apos;Art. 22 GDPR, in quanto: (a) il Venditore pu&ograve; disattivare la trasmissione automatica in qualsiasi momento
+              tramite il proprio pannello di controllo; (b) il Venditore mantiene piena libert&agrave; di scelta sull&apos;agenzia con
+              cui interagire; (c) la trasmissione dei dati &egrave; subordinata al consenso esplicito del Venditore espresso al momento
+              della pubblicazione.
+            </p>
+            <p className="text-text-muted mt-2">
+              <strong>11.3.</strong> Il Venditore ha comunque diritto di ottenere l&apos;intervento umano, di esprimere la propria opinione
+              e di contestare la decisione automatizzata, contattando <strong>privacy@privatio.it</strong>.
+            </p>
+
+            {/* 12. MINORI */}
+            <h2 className="text-lg font-medium text-text mt-8">12. Trattamento dei dati di minori</h2>
+            <p className="text-text-muted">
+              La Piattaforma non &egrave; destinata a soggetti di et&agrave; inferiore a 18 anni. Il Titolare non raccoglie
+              consapevolmente dati personali di minori. Qualora il Titolare venga a conoscenza di aver raccolto dati personali
+              di un minore senza il consenso verificabile del genitore o del tutore legale, provveder&agrave; alla cancellazione
+              tempestiva di tali dati. Per segnalazioni: <strong>privacy@privatio.it</strong>.
+            </p>
+
+            {/* 13. DPIA */}
+            <h2 className="text-lg font-medium text-text mt-8">13. Valutazione d&apos;impatto (DPIA)</h2>
             <p className="text-text-muted">
               Il Titolare ha condotto una Valutazione d&apos;Impatto sulla Protezione dei Dati (Art. 35 GDPR) per il meccanismo
               di trasmissione automatica dei dati ai sensi della &ldquo;Fase 2&rdquo; (trasmissione automatica alle agenzie dopo 48 ore).
               La valutazione ha confermato l&apos;adeguatezza delle misure di sicurezza adottate e il rispetto del principio di minimizzazione.
             </p>
 
-            {/* 12. REFERENTE PRIVACY */}
-            <h2 className="text-lg font-medium text-text mt-8">12. Referente per la protezione dei dati</h2>
+            {/* 14. REFERENTE PRIVACY */}
+            <h2 className="text-lg font-medium text-text mt-8">14. Referente per la protezione dei dati</h2>
             <p className="text-text-muted">
               Per qualsiasi richiesta relativa al trattamento dei dati personali, &egrave; possibile contattare il Referente Privacy
               all&apos;indirizzo: <strong>privacy@privatio.it</strong>.
             </p>
 
-            {/* 13. CONSERVAZIONE PER TIPOLOGIA */}
-            <h2 className="text-lg font-medium text-text mt-8">13. Periodi di conservazione per tipologia di dato</h2>
+            {/* 15. CONSERVAZIONE PER TIPOLOGIA */}
+            <h2 className="text-lg font-medium text-text mt-8">15. Periodi di conservazione per tipologia di dato</h2>
             <div className="overflow-x-auto mt-3">
               <table className="w-full text-sm border border-border rounded-lg">
                 <thead>
@@ -227,7 +256,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <p className="text-sm text-text-muted mt-8 pt-4 border-t border-border">
-              Ultimo aggiornamento: Marzo 2026 — Per informazioni: privacy@privatio.it
+              Ultimo aggiornamento: Aprile 2026 — Per informazioni: privacy@privatio.it
             </p>
           </div>
         </div>

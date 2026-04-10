@@ -25,6 +25,13 @@ export function formatNumber(num: number): string {
   return new Intl.NumberFormat("it-IT").format(num);
 }
 
+export function generateAgencySlug(name: string, city: string, id: string): string {
+  const nameSlug = slugify(name, { lower: true, strict: true });
+  const citySlug = slugify(city, { lower: true, strict: true });
+  const shortId = id.slice(-8);
+  return `${nameSlug}-${citySlug}-${shortId}`;
+}
+
 export function generateSlug(type: string, rooms: number, city: string, id: string): string {
   const typeSlug = slugify(type.toLowerCase().replace(/_/g, "-"), { lower: true, strict: true });
   const citySlug = slugify(city, { lower: true, strict: true });

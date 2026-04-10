@@ -47,6 +47,12 @@ model User {
   suspendedAt        DateTime?
   suspendedReason    String?
   suspendedBy        String?
+  // Email deliverability
+  emailInvalid       Boolean        @default(false)
+  emailBounceCount   Int            @default(0)
+
+  @@index([role])
+  @@index([agencyId])
 }
 
 enum AccountStatus {
@@ -84,6 +90,7 @@ model Account {
 model Agency {
   id                       String                    @id @default(cuid())
   name                     String
+  slug                     String?                   @unique
   email                    String                    @unique
   phone                    String
   address                  String
@@ -154,6 +161,9 @@ model Agency {
   suspendedAt              DateTime?
   suspendedReason          String?
   suspendedBy              String?
+
+  @@index([stripeCustomerId])
+  @@index([status])
 }
 
 model PropertyFallbackContact {
@@ -306,7 +316,7 @@ enum AssignmentStatus {
 
 model Contract {
   id           String    @id @default(cuid())
-  property     Property  @relation(fields: [propertyId], references: [id])
+  property     Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId   String    @unique
   type         String    @default("ESCLUSIVA_90_GIORNI")
   duration     Int       @default(90)
@@ -322,7 +332,7 @@ model Contract {
 
 model Visit {
   id          String      @id @default(cuid())
-  property    Property    @relation(fields: [propertyId], references: [id])
+  property    Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  String
   buyerName   String
   buyerEmail  String
@@ -345,7 +355,7 @@ enum VisitStatus {
 
 model BuyerLead {
   id         String   @id @default(cuid())
-  property   Property @relation(fields: [propertyId], references: [id])
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String
   name       String
   email      String
@@ -414,6 +424,7 @@ model Message {
 
   @@index([propertyId, createdAt])
   @@index([receiverId, read])
+  @@index([senderId])
 }
 
 model Document {
@@ -538,9 +549,9 @@ model Zone {
 
 model TerritoryAssignment {
   id           String     @id @default(cuid())
-  agency       Agency     @relation(fields: [agencyId], references: [id])
+  agency       Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   agencyId     String
-  zone         Zone       @relation(fields: [zoneId], references: [id])
+  zone         Zone       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   zoneId       String
   plan         AgencyPlan
   monthlyPrice Int
@@ -641,4 +652,46 @@ model ChatbotLog {
   @@index([sessionId])
   @@index([createdAt])
   @@index([fallbackTriggered])
+}
+
+// ─── Email tracking ──────────────────────────────────────────────────
+
+model EmailLog {
+  id           String        @id @default(cuid())
+  resendId     String?       @unique
+  to           String
+  from         String
+  subject      String
+  templateName String?
+  category     EmailCategory @default(TRANSACTIONAL)
+  status       EmailStatus   @default(QUEUED)
+  attempts     Int           @default(0)
+  lastError    String?       @db.Text
+  metadata     Json?
+  sentAt       DateTime?
+  deliveredAt  DateTime?
+  openedAt     DateTime?
+  bouncedAt    DateTime?
+  complainedAt DateTime?
+  createdAt    DateTime      @default(now())
+
+  @@index([to])
+  @@index([status])
+  @@index([templateName])
+  @@index([createdAt])
+}
+
+enum EmailCategory {
+  TRANSACTIONAL
+  MARKETING
+  ADMIN_NOTIFICATION
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  BOUNCED
+  COMPLAINED
+  FAILED
 }

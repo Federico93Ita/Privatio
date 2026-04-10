@@ -3,11 +3,15 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { generateTwoFactorSetup } from "@/lib/two-factor";
+import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 /**
  * POST /api/auth/two-factor/setup — Generate a new 2FA secret + QR code
  */
 export async function POST(req: NextRequest) {
+  const limited = await applyRateLimit(RATE_LIMITS.auth, req);
+  if (limited) return limited;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });

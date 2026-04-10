@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/fallback-48h",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/agency-reminder-24h",
+      "schedule": "0 10 * * *"
     }
   ]
 }

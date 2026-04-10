@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sellerLeadSchema } from "@/lib/validations";
-import { sendEmail, leadReceivedEmail } from "@/lib/email";
+import { sendEmail, leadReceivedEmail, adminNewLeadEmail } from "@/lib/email";
 import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
-
-/** Escape HTML special characters */
-function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,21 +33,9 @@ export async function POST(req: NextRequest) {
     // Notify admin
     const adminEmail = process.env.ADMIN_EMAIL;
     if (adminEmail) {
-      await sendEmail({
-        to: adminEmail,
-        subject: `Nuovo lead venditore: ${parsed.data.name} — ${parsed.data.city}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2>Nuovo lead venditore</h2>
-            <p><strong>Nome:</strong> ${esc(parsed.data.name)}</p>
-            <p><strong>Email:</strong> ${esc(parsed.data.email)}</p>
-            <p><strong>Telefono:</strong> ${esc(parsed.data.phone)}</p>
-            <p><strong>Città:</strong> ${esc(parsed.data.city)} (${esc(parsed.data.province)})</p>
-            ${parsed.data.propertyType ? `<p><strong>Tipo:</strong> ${esc(parsed.data.propertyType)}</p>` : ""}
-            ${parsed.data.estimatedValue ? `<p><strong>Valore stimato:</strong> €${parsed.data.estimatedValue.toLocaleString("it-IT")}</p>` : ""}
-          </div>
-        `,
-      });
+      const details = `${parsed.data.city} (${parsed.data.province})${parsed.data.propertyType ? ` — ${parsed.data.propertyType}` : ""}${parsed.data.estimatedValue ? ` — €${parsed.data.estimatedValue.toLocaleString("it-IT")}` : ""}`;
+      const adminTemplate = adminNewLeadEmail("venditore", parsed.data.name, parsed.data.email, details);
+      await sendEmail({ to: adminEmail, ...adminTemplate });
     }
 
     return NextResponse.json({ lead: { id: lead.id } }, { status: 201 });

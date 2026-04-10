@@ -15,16 +15,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Decisione non valida" }, { status: 400 });
     }
 
+    // L'admin non pubblica: approva (l'immobile resta DRAFT, sara l'agenzia a pubblicare)
+    // oppure rifiuta (WITHDRAWN)
+    const updateData: Record<string, unknown> = {
+      moderationNote: note,
+      moderatedAt: new Date(),
+      moderatedBy: admin.userId,
+    };
+
+    if (decision === "REJECT") {
+      updateData.status = "WITHDRAWN";
+    }
+    // APPROVE: lo status resta invariato — l'admin conferma che l'immobile è conforme
+    // L'agenzia assegnata gestirà le transizioni DRAFT → PENDING_REVIEW → PUBLISHED
+
     const property = await prisma.property.update({
       where: { id },
-      data: {
-        status: decision === "APPROVE" ? "PUBLISHED" : "WITHDRAWN",
-        publishedAt: decision === "APPROVE" ? new Date() : null,
-        moderationNote: note,
-        moderatedAt: new Date(),
-        moderatedBy: admin.userId,
-      },
-      select: { id: true, slug: true, status: true, moderationNote: true },
+      data: updateData,
+      select: { id: true, slug: true, status: true, moderationNote: true, moderatedAt: true },
     });
 
     await logAudit({

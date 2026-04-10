@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice, getPropertyTypeLabel, getStatusLabel } from "@/lib/utils";
 
@@ -196,8 +197,8 @@ export default function SellerPropertyEditPage() {
             <h3 className="font-medium text-primary-dark mb-3">Foto ({property.photos.length})</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {property.photos.map((photo: any, i: number) => (
-                <div key={photo.id || i} className="aspect-square rounded-lg overflow-hidden bg-bg-soft">
-                  <img src={photo.url} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                <div key={photo.id || i} className="relative aspect-square rounded-lg overflow-hidden bg-bg-soft">
+                  <Image src={photo.url} alt={`Foto ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
                 </div>
               ))}
             </div>

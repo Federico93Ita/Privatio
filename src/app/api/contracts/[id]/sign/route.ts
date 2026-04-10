@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, contractSignedEmail } from "@/lib/email";
 import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(
@@ -83,6 +83,13 @@ export async function POST(
         { status: 403 }
       );
     }
+    // Verify the agency user belongs to the agency assigned to this property
+    if (role === "agency" && user?.agencyId && contract.property.assignment?.agencyId !== user.agencyId) {
+      return NextResponse.json(
+        { error: "Non sei autorizzato a firmare per questa agenzia" },
+        { status: 403 }
+      );
+    }
     if (role === "seller" && (!user || user.role !== "SELLER")) {
       return NextResponse.json(
         { error: "Non sei autorizzato a firmare come venditore" },
@@ -123,31 +130,19 @@ export async function POST(
     // Notify when contract is fully signed
     if (willBeFullySigned) {
       const property = contract.property;
-      const emailHtml = `
-        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0;">Privatio</h1>
-          </div>
-          <div style="padding: 30px;">
-            <h2 style="color: #10b981;">Autorizzazione confermata!</h2>
-            <p>L'autorizzazione al contatto per <strong>${property.title}</strong> è stata confermata. L'agenzia che hai scelto potrà ora contattarti per organizzare i prossimi passi.</p>
-            <p>Il tuo immobile verrà pubblicato a breve sulla piattaforma.</p>
-          </div>
-        </div>
-      `;
 
-      await sendEmail({
-        to: property.seller.email,
-        subject: "Contratto firmato — Privatio",
-        html: emailHtml,
-      });
+      const sellerTemplate = contractSignedEmail(
+        property.seller.name || "Venditore",
+        property.title
+      );
+      await sendEmail({ to: property.seller.email, ...sellerTemplate });
 
       if (property.assignment?.agency) {
-        await sendEmail({
-          to: property.assignment.agency.email,
-          subject: "Contratto firmato — Privatio",
-          html: emailHtml,
-        });
+        const agencyTemplate = contractSignedEmail(
+          property.assignment.agency.name,
+          property.title
+        );
+        await sendEmail({ to: property.assignment.agency.email, ...agencyTemplate });
       }
     }
 

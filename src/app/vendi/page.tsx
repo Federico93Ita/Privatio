@@ -497,7 +497,7 @@ export default function VendiPage() {
         );
       }
 
-      router.push("/grazie");
+      router.push("/dashboard/venditore");
     } catch (err: unknown) {
       setSubmitError(
         err instanceof Error ? err.message : "Si è verificato un errore. Riprova.",

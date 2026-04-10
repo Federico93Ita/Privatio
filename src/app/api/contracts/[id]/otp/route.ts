@@ -2,14 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, otpCodeEmail } from "@/lib/email";
 import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import crypto from "crypto";
-
-/** Escape HTML special characters */
-function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 
 const OTP_EXPIRY_MINUTES = 5;
 const MAX_OTP_REQUESTS = 3;
@@ -98,32 +93,8 @@ export async function POST(
     });
 
     // Send OTP via email
-    const userName = contract.property.seller.name || "Venditore";
-    await sendEmail({
-      to: userEmail,
-      subject: "Codice OTP per firma contratto — Privatio",
-      html: `
-        <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: #0f172a; padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 28px;">Privatio</h1>
-          </div>
-          <div style="padding: 30px; background: #ffffff;">
-            <h2 style="color: #0f172a; margin-top: 0;">Codice OTP per autorizzazione al contatto</h2>
-            <p style="color: #64748b;">Ciao ${esc(userName)},</p>
-            <p style="color: #64748b;">Hai richiesto un codice OTP per confermare l'autorizzazione al contatto per il tuo immobile.</p>
-            <div style="background: #f8fafc; border: 2px solid #2563eb; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-              <p style="color: #64748b; margin: 0 0 8px 0; font-size: 14px;">Il tuo codice OTP:</p>
-              <p style="color: #0f172a; font-size: 36px; font-weight: bold; letter-spacing: 8px; margin: 0;">${otpCode}</p>
-            </div>
-            <p style="color: #ef4444; font-size: 14px;">Questo codice scade tra ${OTP_EXPIRY_MINUTES} minuti.</p>
-            <p style="color: #64748b; font-size: 14px;">Se non hai richiesto questo codice, ignora questa email.</p>
-          </div>
-          <div style="background: #f8fafc; padding: 20px 30px; text-align: center;">
-            <p style="color: #64748b; font-size: 12px; margin: 0;">&copy; Privatio — La piattaforma per vendere casa senza commissioni</p>
-          </div>
-        </div>
-      `,
-    });
+    const template = otpCodeEmail(otpCode);
+    await sendEmail({ to: userEmail, ...template });
 
     return NextResponse.json({ message: "Codice OTP inviato alla tua email" });
   } catch (error) {

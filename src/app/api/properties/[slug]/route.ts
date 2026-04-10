@@ -91,7 +91,8 @@ export async function GET(
       },
     });
 
-    if (!property || property.status === "DRAFT") {
+    const publicStatuses = ["PUBLISHED", "UNDER_CONTRACT", "SOLD"];
+    if (!property || !publicStatuses.includes(property.status)) {
       return NextResponse.json(
         { error: "Immobile non trovato" },
         { status: 404 }
