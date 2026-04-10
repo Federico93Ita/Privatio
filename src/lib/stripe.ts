@@ -49,6 +49,13 @@ export const PLANS = {
 
 export type PlanKey = keyof typeof PLANS;
 
+/* ------------------------------------------------------------------ */
+/*  Trial gratuito                                                     */
+/* ------------------------------------------------------------------ */
+
+/** Giorni di prova gratuita per nuove agenzie (0 = disabilitato) */
+export const TRIAL_PERIOD_DAYS = 90;
+
 export const PLAN_KEYS: PlanKey[] = ["BASE", "URBANA", "PREMIUM"];
 
 /* ------------------------------------------------------------------ */

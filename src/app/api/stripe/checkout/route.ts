@@ -5,6 +5,7 @@ import {
   stripe,
   createZoneStripePrice,
   addZoneToSubscription,
+  TRIAL_PERIOD_DAYS,
 } from "@/lib/stripe";
 import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
@@ -251,6 +252,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       subscription_data: {
+        ...(TRIAL_PERIOD_DAYS > 0 && { trial_period_days: TRIAL_PERIOD_DAYS }),
         metadata: {
           agencyId: user.agency.id,
           plan,
