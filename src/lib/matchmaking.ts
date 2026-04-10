@@ -44,7 +44,7 @@ export async function assignAgencyToProperty(propertyId: string) {
     where: {
       zoneId,
       isActive: true,
-      agency: { isActive: true },
+      agency: { isActive: true, billingStatus: "ACTIVE" },
     },
     include: {
       agency: {

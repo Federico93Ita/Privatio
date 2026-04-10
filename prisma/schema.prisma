@@ -96,6 +96,7 @@ model Agency {
   isActive                 Boolean                   @default(false)
   stripeCustomerId         String?
   stripeSubId              String?
+  billingStatus            BillingStatus             @default(ACTIVE)
   trialEndsAt              DateTime? // Free trial expiry date
   trialUsed                Boolean                   @default(false)
   logoUrl                  String?
@@ -172,6 +173,13 @@ enum AgencyPlan {
   BASE
   URBANA
   PREMIUM
+}
+
+enum BillingStatus {
+  ACTIVE
+  PAST_DUE
+  UNPAID
+  CANCELED
 }
 
 enum ZoneClass {
@@ -505,6 +513,10 @@ model Zone {
   monthlyPrice Int @default(0) // centesimi EUR
   maxAgencies  Int @default(4)
 
+  // Stripe catalog (seeded via scripts/stripe-seed-products.ts)
+  stripeProductId String?
+  stripePriceId   String?
+
   // Zone adiacenti per espansione territoriale
   adjacentZoneIds String[]
 
@@ -603,6 +615,16 @@ model AuditLog {
 
   @@index([action])
   @@index([userId])
+  @@index([createdAt])
+}
+
+model StripeEventLog {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  type      String
+  createdAt DateTime @default(now())
+
+  @@index([type])
   @@index([createdAt])
 }
 

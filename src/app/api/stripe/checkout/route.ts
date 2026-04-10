@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { stripe, PLANS, createZoneStripePrice } from "@/lib/stripe";
+import {
+  stripe,
+  createZoneStripePrice,
+  addZoneToSubscription,
+} from "@/lib/stripe";
 import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { resolveZoneForProperty } from "@/lib/zones";
@@ -18,14 +22,39 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): num
 }
 
 /**
+ * Garantisce che una Zone abbia uno stripePriceId. Se manca (p.es. zona
+ * nuova non ancora seedata), lo crea al volo e lo salva su DB.
+ */
+async function ensureZonePriceId(zone: {
+  id: string;
+  name: string;
+  zoneClass: string;
+  monthlyPrice: number;
+  stripePriceId: string | null;
+}): Promise<string> {
+  if (zone.stripePriceId) return zone.stripePriceId;
+  const priceId = await createZoneStripePrice(
+    zone.name,
+    zone.id,
+    zone.zoneClass as PlanKey,
+    zone.monthlyPrice
+  );
+  await prisma.zone.update({
+    where: { id: zone.id },
+    data: { stripePriceId: priceId },
+  });
+  return priceId;
+}
+
+/**
  * POST /api/stripe/checkout
  *
- * Crea una sessione Stripe Checkout per acquistare il primo territorio.
  * Body: { zoneId: string }
  *
- * Il piano viene determinato dalla zoneClass della zona.
- * Se l'agenzia ha già una subscription attiva, usa l'API territori
- * per aggiungere line items (non questo endpoint).
+ * - Se l'agenzia NON ha ancora una subscription attiva → crea Checkout
+ *   Session in modalità subscription (prima zona).
+ * - Se l'agenzia HA già stripeSubId → aggiunge un SubscriptionItem alla
+ *   subscription esistente (2ª/3ª zona) senza passare da Checkout.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -50,13 +79,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Agenzia non trovata" }, { status: 404 });
     }
 
-    // Verifica zona
     const zone = await prisma.zone.findUnique({ where: { id: zoneId } });
     if (!zone || !zone.isActive) {
       return NextResponse.json({ error: "Zona non disponibile" }, { status: 404 });
     }
 
-    // Verifica prezzo configurato
     if (zone.monthlyPrice <= 0) {
       return NextResponse.json(
         { error: "Prezzo zona non configurato" },
@@ -64,11 +91,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica slot disponibili
+    // Slot disponibili
     const currentCount = await prisma.territoryAssignment.count({
       where: { zoneId, isActive: true },
     });
-
     if (currentCount >= zone.maxAgencies) {
       return NextResponse.json(
         { error: "Nessuno slot disponibile per questa zona" },
@@ -76,7 +102,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica che l'agenzia non abbia già questa zona
+    // No doppia zona
     const existingTerritory = await prisma.territoryAssignment.findUnique({
       where: { agencyId_zoneId: { agencyId: user.agency.id, zoneId } },
     });
@@ -87,7 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica limiti zone (max 3)
+    // Max 3 zone
     const activeZones = await prisma.territoryAssignment.count({
       where: { agencyId: user.agency.id, isActive: true },
     });
@@ -98,23 +124,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verifica restrizione geografica: entro 5km E stessa classe (BASE/URBANA/PREMIUM)
-    const homeZoneId = await resolveZoneForProperty(user.agency.city, user.agency.province, "");
+    // Restrizione geografica + stessa classe
+    const homeZoneId = await resolveZoneForProperty(
+      user.agency.city,
+      user.agency.province,
+      ""
+    );
     if (homeZoneId && homeZoneId !== zoneId) {
       const homeZone = await prisma.zone.findUnique({
         where: { id: homeZoneId },
         select: { lat: true, lng: true, zoneClass: true },
       });
-      // Blocca se classe diversa
       if (homeZone?.zoneClass && zone.zoneClass !== homeZone.zoneClass) {
         return NextResponse.json(
           { error: "Puoi presidiare solo zone della tua stessa classe" },
           { status: 403 }
         );
       }
-      // Blocca se distanza fuori raggio (variabile per classe)
       if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
-        const radiusByClass: Record<string, number> = { PREMIUM: 5, URBANA: 8, BASE: 15 };
+        const radiusByClass: Record<string, number> = {
+          PREMIUM: 5,
+          URBANA: 8,
+          BASE: 15,
+        };
         const maxDist = radiusByClass[zone.zoneClass] ?? 10;
         const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
         if (dist > maxDist) {
@@ -126,7 +158,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Plan = zona's zoneClass
     const plan = zone.zoneClass as PlanKey;
 
     // Crea/recupera Stripe customer
@@ -144,21 +175,87 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Crea Stripe Price per questa zona
-    const stripePriceId = await createZoneStripePrice(
-      zone.name,
-      zone.id,
-      plan,
-      zone.monthlyPrice
-    );
+    // Price ID (seeded o on-the-fly)
+    const stripePriceId = await ensureZonePriceId(zone);
 
-    // Crea checkout session
+    /* ---------------------------------------------------------------- */
+    /*  BRANCH A — subscription esistente: aggiungi item                  */
+    /* ---------------------------------------------------------------- */
+    if (user.agency.stripeSubId) {
+      // Verifica che la sub sia realmente ancora attiva su Stripe
+      const sub = await stripe.subscriptions.retrieve(user.agency.stripeSubId);
+      if (sub.status === "active" || sub.status === "trialing") {
+        const itemId = await addZoneToSubscription({
+          subscriptionId: sub.id,
+          priceId: stripePriceId,
+          zoneId: zone.id,
+        });
+
+        // Upsert territorio inline (il webhook subscription.updated
+        // confermerà idempotentemente).
+        await prisma.territoryAssignment.upsert({
+          where: { agencyId_zoneId: { agencyId: user.agency.id, zoneId } },
+          create: {
+            agencyId: user.agency.id,
+            zoneId,
+            plan,
+            monthlyPrice: zone.monthlyPrice,
+            stripeItemId: itemId,
+            isActive: true,
+          },
+          update: {
+            isActive: true,
+            stripeItemId: itemId,
+            plan,
+            monthlyPrice: zone.monthlyPrice,
+          },
+        });
+
+        return NextResponse.json({
+          ok: true,
+          added: true,
+          zoneId,
+          message: "Zona aggiunta alla tua subscription.",
+        });
+      }
+      // Se la sub esiste ma non è active, procedi con nuova Checkout Session.
+    }
+
+    /* ---------------------------------------------------------------- */
+    /*  BRANCH B — prima zona: Checkout Session                           */
+    /* ---------------------------------------------------------------- */
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       line_items: [{ price: stripePriceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/territori?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/agenzia/territori?canceled=true`,
+      // Stripe Tax: abilitare su Dashboard prima di passare a live
+      // (quando attivo: automatic_tax.enabled=true + customer_update.address=auto)
+      tax_id_collection: { enabled: true },
+      customer_update: { name: "auto", address: "auto" },
+      billing_address_collection: "required",
+      custom_fields: [
+        {
+          key: "codice_destinatario",
+          label: { type: "custom", custom: "Codice destinatario SDI (7 caratteri)" },
+          type: "text",
+          optional: true,
+          text: { minimum_length: 6, maximum_length: 7 },
+        },
+        {
+          key: "pec",
+          label: { type: "custom", custom: "Indirizzo PEC" },
+          type: "text",
+          optional: true,
+        },
+      ],
+      subscription_data: {
+        metadata: {
+          agencyId: user.agency.id,
+          plan,
+        },
+      },
       metadata: {
         agencyId: user.agency.id,
         plan,

@@ -32,6 +32,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(adjacent.map(formatZone));
   }
 
+  const all = searchParams.get("all");
+  if (all) {
+    const zones = await prisma.zone.findMany({
+      where: { isActive: true },
+      include: {
+        territories: { where: { isActive: true }, select: { id: true } },
+      },
+      orderBy: [{ zoneClass: "asc" }, { name: "asc" }],
+    });
+    return NextResponse.json(zones.map(formatZone));
+  }
+
   if (!province && !region) {
     // Restituisci lista province/regioni disponibili
     const zones = await prisma.zone.findMany({

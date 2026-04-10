@@ -74,6 +74,30 @@ export async function createZoneStripePrice(
 }
 
 /* ------------------------------------------------------------------ */
+/*  Helper: aggiungi una zona a una subscription esistente             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Aggiunge un nuovo subscription item (zona) a una subscription esistente.
+ * Usato quando un'agenzia compra una 2ª/3ª zona avendo già una subscription attiva.
+ * Ritorna l'id del SubscriptionItem creato (da salvare su TerritoryAssignment.stripeItemId).
+ */
+export async function addZoneToSubscription(params: {
+  subscriptionId: string;
+  priceId: string;
+  zoneId: string;
+}): Promise<string> {
+  const item = await stripe.subscriptionItems.create({
+    subscription: params.subscriptionId,
+    price: params.priceId,
+    quantity: 1,
+    metadata: { zoneId: params.zoneId },
+    proration_behavior: "create_prorations",
+  });
+  return item.id;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Helper: determina fascia massima dai territori attivi              */
 /* ------------------------------------------------------------------ */
 

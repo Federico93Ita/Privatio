@@ -41,8 +41,9 @@ interface ZoneAvailable {
   municipalities: string[];
   marketScore: number;
   population: number;
-  prices: Record<string, number>;
-  slots: Record<string, { taken: number; max: number }>;
+  plan: string;
+  price: number;
+  slots: { taken: number; max: number };
 }
 
 interface RegionsData {
@@ -82,10 +83,26 @@ export default function TerritoriPage() {
     }
   }, [searchParams]);
 
-  // Carica territori
+  // Carica territori + zone della provincia dell'agenzia
   useEffect(() => {
-    fetchTerritories();
-    fetchRegions();
+    (async () => {
+      await fetchTerritories();
+      await fetchRegions();
+      // Carica zone in base alla provincia dell'agenzia loggata
+      try {
+        const res = await fetch("/api/dashboard/agency");
+        if (res.ok) {
+          const data = await res.json();
+          const prov = data?.agency?.province || data?.province;
+          if (prov) {
+            setSelectedProvince(prov);
+            await browseZones(prov);
+          }
+        }
+      } catch {
+        /* silent */
+      }
+    })();
   }, []);
 
   async function fetchTerritories() {
@@ -119,6 +136,7 @@ export default function TerritoriPage() {
       if (!res.ok) throw new Error();
       const data: ZoneAvailable[] = await res.json();
       setAvailableZones(data);
+      if (data.length > 0 && data[0].region) setSelectedRegion(data[0].region);
     } catch {
       setAvailableZones([]);
     } finally {
@@ -401,10 +419,12 @@ export default function TerritoriPage() {
                     </div>
                   </div>
 
-                  {/* Piani disponibili per questa zona */}
+                  {/* Piano unico per questa zona */}
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(zone.prices).map(([plan, price]) => {
-                      const slotInfo = zone.slots[plan];
+                    {(() => {
+                      const plan = zone.plan;
+                      const price = zone.price;
+                      const slotInfo = zone.slots;
                       const isFull = slotInfo && slotInfo.taken >= slotInfo.max;
                       const isAlreadyOwned = territories.some(
                         (t) => t.zone.id === zone.id && t.isActive
@@ -414,14 +434,14 @@ export default function TerritoriPage() {
                         <button
                           key={plan}
                           onClick={() => handleBuyZone(zone.id, plan)}
-                          disabled={isFull || isAlreadyOwned || actionLoading === zone.id}
+                          disabled={!!isFull || isAlreadyOwned || actionLoading === zone.id}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-colors ${
                             isFull || isAlreadyOwned
                               ? "bg-bg-soft border-border text-text-muted cursor-not-allowed"
                               : "border-primary/20 text-primary hover:bg-primary/5"
                           }`}
                         >
-                          <span className="font-medium">{PLAN_LABELS[plan]}</span>
+                          <span className="font-medium">{PLAN_LABELS[plan] || plan}</span>
                           <span>{formatPrice(price)}/m</span>
                           {slotInfo && (
                             <span
@@ -445,7 +465,7 @@ export default function TerritoriPage() {
                           )}
                         </button>
                       );
-                    })}
+                    })()}
                   </div>
                 </div>
               ))}

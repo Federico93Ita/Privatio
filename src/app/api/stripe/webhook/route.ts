@@ -23,6 +23,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Webhook signature verification failed" }, { status: 400 });
   }
 
+  /* ------------------------------------------------------------------ */
+  /*  Idempotency guard — una riga per eventId, unique constraint.       */
+  /*  Se l'evento è già stato elaborato, rispondiamo 200 senza effetti.  */
+  /* ------------------------------------------------------------------ */
+  try {
+    await prisma.stripeEventLog.create({
+      data: { eventId: event.id, type: event.type },
+    });
+  } catch {
+    // Unique violation → già visto, ignora.
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+
   switch (event.type) {
     /* -------------------------------------------------------------- */
     /*  Checkout completato — primo territorio acquistato               */
@@ -102,13 +115,28 @@ export async function POST(req: NextRequest) {
       });
 
       if (agency) {
-        const isActive = subscription.status === "active";
+        const isActive =
+          subscription.status === "active" || subscription.status === "trialing";
+
+        // Map Stripe status → BillingStatus
+        const billingStatus =
+          subscription.status === "active" || subscription.status === "trialing"
+            ? "ACTIVE"
+            : subscription.status === "past_due"
+              ? "PAST_DUE"
+              : subscription.status === "unpaid"
+                ? "UNPAID"
+                : subscription.status === "canceled" ||
+                    subscription.status === "incomplete_expired"
+                  ? "CANCELED"
+                  : "ACTIVE";
 
         await prisma.agency.update({
           where: { id: agency.id },
           data: {
             isActive,
             stripeSubId: subscription.id,
+            billingStatus,
           },
         });
 
@@ -117,6 +145,17 @@ export async function POST(req: NextRequest) {
           await prisma.territoryAssignment.updateMany({
             where: { agencyId: agency.id },
             data: { isActive: false },
+          });
+        }
+
+        // Notifica PAST_DUE all'agenzia
+        if (billingStatus === "PAST_DUE") {
+          await notifyAgency({
+            agencyId: agency.id,
+            type: "PAYMENT_FAILED",
+            title: "Pagamento in sospeso",
+            body: "Il tuo abbonamento è in stato past due. Aggiorna il metodo di pagamento per evitare la sospensione.",
+            href: "/dashboard/agenzia/fatturazione",
           });
         }
 
@@ -165,7 +204,11 @@ export async function POST(req: NextRequest) {
 
         await prisma.agency.update({
           where: { id: agency.id },
-          data: { isActive: false, stripeSubId: null },
+          data: {
+            isActive: false,
+            stripeSubId: null,
+            billingStatus: "CANCELED",
+          },
         });
 
         await sendEmail({
@@ -200,6 +243,11 @@ export async function POST(req: NextRequest) {
       });
 
       if (agency) {
+        await prisma.agency.update({
+          where: { id: agency.id },
+          data: { billingStatus: "PAST_DUE" },
+        });
+
         // In-app notification
         await notifyAgency({
           agencyId: agency.id,
@@ -228,6 +276,26 @@ export async function POST(req: NextRequest) {
               </div>
             </div>
           `,
+        });
+      }
+      break;
+    }
+
+    /* -------------------------------------------------------------- */
+    /*  Pagamento riuscito — reset eventuale PAST_DUE                   */
+    /* -------------------------------------------------------------- */
+    case "invoice.paid": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = invoice.customer as string;
+      if (!customerId) break;
+
+      const agency = await prisma.agency.findFirst({
+        where: { stripeCustomerId: customerId },
+      });
+      if (agency && agency.billingStatus !== "ACTIVE") {
+        await prisma.agency.update({
+          where: { id: agency.id },
+          data: { billingStatus: "ACTIVE", isActive: true },
         });
       }
       break;
