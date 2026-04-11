@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
-  PLAN_LABELS,
+  ZONE_TIER_SHORT,
   ZONE_CLASS_LABELS,
   ZONE_CLASS_COLORS,
 } from "@/lib/zone-constants";
@@ -44,10 +44,47 @@ interface ZoneAvailable {
   plan: string;
   price: number;
   slots: { taken: number; max: number };
+  adjacentZoneIds: string[];
 }
 
-interface RegionsData {
-  regions: Record<string, string[]>;
+type ZoneStatus = "owned" | "available" | "full" | "limit_reached";
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function formatPrice(cents: number): string {
+  return new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+  }).format(cents / 100);
+}
+
+function classifyZone(
+  zone: ZoneAvailable,
+  ownedZoneIds: Set<string>,
+  activeCount: number,
+  maxZones: number
+): ZoneStatus {
+  if (ownedZoneIds.has(zone.id)) return "owned";
+  if (zone.slots.taken >= zone.slots.max) return "full";
+  if (activeCount >= maxZones) return "limit_reached";
+  return "available";
+}
+
+function sortZones(zones: ZoneAvailable[], ownedZoneIds: Set<string>, activeCount: number, maxZones: number): ZoneAvailable[] {
+  const order: Record<ZoneStatus, number> = {
+    available: 0,
+    limit_reached: 1,
+    full: 2,
+    owned: 3,
+  };
+  return [...zones].sort((a, b) => {
+    const sa = classifyZone(a, ownedZoneIds, activeCount, maxZones);
+    const sb = classifyZone(b, ownedZoneIds, activeCount, maxZones);
+    if (order[sa] !== order[sb]) return order[sa] - order[sb];
+    return b.marketScore - a.marketScore;
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -57,103 +94,166 @@ interface RegionsData {
 export default function TerritoriPage() {
   const searchParams = useSearchParams();
 
+  // Core data
   const [territories, setTerritories] = useState<Territory[]>([]);
   const [currentPlan, setCurrentPlan] = useState<string>("BASE");
-  const [maxZones, setMaxZones] = useState(1);
+  const [maxZones, setMaxZones] = useState(3);
+  const [agencyProvince, setAgencyProvince] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Browser zone
+  // Zone lists
+  const [provinceZones, setProvinceZones] = useState<ZoneAvailable[]>([]);
+  const [adjacentZones, setAdjacentZones] = useState<ZoneAvailable[]>([]);
+  const [provinceLoading, setProvinceLoading] = useState(false);
+
+  // Search in other provinces
+  const [showOtherProvinces, setShowOtherProvinces] = useState(false);
   const [regions, setRegions] = useState<Record<string, string[]>>({});
-  const [selectedRegion, setSelectedRegion] = useState("");
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [availableZones, setAvailableZones] = useState<ZoneAvailable[]>([]);
-  const [browseLoading, setBrowseLoading] = useState(false);
+  const [searchRegion, setSearchRegion] = useState("");
+  const [searchProvince, setSearchProvince] = useState("");
+  const [searchZones, setSearchZones] = useState<ZoneAvailable[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
+  // Actions
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [banner, setBanner] = useState<{ type: "success" | "warning" | "error"; message: string } | null>(null);
+  const [banner, setBanner] = useState<{
+    type: "success" | "warning" | "error";
+    message: string;
+  } | null>(null);
 
-  // Banner post-checkout
+  // Derived
+  const activeCount = territories.filter((t) => t.isActive).length;
+  const ownedZoneIds = new Set(
+    territories.filter((t) => t.isActive).map((t) => t.zone.id)
+  );
+
+  /* ---------------------------------------------------------------- */
+  /*  Post-checkout banner                                             */
+  /* ---------------------------------------------------------------- */
+
   useEffect(() => {
     if (searchParams.get("success") === "true") {
-      setBanner({ type: "success", message: "Territorio acquistato con successo!" });
+      setBanner({
+        type: "success",
+        message: "Territorio acquistato con successo!",
+      });
       window.history.replaceState({}, "", "/dashboard/agenzia/territori");
     } else if (searchParams.get("canceled") === "true") {
-      setBanner({ type: "warning", message: "Acquisto annullato. Puoi riprovare quando vuoi." });
+      setBanner({
+        type: "warning",
+        message: "Acquisto annullato. Puoi riprovare quando vuoi.",
+      });
       window.history.replaceState({}, "", "/dashboard/agenzia/territori");
     }
   }, [searchParams]);
 
-  // Carica territori + zone della provincia dell'agenzia
-  useEffect(() => {
-    (async () => {
-      await fetchTerritories();
-      await fetchRegions();
-      // Carica zone in base alla provincia dell'agenzia loggata
-      try {
-        const res = await fetch("/api/dashboard/agency");
-        if (res.ok) {
-          const data = await res.json();
-          const prov = data?.agency?.province || data?.province;
-          if (prov) {
-            setSelectedProvince(prov);
-            await browseZones(prov);
-          }
-        }
-      } catch {
-        /* silent */
-      }
-    })();
-  }, []);
+  /* ---------------------------------------------------------------- */
+  /*  Data fetching                                                    */
+  /* ---------------------------------------------------------------- */
 
-  async function fetchTerritories() {
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
     try {
-      const res = await fetch("/api/dashboard/agency/territories");
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setTerritories(data.territories || []);
-      setCurrentPlan(data.plan);
-      setMaxZones(data.maxZones);
+      // Parallel: territories + agency profile
+      const [terRes, agRes] = await Promise.all([
+        fetch("/api/dashboard/agency/territories"),
+        fetch("/api/dashboard/agency"),
+      ]);
+
+      // Territories
+      let loadedTerritories: Territory[] = [];
+      if (terRes.ok) {
+        const terData = await terRes.json();
+        loadedTerritories = terData.territories || [];
+        setTerritories(loadedTerritories);
+        setCurrentPlan(terData.plan);
+        setMaxZones(terData.maxZones || 3);
+      }
+
+      // Agency province
+      let province = "";
+      if (agRes.ok) {
+        const agData = await agRes.json();
+        province = agData?.agency?.province || agData?.province || "";
+        setAgencyProvince(province);
+      }
+
+      setLoading(false);
+
+      // Now load province zones
+      if (province) {
+        setProvinceLoading(true);
+        try {
+          const zRes = await fetch(`/api/zones?province=${province}`);
+          if (zRes.ok) {
+            const zones: ZoneAvailable[] = await zRes.json();
+            setProvinceZones(zones);
+          }
+        } catch {
+          /* silent */
+        }
+        setProvinceLoading(false);
+      }
+
+      // Load adjacent zones (for each active territory)
+      const activeTerritories = loadedTerritories.filter((t) => t.isActive);
+      if (activeTerritories.length > 0 && activeTerritories.length < 3) {
+        const adjacentPromises = activeTerritories.map((t) =>
+          fetch(`/api/zones?adjacentTo=${t.zone.id}`)
+            .then((r) => (r.ok ? r.json() : []))
+            .catch(() => [])
+        );
+        const adjacentResults = await Promise.all(adjacentPromises);
+        const allAdjacent: ZoneAvailable[] = adjacentResults.flat();
+
+        // Deduplicate and remove zones already in province list or owned
+        const provinceIds = new Set(
+          provinceZones.map((z) => z.id)
+        );
+        // We need to re-check provinceZones here since it might not be set yet
+        // Use a fresh fetch approach: filter by what's NOT in the province
+        const seenIds = new Set<string>();
+        const uniqueAdjacent = allAdjacent.filter((z) => {
+          if (seenIds.has(z.id)) return false;
+          seenIds.add(z.id);
+          // Keep zones that aren't in the province set
+          return !provinceIds.has(z.id);
+        });
+
+        setAdjacentZones(uniqueAdjacent);
+      }
     } catch {
-      setBanner({ type: "error", message: "Errore nel caricamento dei territori." });
-    } finally {
+      setBanner({
+        type: "error",
+        message: "Errore nel caricamento dei territori.",
+      });
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchRegions() {
-    try {
-      const res = await fetch("/api/zones");
-      if (!res.ok) throw new Error();
-      const data: RegionsData = await res.json();
-      setRegions(data.regions || {});
-    } catch { /* silenzioso */ }
-  }
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
-  async function browseZones(province: string) {
-    setBrowseLoading(true);
-    try {
-      const res = await fetch(`/api/zones?province=${province}`);
-      if (!res.ok) throw new Error();
-      const data: ZoneAvailable[] = await res.json();
-      setAvailableZones(data);
-      if (data.length > 0 && data[0].region) setSelectedRegion(data[0].region);
-    } catch {
-      setAvailableZones([]);
-    } finally {
-      setBrowseLoading(false);
-    }
-  }
+  // Re-derive adjacent zones when province zones load
+  useEffect(() => {
+    if (provinceZones.length === 0) return;
+    const provinceIds = new Set(provinceZones.map((z) => z.id));
+    setAdjacentZones((prev) => prev.filter((z) => !provinceIds.has(z.id)));
+  }, [provinceZones]);
+
+  /* ---------------------------------------------------------------- */
+  /*  Actions                                                          */
+  /* ---------------------------------------------------------------- */
 
   async function handleBuyZone(zoneId: string, plan: string) {
     setActionLoading(zoneId);
     setBanner(null);
 
-    const activeCount = territories.filter((t) => t.isActive).length;
     const isFirstTerritory = activeCount === 0;
 
     try {
       if (isFirstTerritory) {
-        // Usa checkout per il primo territorio
         const res = await fetch("/api/stripe/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -166,7 +266,6 @@ export default function TerritoriPage() {
         }
         if (data.error) throw new Error(data.error);
       } else {
-        // Aggiungi a subscription esistente
         const res = await fetch("/api/dashboard/agency/territories", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -176,7 +275,6 @@ export default function TerritoriPage() {
         if (!res.ok) {
           const data = await res.json();
           if (data.error === "redirect_to_checkout") {
-            // Fallback a checkout
             const checkoutRes = await fetch("/api/stripe/checkout", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -191,14 +289,19 @@ export default function TerritoriPage() {
           throw new Error(data.error || "Errore nell'acquisto");
         }
 
-        setBanner({ type: "success", message: "Territorio aggiunto con successo!" });
-        await fetchTerritories();
-        await browseZones(selectedProvince);
+        setBanner({
+          type: "success",
+          message: "Territorio aggiunto con successo!",
+        });
+        await fetchAll();
       }
     } catch (err) {
       setBanner({
         type: "error",
-        message: err instanceof Error ? err.message : "Errore nell'acquisto del territorio.",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Errore nell'acquisto del territorio.",
       });
     } finally {
       setActionLoading(null);
@@ -206,7 +309,12 @@ export default function TerritoriPage() {
   }
 
   async function handleReleaseTerritory(territoryId: string) {
-    if (!confirm("Sei sicuro di voler rilasciare questo territorio? L'operazione è immediata.")) return;
+    if (
+      !confirm(
+        "Sei sicuro di voler rilasciare questo territorio? L'operazione è immediata."
+      )
+    )
+      return;
 
     setActionLoading(territoryId);
     setBanner(null);
@@ -224,23 +332,48 @@ export default function TerritoriPage() {
       }
 
       setBanner({ type: "success", message: "Territorio rilasciato." });
-      await fetchTerritories();
-      if (selectedProvince) await browseZones(selectedProvince);
+      await fetchAll();
     } catch (err) {
       setBanner({
         type: "error",
-        message: err instanceof Error ? err.message : "Errore nel rilascio del territorio.",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Errore nel rilascio del territorio.",
       });
     } finally {
       setActionLoading(null);
     }
   }
 
-  function formatPrice(cents: number): string {
-    return new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(cents / 100);
+  async function handleSearchProvince(province: string) {
+    setSearchProvince(province);
+    if (!province) {
+      setSearchZones([]);
+      return;
+    }
+    setSearchLoading(true);
+    try {
+      const res = await fetch(`/api/zones?province=${province}`);
+      if (res.ok) setSearchZones(await res.json());
+    } catch {
+      setSearchZones([]);
+    }
+    setSearchLoading(false);
   }
 
-  const activeCount = territories.filter((t) => t.isActive).length;
+  async function loadRegions() {
+    if (Object.keys(regions).length > 0) return;
+    try {
+      const res = await fetch("/api/zones");
+      if (res.ok) {
+        const data = await res.json();
+        setRegions(data.regions || {});
+      }
+    } catch {
+      /* silent */
+    }
+  }
 
   /* ================================================================ */
   /*  Render                                                          */
@@ -248,15 +381,12 @@ export default function TerritoriPage() {
 
   return (
     <DashboardLayout role="agency">
-      <div className="space-y-8">
+      <div className="max-w-4xl space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-medium text-text">I tuoi Territori</h1>
-          <p className="text-text-muted mt-1">
-            Gestisci le zone in cui operi. Piano attuale:{" "}
-            <span className="font-medium text-primary">{PLAN_LABELS[currentPlan] || currentPlan}</span>
-            {" — "}
-            {activeCount}/{maxZones} zone attive
+          <h1 className="text-2xl font-heading text-[#0B1D3A]">Territori</h1>
+          <p className="text-sm text-[#0B1D3A]/50 mt-1">
+            Gestisci le zone in cui operi
           </p>
         </div>
 
@@ -265,29 +395,88 @@ export default function TerritoriPage() {
           <div
             className={`p-4 rounded-xl border text-sm ${
               banner.type === "success"
-                ? "bg-success/5 border-success/15 text-success"
+                ? "bg-green-50 border-green-200 text-green-800"
                 : banner.type === "warning"
                 ? "bg-amber-50 border-amber-200 text-amber-800"
-                : "bg-error/5 border-error/15 text-error"
+                : "bg-red-50 border-red-200 text-red-800"
             }`}
           >
             {banner.message}
           </div>
         )}
 
-        {/* Territori attivi */}
-        <section>
-          <h2 className="text-lg font-medium text-text mb-4">Territori Attivi</h2>
+        {/* ────────────────────────────────────────────────────────── */}
+        {/*  SEZIONE 1 — I tuoi territori                             */}
+        {/* ────────────────────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-heading text-[#0B1D3A]">
+              I tuoi territori
+            </h2>
+            {/* Slot indicator */}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[...Array(maxZones)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-3 h-3 rounded-full ${
+                      i < activeCount
+                        ? "bg-[#C9A84C]"
+                        : "bg-[#0B1D3A]/10"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-[#0B1D3A]/40">
+                {activeCount}/{maxZones} zone attive
+              </span>
+            </div>
+          </div>
+
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : activeCount === 0 ? (
-            <div className="bg-bg-soft rounded-xl border border-border p-8 text-center">
-              <p className="text-text-muted">Nessun territorio attivo.</p>
-              <p className="text-text-muted text-sm mt-1">
-                Esplora le zone disponibili qui sotto per iniziare.
+            <div className="text-center py-10">
+              <svg
+                className="w-12 h-12 text-[#0B1D3A]/10 mx-auto mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                />
+              </svg>
+              <h3 className="font-heading text-[#0B1D3A] text-base mb-1">
+                Non hai ancora nessun territorio
+              </h3>
+              <p className="text-sm text-[#0B1D3A]/40 max-w-sm mx-auto">
+                Scegli la tua prima zona operativa qui sotto. Potrai attivare
+                fino a {maxZones} zone nella tua area.
               </p>
+              <svg
+                className="w-5 h-5 text-[#C9A84C] mx-auto mt-4 animate-bounce"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
+              </svg>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -296,29 +485,32 @@ export default function TerritoriPage() {
                 .map((t) => (
                   <div
                     key={t.id}
-                    className="bg-white rounded-xl border border-border p-5 space-y-3"
+                    className="rounded-xl border border-green-200 bg-green-50/30 p-4 space-y-3"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-medium text-text">{t.zone.name}</h3>
-                        <p className="text-xs text-text-muted mt-0.5">
+                        <h3 className="font-medium text-[#0B1D3A] text-sm">
+                          {t.zone.name}
+                        </h3>
+                        <p className="text-xs text-[#0B1D3A]/40 mt-0.5">
                           {t.zone.province} — {t.zone.region}
                         </p>
                       </div>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                           ZONE_CLASS_COLORS[t.zone.zoneClass] || "bg-gray-100"
                         }`}
                       >
-                        {ZONE_CLASS_LABELS[t.zone.zoneClass] || t.zone.zoneClass}
+                        {ZONE_TIER_SHORT[t.zone.zoneClass] || t.zone.zoneClass}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-muted">
-                        Piano: <span className="text-text">{PLAN_LABELS[t.plan]}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-green-700 font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        Attiva
                       </span>
-                      <span className="font-medium text-text">
+                      <span className="text-sm font-semibold text-[#0B1D3A]">
                         {formatPrice(t.monthlyPrice)}/mese
                       </span>
                     </div>
@@ -326,9 +518,9 @@ export default function TerritoriPage() {
                     <button
                       onClick={() => handleReleaseTerritory(t.id)}
                       disabled={actionLoading === t.id}
-                      className="w-full py-2 text-sm text-error border border-error/20 rounded-lg hover:bg-error/5 transition-colors disabled:opacity-50"
+                      className="w-full py-2 text-xs text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
                     >
-                      {actionLoading === t.id ? "Rilascio..." : "Rilascia territorio"}
+                      {actionLoading === t.id ? "Rilascio..." : "Rilascia"}
                     </button>
                   </div>
                 ))}
@@ -336,151 +528,328 @@ export default function TerritoriPage() {
           )}
         </section>
 
-        {/* Divider */}
-        <div className="border-t border-border" />
-
-        {/* Browser zone */}
-        <section>
-          <h2 className="text-lg font-medium text-text mb-4">Esplora Zone Disponibili</h2>
-
-          <div className="flex flex-wrap gap-3 mb-6">
-            <select
-              value={selectedRegion}
-              onChange={(e) => {
-                setSelectedRegion(e.target.value);
-                setSelectedProvince("");
-                setAvailableZones([]);
-              }}
-              className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/30"
-            >
-              <option value="">Seleziona regione</option>
-              {Object.keys(regions)
-                .sort()
-                .map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-            </select>
-
-            {selectedRegion && regions[selectedRegion] && (
-              <select
-                value={selectedProvince}
-                onChange={(e) => {
-                  setSelectedProvince(e.target.value);
-                  if (e.target.value) browseZones(e.target.value);
-                  else setAvailableZones([]);
-                }}
-                className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary/30"
-              >
-                <option value="">Seleziona provincia</option>
-                {regions[selectedRegion].sort().map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+        {/* ────────────────────────────────────────────────────────── */}
+        {/*  SEZIONE 2 — Zone disponibili nella tua provincia          */}
+        {/* ────────────────────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white p-6">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-lg font-heading text-[#0B1D3A]">
+              Zone disponibili
+            </h2>
+            {agencyProvince && (
+              <span className="text-xs text-[#0B1D3A]/30 bg-[#0B1D3A]/5 px-2.5 py-1 rounded-full">
+                Provincia di {agencyProvince}
+              </span>
             )}
           </div>
+          <p className="text-sm text-[#0B1D3A]/40 mb-5">
+            Zone acquistabili nella tua provincia — seleziona per attivare
+          </p>
 
-          {browseLoading ? (
+          {loading || provinceLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : availableZones.length > 0 ? (
-            <div className="space-y-3">
-              {availableZones.map((zone) => (
-                <div
-                  key={zone.id}
-                  className="bg-white rounded-xl border border-border p-5"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-text">{zone.name}</h3>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${
-                            ZONE_CLASS_COLORS[zone.zoneClass] || "bg-gray-100"
-                          }`}
-                        >
-                          {ZONE_CLASS_LABELS[zone.zoneClass] || zone.zoneClass}
-                        </span>
-                      </div>
-                      {zone.municipalities.length > 1 && (
-                        <p className="text-xs text-text-muted mt-1">
-                          Comuni: {zone.municipalities.slice(0, 5).join(", ")}
-                          {zone.municipalities.length > 5 && ` +${zone.municipalities.length - 5}`}
-                        </p>
-                      )}
-                    </div>
-                    <div className="text-right text-xs text-text-muted">
-                      <p>Market Score: {zone.marketScore}/10</p>
-                      <p>{zone.population.toLocaleString("it-IT")} ab.</p>
-                    </div>
-                  </div>
-
-                  {/* Piano unico per questa zona */}
-                  <div className="flex flex-wrap gap-2">
-                    {(() => {
-                      const plan = zone.plan;
-                      const price = zone.price;
-                      const slotInfo = zone.slots;
-                      const isFull = slotInfo && slotInfo.taken >= slotInfo.max;
-                      const isAlreadyOwned = territories.some(
-                        (t) => t.zone.id === zone.id && t.isActive
-                      );
-
-                      return (
-                        <button
-                          key={plan}
-                          onClick={() => handleBuyZone(zone.id, plan)}
-                          disabled={!!isFull || isAlreadyOwned || actionLoading === zone.id}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-colors ${
-                            isFull || isAlreadyOwned
-                              ? "bg-bg-soft border-border text-text-muted cursor-not-allowed"
-                              : "border-primary/20 text-primary hover:bg-primary/5"
-                          }`}
-                        >
-                          <span className="font-medium">{PLAN_LABELS[plan] || plan}</span>
-                          <span>{formatPrice(price)}/m</span>
-                          {slotInfo && (
-                            <span
-                              className={`px-1.5 py-0.5 rounded text-[10px] ${
-                                isFull
-                                  ? "bg-error/10 text-error"
-                                  : slotInfo.max - slotInfo.taken === 1
-                                  ? "bg-amber-50 text-amber-700"
-                                  : "bg-success/10 text-success"
-                              }`}
-                            >
-                              {isFull
-                                ? "Esaurito"
-                                : `${slotInfo.max - slotInfo.taken}/${slotInfo.max}`}
-                            </span>
-                          )}
-                          {isAlreadyOwned && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-primary/10 text-primary">
-                              Attivo
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })()}
-                  </div>
-                </div>
-              ))}
+          ) : provinceZones.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-[#0B1D3A]/40">
+                Nessuna zona disponibile nella tua provincia.
+              </p>
             </div>
-          ) : selectedProvince ? (
-            <p className="text-text-muted text-center py-8">
-              Nessuna zona disponibile per questa provincia.
-            </p>
           ) : (
-            <p className="text-text-muted text-center py-8">
-              Seleziona una regione e una provincia per esplorare le zone disponibili.
-            </p>
+            <div className="space-y-3">
+              {sortZones(provinceZones, ownedZoneIds, activeCount, maxZones).map(
+                (zone) => (
+                  <ZoneCard
+                    key={zone.id}
+                    zone={zone}
+                    status={classifyZone(
+                      zone,
+                      ownedZoneIds,
+                      activeCount,
+                      maxZones
+                    )}
+                    actionLoading={actionLoading}
+                    onBuy={handleBuyZone}
+                  />
+                )
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* ────────────────────────────────────────────────────────── */}
+        {/*  SEZIONE 3 — Zone adiacenti                                */}
+        {/* ────────────────────────────────────────────────────────── */}
+        {activeCount > 0 &&
+          activeCount < maxZones &&
+          adjacentZones.length > 0 && (
+            <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white p-6">
+              <h2 className="text-lg font-heading text-[#0B1D3A] mb-1">
+                Espandi in zone adiacenti
+              </h2>
+              <p className="text-sm text-[#0B1D3A]/40 mb-5">
+                Zone vicine ai tuoi territori attuali
+              </p>
+
+              <div className="space-y-3">
+                {sortZones(
+                  adjacentZones,
+                  ownedZoneIds,
+                  activeCount,
+                  maxZones
+                ).map((zone) => (
+                  <ZoneCard
+                    key={zone.id}
+                    zone={zone}
+                    status={classifyZone(
+                      zone,
+                      ownedZoneIds,
+                      activeCount,
+                      maxZones
+                    )}
+                    actionLoading={actionLoading}
+                    onBuy={handleBuyZone}
+                    showProvince
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+        {/* ────────────────────────────────────────────────────────── */}
+        {/*  SEZIONE 4 — Cerca in altre province (collassata)          */}
+        {/* ────────────────────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white overflow-hidden">
+          <button
+            onClick={() => {
+              setShowOtherProvinces(!showOtherProvinces);
+              if (!showOtherProvinces) loadRegions();
+            }}
+            className="w-full p-5 flex items-center justify-between text-left hover:bg-[#0B1D3A]/[0.02] transition-colors"
+          >
+            <div>
+              <h2 className="text-base font-heading text-[#0B1D3A]">
+                Cerca in altre province
+              </h2>
+              <p className="text-xs text-[#0B1D3A]/30 mt-0.5">
+                Per agenzie vicine al confine provinciale
+              </p>
+            </div>
+            <svg
+              className={`w-5 h-5 text-[#0B1D3A]/30 transition-transform ${
+                showOtherProvinces ? "rotate-180" : ""
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {showOtherProvinces && (
+            <div className="px-5 pb-5 space-y-4 border-t border-[#0B1D3A]/5 pt-4">
+              <div className="flex flex-wrap gap-3">
+                <select
+                  value={searchRegion}
+                  onChange={(e) => {
+                    setSearchRegion(e.target.value);
+                    setSearchProvince("");
+                    setSearchZones([]);
+                  }}
+                  className="px-3 py-2 border border-[#0B1D3A]/10 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]"
+                >
+                  <option value="">Seleziona regione</option>
+                  {Object.keys(regions)
+                    .sort()
+                    .map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                </select>
+
+                {searchRegion && regions[searchRegion] && (
+                  <select
+                    value={searchProvince}
+                    onChange={(e) => handleSearchProvince(e.target.value)}
+                    className="px-3 py-2 border border-[#0B1D3A]/10 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]"
+                  >
+                    <option value="">Seleziona provincia</option>
+                    {regions[searchRegion].sort().map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {searchLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-5 h-5 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : searchZones.length > 0 ? (
+                <div className="space-y-3">
+                  {sortZones(
+                    searchZones,
+                    ownedZoneIds,
+                    activeCount,
+                    maxZones
+                  ).map((zone) => (
+                    <ZoneCard
+                      key={zone.id}
+                      zone={zone}
+                      status={classifyZone(
+                        zone,
+                        ownedZoneIds,
+                        activeCount,
+                        maxZones
+                      )}
+                      actionLoading={actionLoading}
+                      onBuy={handleBuyZone}
+                      showProvince
+                    />
+                  ))}
+                </div>
+              ) : searchProvince ? (
+                <p className="text-sm text-[#0B1D3A]/30 text-center py-6">
+                  Nessuna zona disponibile in questa provincia.
+                </p>
+              ) : null}
+            </div>
           )}
         </section>
       </div>
     </DashboardLayout>
+  );
+}
+
+/* ================================================================== */
+/*  ZoneCard — Componente riutilizzabile per le card zona              */
+/* ================================================================== */
+
+function ZoneCard({
+  zone,
+  status,
+  actionLoading,
+  onBuy,
+  showProvince = false,
+}: {
+  zone: ZoneAvailable;
+  status: ZoneStatus;
+  actionLoading: string | null;
+  onBuy: (zoneId: string, plan: string) => void;
+  showProvince?: boolean;
+}) {
+  const isDisabled =
+    status === "owned" || status === "full" || status === "limit_reached";
+  const slotsRemaining = zone.slots.max - zone.slots.taken;
+
+  return (
+    <div
+      className={`rounded-xl border p-4 transition-colors ${
+        status === "owned"
+          ? "border-green-200 bg-green-50/30"
+          : status === "full" || status === "limit_reached"
+          ? "border-[#0B1D3A]/5 bg-[#0B1D3A]/[0.02] opacity-60"
+          : "border-[#0B1D3A]/10 bg-white hover:border-[#C9A84C]/30"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        {/* Left: zone info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-medium text-[#0B1D3A] text-sm">
+              {zone.name}
+            </h3>
+            <span
+              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                ZONE_CLASS_COLORS[zone.zoneClass] || "bg-gray-100"
+              }`}
+            >
+              {ZONE_TIER_SHORT[zone.zoneClass] || zone.zoneClass}
+            </span>
+            {showProvince && (
+              <span className="text-[10px] text-[#0B1D3A]/30 bg-[#0B1D3A]/5 px-1.5 py-0.5 rounded">
+                {zone.province}
+              </span>
+            )}
+          </div>
+
+          {/* Municipalities */}
+          {zone.municipalities.length > 0 && (
+            <p className="text-xs text-[#0B1D3A]/30 mt-1">
+              {zone.municipalities.slice(0, 5).join(", ")}
+              {zone.municipalities.length > 5 &&
+                ` +${zone.municipalities.length - 5} altri`}
+            </p>
+          )}
+
+          {/* Stats row */}
+          <div className="flex items-center gap-4 mt-2">
+            <span className="text-xs text-[#0B1D3A]/40">
+              Score {zone.marketScore}/10
+            </span>
+            <span className="text-xs text-[#0B1D3A]/40">
+              {zone.population.toLocaleString("it-IT")} ab.
+            </span>
+            {/* Slot indicator */}
+            <span
+              className={`text-xs font-medium ${
+                status === "full"
+                  ? "text-red-500"
+                  : slotsRemaining === 1
+                  ? "text-amber-600"
+                  : "text-green-600"
+              }`}
+            >
+              {status === "full"
+                ? "Esaurita"
+                : `${slotsRemaining} ${slotsRemaining === 1 ? "posto libero" : "posti liberi"} su ${zone.slots.max}`}
+            </span>
+          </div>
+        </div>
+
+        {/* Right: price + action */}
+        <div className="text-right shrink-0 flex flex-col items-end gap-2">
+          <div>
+            <p className="text-base font-semibold text-[#0B1D3A]">
+              {formatPrice(zone.price)}
+            </p>
+            <p className="text-[10px] text-[#0B1D3A]/30">al mese</p>
+          </div>
+
+          {status === "owned" ? (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-100 px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              Attiva
+            </span>
+          ) : status === "full" ? (
+            <span className="text-xs text-red-400 bg-red-50 px-2.5 py-1 rounded-full">
+              Esaurita
+            </span>
+          ) : status === "limit_reached" ? (
+            <span className="text-xs text-[#0B1D3A]/30 bg-[#0B1D3A]/5 px-2.5 py-1 rounded-full">
+              Limite raggiunto
+            </span>
+          ) : (
+            <button
+              onClick={() => onBuy(zone.id, zone.plan)}
+              disabled={actionLoading === zone.id}
+              className="px-4 py-1.5 text-xs font-semibold text-white bg-[#C9A84C] rounded-lg hover:bg-[#D4B65E] transition-colors disabled:opacity-50"
+            >
+              {actionLoading === zone.id ? "..." : "Acquista"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
