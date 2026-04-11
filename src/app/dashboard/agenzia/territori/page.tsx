@@ -86,85 +86,6 @@ const RADIUS_BY_CLASS: Record<string, number> = {
   BASE: 15,
 };
 
-/**
- * Finds the agency's "home zone" — the nearest zone matching the agency's city.
- * Mirrors the server-side resolveZoneForProperty logic.
- */
-function findHomeZone(
-  zones: ZoneAvailable[],
-  agencyCity: string,
-  agencyLat: number,
-  agencyLng: number
-): ZoneAvailable | null {
-  if (zones.length === 0) return null;
-
-  // 1. Exact city match (case-insensitive)
-  const cityNorm = agencyCity.trim().toLowerCase();
-  const cityMatches = zones.filter(
-    (z) => z.city?.trim().toLowerCase() === cityNorm
-  );
-
-  // If multiple city matches, pick the nearest one
-  if (cityMatches.length > 0) {
-    let nearest = cityMatches[0];
-    let minDist = Infinity;
-    for (const z of cityMatches) {
-      if (z.lat && z.lng) {
-        const d = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
-        if (d < minDist) {
-          minDist = d;
-          nearest = z;
-        }
-      }
-    }
-    return nearest;
-  }
-
-  // 2. Municipality match
-  const municipalityMatch = zones.find((z) =>
-    z.municipalities.some((m) => m.trim().toLowerCase() === cityNorm)
-  );
-  if (municipalityMatch) return municipalityMatch;
-
-  // 3. Nearest by distance
-  let nearest: ZoneAvailable | null = null;
-  let minDist = Infinity;
-  for (const z of zones) {
-    if (z.lat && z.lng) {
-      const d = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
-      if (d < minDist) {
-        minDist = d;
-        nearest = z;
-      }
-    }
-  }
-  return nearest;
-}
-
-/**
- * Filters zones to only those the agency can actually purchase:
- * same class as home zone + within distance radius.
- */
-function filterEligibleZones(
-  zones: ZoneAvailable[],
-  homeZone: ZoneAvailable,
-  agencyLat: number,
-  agencyLng: number
-): ZoneAvailable[] {
-  const maxDist = RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10;
-
-  return zones.filter((z) => {
-    // Must be same class
-    if (z.zoneClass !== homeZone.zoneClass) return false;
-    // Check distance
-    if (z.lat && z.lng) {
-      const dist = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
-      if (dist > maxDist) return false;
-    }
-    return true;
-  });
-}
-
 function classifyZone(
   zone: ZoneAvailable,
   ownedZoneIds: Set<string>,
@@ -216,8 +137,9 @@ export default function TerritoriPage() {
   const [agencyLat, setAgencyLat] = useState<number>(0);
   const [agencyLng, setAgencyLng] = useState<number>(0);
 
-  // All province zones (unfiltered)
-  const [allProvinceZones, setAllProvinceZones] = useState<ZoneAvailable[]>([]);
+  // Zones already filtered server-side (class + distance)
+  const [nearbyZones, setNearbyZones] = useState<ZoneAvailable[]>([]);
+  const [homeZoneId, setHomeZoneId] = useState<string | null>(null);
   const [adjacentZones, setAdjacentZones] = useState<ZoneAvailable[]>([]);
   const [provinceLoading, setProvinceLoading] = useState(false);
 
@@ -234,21 +156,11 @@ export default function TerritoriPage() {
     territories.filter((t) => t.isActive).map((t) => t.zone.id)
   );
 
-  // Home zone + eligible zones (computed from all province zones)
+  // Home zone object (resolved from server-side homeZoneId)
   const homeZone = useMemo(() => {
-    if (!agencyCity || !agencyLat || allProvinceZones.length === 0) return null;
-    return findHomeZone(allProvinceZones, agencyCity, agencyLat, agencyLng);
-  }, [allProvinceZones, agencyCity, agencyLat, agencyLng]);
-
-  const eligibleZones = useMemo(() => {
-    if (!homeZone || !agencyLat) return allProvinceZones;
-    return filterEligibleZones(
-      allProvinceZones,
-      homeZone,
-      agencyLat,
-      agencyLng
-    );
-  }, [allProvinceZones, homeZone, agencyLat, agencyLng]);
+    if (!homeZoneId || nearbyZones.length === 0) return null;
+    return nearbyZones.find((z) => z.id === homeZoneId) ?? null;
+  }, [nearbyZones, homeZoneId]);
 
   /* ---------------------------------------------------------------- */
   /*  Post-checkout banner                                             */
@@ -292,26 +204,31 @@ export default function TerritoriPage() {
       }
 
       let province = "";
+      let city = "";
       if (agRes.ok) {
         const agData = await agRes.json();
         const ag = agData?.agency || agData;
         province = ag?.province || "";
+        city = ag?.city || "";
         setAgencyProvince(province);
-        setAgencyCity(ag?.city || "");
+        setAgencyCity(city);
         setAgencyLat(ag?.lat || 0);
         setAgencyLng(ag?.lng || 0);
       }
 
       setLoading(false);
 
-      // Load province zones
-      if (province) {
+      // Load nearby zones (server-side filtered by class + distance)
+      if (province && city) {
         setProvinceLoading(true);
         try {
-          const zRes = await fetch(`/api/zones?province=${province}`);
+          const zRes = await fetch(
+            `/api/zones/nearby?city=${encodeURIComponent(city)}&province=${province}`
+          );
           if (zRes.ok) {
-            const zones: ZoneAvailable[] = await zRes.json();
-            setAllProvinceZones(zones);
+            const data = await zRes.json();
+            setNearbyZones(data.zones || []);
+            setHomeZoneId(data.homeZoneId || null);
           }
         } catch {
           /* silent */
@@ -352,13 +269,12 @@ export default function TerritoriPage() {
     fetchAll();
   }, [fetchAll]);
 
-  // Filter adjacent zones: remove those already in eligible list
+  // Filter adjacent zones: remove duplicates + apply class/distance filter
   const filteredAdjacentZones = useMemo(() => {
-    const eligibleIds = new Set(eligibleZones.map((z) => z.id));
-    // Also filter by class + distance like eligible zones
+    const nearbyIds = new Set(nearbyZones.map((z) => z.id));
     if (!homeZone || !agencyLat) return [];
     return adjacentZones.filter((z) => {
-      if (eligibleIds.has(z.id)) return false;
+      if (nearbyIds.has(z.id)) return false;
       if (z.zoneClass !== homeZone.zoneClass) return false;
       if (z.lat && z.lng) {
         const maxDist = RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10;
@@ -367,7 +283,7 @@ export default function TerritoriPage() {
       }
       return true;
     });
-  }, [adjacentZones, eligibleZones, homeZone, agencyLat, agencyLng]);
+  }, [adjacentZones, nearbyZones, homeZone, agencyLat, agencyLng]);
 
   /* ---------------------------------------------------------------- */
   /*  Actions                                                          */
@@ -677,7 +593,7 @@ export default function TerritoriPage() {
             <div className="flex items-center justify-center py-12">
               <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : eligibleZones.length === 0 ? (
+          ) : nearbyZones.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-sm text-[#0B1D3A]/40">
                 Nessuna zona disponibile nella tua area.
@@ -686,7 +602,7 @@ export default function TerritoriPage() {
           ) : (
             <div className="space-y-3">
               {sortZones(
-                eligibleZones,
+                nearbyZones,
                 ownedZoneIds,
                 activeCount,
                 maxZones
