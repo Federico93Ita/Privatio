@@ -106,13 +106,6 @@ export default function TerritoriPage() {
   const [adjacentZones, setAdjacentZones] = useState<ZoneAvailable[]>([]);
   const [provinceLoading, setProvinceLoading] = useState(false);
 
-  // Search in other provinces
-  const [showOtherProvinces, setShowOtherProvinces] = useState(false);
-  const [regions, setRegions] = useState<Record<string, string[]>>({});
-  const [searchRegion, setSearchRegion] = useState("");
-  const [searchProvince, setSearchProvince] = useState("");
-  const [searchZones, setSearchZones] = useState<ZoneAvailable[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
 
   // Actions
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -346,34 +339,6 @@ export default function TerritoriPage() {
     }
   }
 
-  async function handleSearchProvince(province: string) {
-    setSearchProvince(province);
-    if (!province) {
-      setSearchZones([]);
-      return;
-    }
-    setSearchLoading(true);
-    try {
-      const res = await fetch(`/api/zones?province=${province}`);
-      if (res.ok) setSearchZones(await res.json());
-    } catch {
-      setSearchZones([]);
-    }
-    setSearchLoading(false);
-  }
-
-  async function loadRegions() {
-    if (Object.keys(regions).length > 0) return;
-    try {
-      const res = await fetch("/api/zones");
-      if (res.ok) {
-        const data = await res.json();
-        setRegions(data.regions || {});
-      }
-    } catch {
-      /* silent */
-    }
-  }
 
   /* ================================================================ */
   /*  Render                                                          */
@@ -617,115 +582,6 @@ export default function TerritoriPage() {
             </section>
           )}
 
-        {/* ────────────────────────────────────────────────────────── */}
-        {/*  SEZIONE 4 — Cerca in altre province (collassata)          */}
-        {/* ────────────────────────────────────────────────────────── */}
-        <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white overflow-hidden">
-          <button
-            onClick={() => {
-              setShowOtherProvinces(!showOtherProvinces);
-              if (!showOtherProvinces) loadRegions();
-            }}
-            className="w-full p-5 flex items-center justify-between text-left hover:bg-[#0B1D3A]/[0.02] transition-colors"
-          >
-            <div>
-              <h2 className="text-base font-heading text-[#0B1D3A]">
-                Cerca in altre province
-              </h2>
-              <p className="text-xs text-[#0B1D3A]/30 mt-0.5">
-                Per agenzie vicine al confine provinciale
-              </p>
-            </div>
-            <svg
-              className={`w-5 h-5 text-[#0B1D3A]/30 transition-transform ${
-                showOtherProvinces ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-
-          {showOtherProvinces && (
-            <div className="px-5 pb-5 space-y-4 border-t border-[#0B1D3A]/5 pt-4">
-              <div className="flex flex-wrap gap-3">
-                <select
-                  value={searchRegion}
-                  onChange={(e) => {
-                    setSearchRegion(e.target.value);
-                    setSearchProvince("");
-                    setSearchZones([]);
-                  }}
-                  className="px-3 py-2 border border-[#0B1D3A]/10 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]"
-                >
-                  <option value="">Seleziona regione</option>
-                  {Object.keys(regions)
-                    .sort()
-                    .map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                </select>
-
-                {searchRegion && regions[searchRegion] && (
-                  <select
-                    value={searchProvince}
-                    onChange={(e) => handleSearchProvince(e.target.value)}
-                    className="px-3 py-2 border border-[#0B1D3A]/10 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/30 focus:border-[#C9A84C]"
-                  >
-                    <option value="">Seleziona provincia</option>
-                    {regions[searchRegion].sort().map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {searchLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-5 h-5 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : searchZones.length > 0 ? (
-                <div className="space-y-3">
-                  {sortZones(
-                    searchZones,
-                    ownedZoneIds,
-                    activeCount,
-                    maxZones
-                  ).map((zone) => (
-                    <ZoneCard
-                      key={zone.id}
-                      zone={zone}
-                      status={classifyZone(
-                        zone,
-                        ownedZoneIds,
-                        activeCount,
-                        maxZones
-                      )}
-                      actionLoading={actionLoading}
-                      onBuy={handleBuyZone}
-                      showProvince
-                    />
-                  ))}
-                </div>
-              ) : searchProvince ? (
-                <p className="text-sm text-[#0B1D3A]/30 text-center py-6">
-                  Nessuna zona disponibile in questa provincia.
-                </p>
-              ) : null}
-            </div>
-          )}
-        </section>
       </div>
     </DashboardLayout>
   );
