@@ -6,135 +6,20 @@ import Image from "next/image";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { formatPrice, getPropertyTypeLabel, getStatusLabel } from "@/lib/utils";
 
-const ENERGY_CLASSES = ["A4", "A3", "A2", "A1", "B", "C", "D", "E", "F", "G"];
-const STATO_OPTIONS = ["Nuovo", "Ottimo", "Buono", "Da ristrutturare"];
-const RISCALDAMENTO_OPTIONS = ["Autonomo", "Centralizzato", "Pavimento radiante", "Assente"];
-
-export default function SellerPropertyEditPage() {
+export default function SellerPropertyViewPage() {
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
-
-  // Editable fields
-  const [price, setPrice] = useState(0);
-  const [description, setDescription] = useState("");
-  const [rooms, setRooms] = useState(0);
-  const [bathrooms, setBathrooms] = useState(0);
-  const [surface, setSurface] = useState(0);
-  const [floor, setFloor] = useState<number | null>(null);
-  const [totalFloors, setTotalFloors] = useState<number | null>(null);
-  const [hasGarage, setHasGarage] = useState(false);
-  const [hasGarden, setHasGarden] = useState(false);
-  const [hasBalcony, setHasBalcony] = useState(false);
-  const [hasElevator, setHasElevator] = useState(false);
-  const [hasParkingSpace, setHasParkingSpace] = useState(false);
-  const [hasCellar, setHasCellar] = useState(false);
-  const [hasTerrace, setHasTerrace] = useState(false);
-  const [hasPool, setHasPool] = useState(false);
-  const [hasAirConditioning, setHasAirConditioning] = useState(false);
-  const [isFurnished, setIsFurnished] = useState(false);
-  const [hasConcierge, setHasConcierge] = useState(false);
-  const [hasAlarm, setHasAlarm] = useState(false);
-  const [energyClass, setEnergyClass] = useState<string | null>(null);
-  const [condominiumFees, setCondominiumFees] = useState<number | null>(null);
-  const [extraCosts, setExtraCosts] = useState("");
-  const [condition, setCondition] = useState<string | null>(null);
-  const [heatingType, setHeatingType] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/dashboard/seller/property")
       .then((r) => r.json())
       .then((data) => {
-        if (data.property) {
-          const p = data.property;
-          setProperty(p);
-          setPrice(p.price);
-          setDescription(p.description || "");
-          setRooms(p.rooms);
-          setBathrooms(p.bathrooms);
-          setSurface(p.surface);
-          setFloor(p.floor);
-          setTotalFloors(p.totalFloors);
-          setHasGarage(p.hasGarage);
-          setHasGarden(p.hasGarden);
-          setHasBalcony(p.hasBalcony);
-          setHasElevator(p.hasElevator);
-          setHasParkingSpace(p.hasParkingSpace ?? false);
-          setHasCellar(p.hasCellar ?? false);
-          setHasTerrace(p.hasTerrace ?? false);
-          setHasPool(p.hasPool ?? false);
-          setHasAirConditioning(p.hasAirConditioning ?? false);
-          setIsFurnished(p.isFurnished ?? false);
-          setHasConcierge(p.hasConcierge ?? false);
-          setHasAlarm(p.hasAlarm ?? false);
-          setEnergyClass(p.energyClass);
-          setCondominiumFees(p.condominiumFees ?? null);
-          setExtraCosts(p.extraCosts || "");
-          setCondition(p.condition ?? null);
-          setHeatingType(p.heatingType ?? null);
-        }
+        if (data.property) setProperty(data.property);
       })
       .catch(() => setError("Errore nel caricamento dell'immobile. Riprova."))
       .finally(() => setLoading(false));
   }, []);
-
-  const isPublished = property && ["PUBLISHED", "UNDER_CONTRACT"].includes(property.status);
-  const isReadOnly = property && ["SOLD", "WITHDRAWN"].includes(property.status);
-
-  async function handleSave() {
-    setSaving(true);
-    setError("");
-    setSaved(false);
-    try {
-      const body: Record<string, unknown> = { price, description, condominiumFees, extraCosts: extraCosts || null };
-      if (!isPublished) {
-        Object.assign(body, {
-          rooms,
-          bathrooms,
-          surface,
-          floor,
-          totalFloors,
-          hasGarage,
-          hasGarden,
-          hasBalcony,
-          hasElevator,
-          hasParkingSpace,
-          hasCellar,
-          hasTerrace,
-          hasPool,
-          hasAirConditioning,
-          isFurnished,
-          hasConcierge,
-          hasAlarm,
-          energyClass,
-          condition,
-          heatingType,
-        });
-      }
-
-      const res = await fetch("/api/dashboard/seller/property", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setProperty(data.property);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-      } else {
-        const data = await res.json();
-        setError(data.error || "Errore nel salvataggio");
-      }
-    } catch {
-      setError("Errore di connessione");
-    } finally {
-      setSaving(false);
-    }
-  }
 
   if (loading) {
     return (
@@ -148,11 +33,13 @@ export default function SellerPropertyEditPage() {
     );
   }
 
-  if (!property) {
+  if (error || !property) {
     return (
       <DashboardLayout role="seller">
         <div className="bg-white rounded-xl p-8 border border-border text-center">
-          <h2 className="text-lg font-medium text-primary-dark mb-2">Nessun immobile</h2>
+          <h2 className="text-lg font-medium text-primary-dark mb-2">
+            {error || "Nessun immobile"}
+          </h2>
           <p className="text-text-muted mb-4">Non hai ancora inserito un immobile.</p>
           <Link href="/vendi" className="text-primary hover:underline font-medium">
             Inserisci il tuo immobile
@@ -162,210 +49,200 @@ export default function SellerPropertyEditPage() {
     );
   }
 
-  const inputCls = "w-full px-4 py-2.5 border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary/30 text-sm";
+  const features = [
+    { label: "Garage", value: property.hasGarage },
+    { label: "Posto auto", value: property.hasParkingSpace },
+    { label: "Giardino", value: property.hasGarden },
+    { label: "Balcone", value: property.hasBalcony },
+    { label: "Terrazza", value: property.hasTerrace },
+    { label: "Ascensore", value: property.hasElevator },
+    { label: "Cantina", value: property.hasCellar },
+    { label: "Piscina", value: property.hasPool },
+    { label: "Aria condizionata", value: property.hasAirConditioning },
+    { label: "Arredato", value: property.isFurnished },
+    { label: "Portineria", value: property.hasConcierge },
+    { label: "Allarme", value: property.hasAlarm },
+  ].filter((f) => f.value);
 
   return (
     <DashboardLayout role="seller">
       <div className="space-y-6 max-w-3xl">
-        <div className="flex items-center justify-between">
-          <div>
-            <Link href="/dashboard/venditore" className="text-sm text-primary hover:underline mb-2 inline-block">
-              &larr; Torna alla Dashboard
-            </Link>
-            <h1 className="text-2xl font-light tracking-[-0.03em] text-text">Modifica Immobile</h1>
-            <p className="text-text-muted text-sm mt-1">
-              {property.title} — {getStatusLabel(property.status)}
-            </p>
-          </div>
+        {/* Header */}
+        <div>
+          <Link
+            href="/dashboard/venditore"
+            className="text-sm text-primary hover:underline mb-2 inline-block"
+          >
+            &larr; Torna alla Dashboard
+          </Link>
+          <h1 className="text-2xl font-light tracking-[-0.03em] text-text">
+            Il tuo Immobile
+          </h1>
+          <p className="text-text-muted text-sm mt-1">
+            {property.title} — {getStatusLabel(property.status)}
+          </p>
         </div>
 
-        {isPublished && (
-          <div className="bg-accent/10 border border-accent/30 rounded-xl p-4 text-sm text-accent">
-            L&apos;immobile è pubblicato. Puoi modificare solo prezzo, descrizione e spese.
-          </div>
-        )}
-
-        {isReadOnly && (
-          <div className="bg-text-muted/10 border border-text-muted/30 rounded-xl p-4 text-sm text-text-muted">
-            L&apos;immobile è in stato {getStatusLabel(property.status).toLowerCase()} e non può essere modificato.
+        {/* Info banner */}
+        {property.assignment?.agency && (
+          <div className="bg-primary/5 border border-primary/15 rounded-xl p-4 text-sm text-primary-dark flex items-start gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span>
+              L&apos;annuncio è gestito dalla tua agenzia partner{" "}
+              <strong>{property.assignment.agency.name}</strong>. Per modifiche,
+              contattala tramite i{" "}
+              <Link href="/dashboard/venditore/messaggi" className="underline font-medium">
+                Messaggi
+              </Link>
+              .
+            </span>
           </div>
         )}
 
         {/* Photos */}
         {property.photos?.length > 0 && (
           <div className="bg-white rounded-xl p-5 border border-border">
-            <h3 className="font-medium text-primary-dark mb-3">Foto ({property.photos.length})</h3>
+            <h3 className="font-medium text-primary-dark mb-3">
+              Foto ({property.photos.length})
+            </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {property.photos.map((photo: any, i: number) => (
-                <div key={photo.id || i} className="relative aspect-square rounded-lg overflow-hidden bg-bg-soft">
-                  <Image src={photo.url} alt={`Foto ${i + 1}`} fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
+                <div
+                  key={photo.id || i}
+                  className="relative aspect-square rounded-lg overflow-hidden bg-bg-soft"
+                >
+                  <Image
+                    src={photo.url}
+                    alt={`Foto ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                  />
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Info base */}
+        {/* Info principali */}
         <div className="bg-white rounded-xl p-5 border border-border space-y-4">
           <h3 className="font-medium text-primary-dark">Informazioni</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-text-muted">Tipologia</span>
-              <p className="font-medium text-primary-dark">{getPropertyTypeLabel(property.type)}</p>
-            </div>
-            <div>
-              <span className="text-text-muted">Indirizzo</span>
-              <p className="font-medium text-primary-dark">{property.address}, {property.city}</p>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+            <InfoItem label="Tipologia" value={getPropertyTypeLabel(property.type)} />
+            <InfoItem label="Indirizzo" value={`${property.address}, ${property.city}`} />
+            <InfoItem label="Prezzo" value={formatPrice(property.price)} />
+            <InfoItem label="Superficie" value={`${property.surface} m²`} />
+            <InfoItem label="Locali" value={property.rooms} />
+            <InfoItem label="Bagni" value={property.bathrooms ?? "—"} />
+            <InfoItem
+              label="Piano"
+              value={
+                property.floor != null
+                  ? `${property.floor}${property.totalFloors ? ` / ${property.totalFloors}` : ""}`
+                  : "—"
+              }
+            />
+            <InfoItem label="Classe energetica" value={property.energyClass || "—"} />
+            <InfoItem label="Anno costruzione" value={property.yearBuilt || "—"} />
           </div>
+
+          {property.condominiumFees != null && (
+            <div className="pt-2 border-t border-border">
+              <InfoItem
+                label="Spese condominiali"
+                value={`${property.condominiumFees} €/mese`}
+              />
+            </div>
+          )}
         </div>
 
-        {/* Editable fields */}
-        {!isReadOnly && (
-          <div className="bg-white rounded-xl p-5 border border-border space-y-5">
-            <h3 className="font-medium text-primary-dark">Dettagli modificabili</h3>
+        {/* Descrizione */}
+        {property.description && (
+          <div className="bg-white rounded-xl p-5 border border-border">
+            <h3 className="font-medium text-primary-dark mb-3">Descrizione</h3>
+            <p className="text-sm text-text leading-relaxed whitespace-pre-line">
+              {property.description}
+            </p>
+          </div>
+        )}
 
-            {/* Price + Condo fees */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">Prezzo (EUR)</label>
-                <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
-                  className={inputCls}
-                />
+        {/* Caratteristiche */}
+        {features.length > 0 && (
+          <div className="bg-white rounded-xl p-5 border border-border">
+            <h3 className="font-medium text-primary-dark mb-3">Caratteristiche</h3>
+            <div className="flex flex-wrap gap-2">
+              {features.map((f) => (
+                <span
+                  key={f.label}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  {f.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Stato e dettagli aggiuntivi */}
+        {(property.condition || property.heatingType || property.extraCosts) && (
+          <div className="bg-white rounded-xl p-5 border border-border space-y-3">
+            <h3 className="font-medium text-primary-dark">Dettagli aggiuntivi</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              {property.condition && (
+                <InfoItem label="Stato immobile" value={property.condition} />
+              )}
+              {property.heatingType && (
+                <InfoItem label="Riscaldamento" value={property.heatingType} />
+              )}
+            </div>
+            {property.extraCosts && (
+              <div className="pt-2 border-t border-border">
+                <span className="text-xs text-text-muted">Costi aggiuntivi</span>
+                <p className="text-sm text-text mt-0.5">{property.extraCosts}</p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-text mb-1">Spese condominiali (EUR/mese)</label>
-                <input
-                  type="number"
-                  min={0}
-                  placeholder="es. 150"
-                  value={condominiumFees ?? ""}
-                  onChange={(e) => setCondominiumFees(e.target.value ? Number(e.target.value) : null)}
-                  className={inputCls}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Descrizione</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className={`${inputCls} resize-none`}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text mb-1">Costi aggiuntivi</label>
-              <textarea
-                value={extraCosts}
-                onChange={(e) => setExtraCosts(e.target.value)}
-                rows={2}
-                placeholder="Eventuali spese extra (es. lavori straordinari, costi di ristrutturazione...)"
-                className={`${inputCls} resize-none`}
-              />
-            </div>
-
-            {!isPublished && (
-              <>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Locali</label>
-                    <input type="number" value={rooms} onChange={(e) => setRooms(Number(e.target.value))} className={inputCls} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Bagni</label>
-                    <input type="number" value={bathrooms} onChange={(e) => setBathrooms(Number(e.target.value))} className={inputCls} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Superficie (m&sup2;)</label>
-                    <input type="number" value={surface} onChange={(e) => setSurface(Number(e.target.value))} className={inputCls} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Piano</label>
-                    <input type="number" value={floor ?? ""} onChange={(e) => setFloor(e.target.value ? Number(e.target.value) : null)} className={inputCls} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Piani totali</label>
-                    <input type="number" value={totalFloors ?? ""} onChange={(e) => setTotalFloors(e.target.value ? Number(e.target.value) : null)} className={inputCls} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Stato</label>
-                    <select value={condition || ""} onChange={(e) => setCondition(e.target.value || null)} className={inputCls}>
-                      <option value="">Non specificato</option>
-                      {STATO_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text mb-1">Riscaldamento</label>
-                    <select value={heatingType || ""} onChange={(e) => setHeatingType(e.target.value || null)} className={inputCls}>
-                      <option value="">Non specificato</option>
-                      {RISCALDAMENTO_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1">Classe energetica</label>
-                  <select value={energyClass || ""} onChange={(e) => setEnergyClass(e.target.value || null)} className={inputCls}>
-                    <option value="">Non specificata</option>
-                    {ENERGY_CLASSES.map((ec) => <option key={ec} value={ec}>{ec}</option>)}
-                  </select>
-                </div>
-
-                {/* All features */}
-                <div>
-                  <label className="block text-sm font-medium text-text mb-2">Caratteristiche</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {[
-                      { label: "Garage", value: hasGarage, setter: setHasGarage },
-                      { label: "Posto auto", value: hasParkingSpace, setter: setHasParkingSpace },
-                      { label: "Giardino", value: hasGarden, setter: setHasGarden },
-                      { label: "Balcone", value: hasBalcony, setter: setHasBalcony },
-                      { label: "Terrazza", value: hasTerrace, setter: setHasTerrace },
-                      { label: "Ascensore", value: hasElevator, setter: setHasElevator },
-                      { label: "Cantina", value: hasCellar, setter: setHasCellar },
-                      { label: "Piscina", value: hasPool, setter: setHasPool },
-                      { label: "Aria condizionata", value: hasAirConditioning, setter: setHasAirConditioning },
-                      { label: "Arredato", value: isFurnished, setter: setIsFurnished },
-                      { label: "Portineria", value: hasConcierge, setter: setHasConcierge },
-                      { label: "Allarme", value: hasAlarm, setter: setHasAlarm },
-                    ].map((feat) => (
-                      <label key={feat.label} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={feat.value}
-                          onChange={(e) => feat.setter(e.target.checked)}
-                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30"
-                        />
-                        <span className="text-sm text-text">{feat.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </>
             )}
+          </div>
+        )}
 
-            {error && <p className="text-sm text-error">{error}</p>}
-            {saved && <p className="text-sm text-success">Modifiche salvate con successo!</p>}
-
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="w-full py-2.5 bg-primary text-white rounded-lg font-medium disabled:opacity-50 hover:bg-primary/85 transition-colors"
-            >
-              {saving ? "Salvataggio..." : "Salva Modifiche"}
-            </button>
+        {/* Agenzia partner */}
+        {property.assignment?.agency && (
+          <div className="bg-white rounded-xl p-5 border border-border">
+            <h3 className="font-medium text-primary-dark mb-3">Agenzia Partner</h3>
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+                {property.assignment.agency.name.charAt(0)}
+              </div>
+              <div>
+                <p className="font-medium text-text">
+                  {property.assignment.agency.name}
+                </p>
+                {property.assignment.agency.phone && (
+                  <p className="text-sm text-text-muted">
+                    {property.assignment.agency.phone}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
     </DashboardLayout>
+  );
+}
+
+/** Small read-only info display component */
+function InfoItem({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div>
+      <span className="text-xs text-text-muted">{label}</span>
+      <p className="font-medium text-primary-dark text-sm">{String(value)}</p>
+    </div>
   );
 }
