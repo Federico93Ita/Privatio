@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import {
@@ -38,6 +38,8 @@ interface ZoneAvailable {
   region: string;
   province: string;
   city: string | null;
+  lat: number | null;
+  lng: number | null;
   municipalities: string[];
   marketScore: number;
   population: number;
@@ -60,6 +62,109 @@ function formatPrice(cents: number): string {
   }).format(cents / 100);
 }
 
+/** Haversine distance in km — same formula used server-side */
+function distanceKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const RADIUS_BY_CLASS: Record<string, number> = {
+  PREMIUM: 5,
+  URBANA: 8,
+  BASE: 15,
+};
+
+/**
+ * Finds the agency's "home zone" — the nearest zone matching the agency's city.
+ * Mirrors the server-side resolveZoneForProperty logic.
+ */
+function findHomeZone(
+  zones: ZoneAvailable[],
+  agencyCity: string,
+  agencyLat: number,
+  agencyLng: number
+): ZoneAvailable | null {
+  if (zones.length === 0) return null;
+
+  // 1. Exact city match (case-insensitive)
+  const cityNorm = agencyCity.trim().toLowerCase();
+  const cityMatches = zones.filter(
+    (z) => z.city?.trim().toLowerCase() === cityNorm
+  );
+
+  // If multiple city matches, pick the nearest one
+  if (cityMatches.length > 0) {
+    let nearest = cityMatches[0];
+    let minDist = Infinity;
+    for (const z of cityMatches) {
+      if (z.lat && z.lng) {
+        const d = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
+        if (d < minDist) {
+          minDist = d;
+          nearest = z;
+        }
+      }
+    }
+    return nearest;
+  }
+
+  // 2. Municipality match
+  const municipalityMatch = zones.find((z) =>
+    z.municipalities.some((m) => m.trim().toLowerCase() === cityNorm)
+  );
+  if (municipalityMatch) return municipalityMatch;
+
+  // 3. Nearest by distance
+  let nearest: ZoneAvailable | null = null;
+  let minDist = Infinity;
+  for (const z of zones) {
+    if (z.lat && z.lng) {
+      const d = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
+      if (d < minDist) {
+        minDist = d;
+        nearest = z;
+      }
+    }
+  }
+  return nearest;
+}
+
+/**
+ * Filters zones to only those the agency can actually purchase:
+ * same class as home zone + within distance radius.
+ */
+function filterEligibleZones(
+  zones: ZoneAvailable[],
+  homeZone: ZoneAvailable,
+  agencyLat: number,
+  agencyLng: number
+): ZoneAvailable[] {
+  const maxDist = RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10;
+
+  return zones.filter((z) => {
+    // Must be same class
+    if (z.zoneClass !== homeZone.zoneClass) return false;
+    // Check distance
+    if (z.lat && z.lng) {
+      const dist = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
+      if (dist > maxDist) return false;
+    }
+    return true;
+  });
+}
+
 function classifyZone(
   zone: ZoneAvailable,
   ownedZoneIds: Set<string>,
@@ -72,7 +177,12 @@ function classifyZone(
   return "available";
 }
 
-function sortZones(zones: ZoneAvailable[], ownedZoneIds: Set<string>, activeCount: number, maxZones: number): ZoneAvailable[] {
+function sortZones(
+  zones: ZoneAvailable[],
+  ownedZoneIds: Set<string>,
+  activeCount: number,
+  maxZones: number
+): ZoneAvailable[] {
   const order: Record<ZoneStatus, number> = {
     available: 0,
     limit_reached: 1,
@@ -98,14 +208,18 @@ export default function TerritoriPage() {
   const [territories, setTerritories] = useState<Territory[]>([]);
   const [currentPlan, setCurrentPlan] = useState<string>("BASE");
   const [maxZones, setMaxZones] = useState(3);
-  const [agencyProvince, setAgencyProvince] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Zone lists
-  const [provinceZones, setProvinceZones] = useState<ZoneAvailable[]>([]);
+  // Agency info
+  const [agencyProvince, setAgencyProvince] = useState("");
+  const [agencyCity, setAgencyCity] = useState("");
+  const [agencyLat, setAgencyLat] = useState<number>(0);
+  const [agencyLng, setAgencyLng] = useState<number>(0);
+
+  // All province zones (unfiltered)
+  const [allProvinceZones, setAllProvinceZones] = useState<ZoneAvailable[]>([]);
   const [adjacentZones, setAdjacentZones] = useState<ZoneAvailable[]>([]);
   const [provinceLoading, setProvinceLoading] = useState(false);
-
 
   // Actions
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -119,6 +233,22 @@ export default function TerritoriPage() {
   const ownedZoneIds = new Set(
     territories.filter((t) => t.isActive).map((t) => t.zone.id)
   );
+
+  // Home zone + eligible zones (computed from all province zones)
+  const homeZone = useMemo(() => {
+    if (!agencyCity || !agencyLat || allProvinceZones.length === 0) return null;
+    return findHomeZone(allProvinceZones, agencyCity, agencyLat, agencyLng);
+  }, [allProvinceZones, agencyCity, agencyLat, agencyLng]);
+
+  const eligibleZones = useMemo(() => {
+    if (!homeZone || !agencyLat) return allProvinceZones;
+    return filterEligibleZones(
+      allProvinceZones,
+      homeZone,
+      agencyLat,
+      agencyLng
+    );
+  }, [allProvinceZones, homeZone, agencyLat, agencyLng]);
 
   /* ---------------------------------------------------------------- */
   /*  Post-checkout banner                                             */
@@ -147,13 +277,11 @@ export default function TerritoriPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      // Parallel: territories + agency profile
       const [terRes, agRes] = await Promise.all([
         fetch("/api/dashboard/agency/territories"),
         fetch("/api/dashboard/agency"),
       ]);
 
-      // Territories
       let loadedTerritories: Territory[] = [];
       if (terRes.ok) {
         const terData = await terRes.json();
@@ -163,24 +291,27 @@ export default function TerritoriPage() {
         setMaxZones(terData.maxZones || 3);
       }
 
-      // Agency province
       let province = "";
       if (agRes.ok) {
         const agData = await agRes.json();
-        province = agData?.agency?.province || agData?.province || "";
+        const ag = agData?.agency || agData;
+        province = ag?.province || "";
         setAgencyProvince(province);
+        setAgencyCity(ag?.city || "");
+        setAgencyLat(ag?.lat || 0);
+        setAgencyLng(ag?.lng || 0);
       }
 
       setLoading(false);
 
-      // Now load province zones
+      // Load province zones
       if (province) {
         setProvinceLoading(true);
         try {
           const zRes = await fetch(`/api/zones?province=${province}`);
           if (zRes.ok) {
             const zones: ZoneAvailable[] = await zRes.json();
-            setProvinceZones(zones);
+            setAllProvinceZones(zones);
           }
         } catch {
           /* silent */
@@ -188,7 +319,7 @@ export default function TerritoriPage() {
         setProvinceLoading(false);
       }
 
-      // Load adjacent zones (for each active territory)
+      // Load adjacent zones
       const activeTerritories = loadedTerritories.filter((t) => t.isActive);
       if (activeTerritories.length > 0 && activeTerritories.length < 3) {
         const adjacentPromises = activeTerritories.map((t) =>
@@ -199,18 +330,11 @@ export default function TerritoriPage() {
         const adjacentResults = await Promise.all(adjacentPromises);
         const allAdjacent: ZoneAvailable[] = adjacentResults.flat();
 
-        // Deduplicate and remove zones already in province list or owned
-        const provinceIds = new Set(
-          provinceZones.map((z) => z.id)
-        );
-        // We need to re-check provinceZones here since it might not be set yet
-        // Use a fresh fetch approach: filter by what's NOT in the province
         const seenIds = new Set<string>();
         const uniqueAdjacent = allAdjacent.filter((z) => {
           if (seenIds.has(z.id)) return false;
           seenIds.add(z.id);
-          // Keep zones that aren't in the province set
-          return !provinceIds.has(z.id);
+          return true;
         });
 
         setAdjacentZones(uniqueAdjacent);
@@ -228,12 +352,22 @@ export default function TerritoriPage() {
     fetchAll();
   }, [fetchAll]);
 
-  // Re-derive adjacent zones when province zones load
-  useEffect(() => {
-    if (provinceZones.length === 0) return;
-    const provinceIds = new Set(provinceZones.map((z) => z.id));
-    setAdjacentZones((prev) => prev.filter((z) => !provinceIds.has(z.id)));
-  }, [provinceZones]);
+  // Filter adjacent zones: remove those already in eligible list
+  const filteredAdjacentZones = useMemo(() => {
+    const eligibleIds = new Set(eligibleZones.map((z) => z.id));
+    // Also filter by class + distance like eligible zones
+    if (!homeZone || !agencyLat) return [];
+    return adjacentZones.filter((z) => {
+      if (eligibleIds.has(z.id)) return false;
+      if (z.zoneClass !== homeZone.zoneClass) return false;
+      if (z.lat && z.lng) {
+        const maxDist = RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10;
+        const dist = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
+        if (dist > maxDist) return false;
+      }
+      return true;
+    });
+  }, [adjacentZones, eligibleZones, homeZone, agencyLat, agencyLng]);
 
   /* ---------------------------------------------------------------- */
   /*  Actions                                                          */
@@ -339,10 +473,13 @@ export default function TerritoriPage() {
     }
   }
 
-
   /* ================================================================ */
   /*  Render                                                          */
   /* ================================================================ */
+
+  const maxDistKm = homeZone
+    ? RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10
+    : 10;
 
   return (
     <DashboardLayout role="agency">
@@ -378,16 +515,13 @@ export default function TerritoriPage() {
             <h2 className="text-lg font-heading text-[#0B1D3A]">
               I tuoi territori
             </h2>
-            {/* Slot indicator */}
             <div className="flex items-center gap-2">
               <div className="flex gap-1">
                 {[...Array(maxZones)].map((_, i) => (
                   <div
                     key={i}
                     className={`w-3 h-3 rounded-full ${
-                      i < activeCount
-                        ? "bg-[#C9A84C]"
-                        : "bg-[#0B1D3A]/10"
+                      i < activeCount ? "bg-[#C9A84C]" : "bg-[#0B1D3A]/10"
                     }`}
                   />
                 ))}
@@ -494,51 +628,84 @@ export default function TerritoriPage() {
         </section>
 
         {/* ────────────────────────────────────────────────────────── */}
-        {/*  SEZIONE 2 — Zone disponibili nella tua provincia          */}
+        {/*  SEZIONE 2 — Zone disponibili nella tua area               */}
         {/* ────────────────────────────────────────────────────────── */}
         <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white p-6">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-lg font-heading text-[#0B1D3A]">
-              Zone disponibili
+              Zone disponibili nella tua area
             </h2>
-            {agencyProvince && (
-              <span className="text-xs text-[#0B1D3A]/30 bg-[#0B1D3A]/5 px-2.5 py-1 rounded-full">
-                Provincia di {agencyProvince}
+            {homeZone && (
+              <span
+                className={`text-[10px] font-semibold px-2.5 py-1 rounded-full ${
+                  ZONE_CLASS_COLORS[homeZone.zoneClass] || "bg-gray-100"
+                }`}
+              >
+                {ZONE_CLASS_LABELS[homeZone.zoneClass] || homeZone.zoneClass}
               </span>
             )}
           </div>
-          <p className="text-sm text-[#0B1D3A]/40 mb-5">
-            Zone acquistabili nella tua provincia — seleziona per attivare
-          </p>
+
+          {/* Info banner about zone class */}
+          {homeZone && (
+            <div className="flex items-start gap-2 mb-5 p-3 rounded-lg bg-[#0B1D3A]/[0.02] border border-[#0B1D3A]/5">
+              <svg
+                className="w-4 h-4 text-[#0B1D3A]/30 shrink-0 mt-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                />
+              </svg>
+              <p className="text-xs text-[#0B1D3A]/50">
+                La tua agenzia si trova in una{" "}
+                <strong className="text-[#0B1D3A]/70">
+                  {ZONE_CLASS_LABELS[homeZone.zoneClass]?.toLowerCase()}
+                </strong>
+                . Puoi operare solo in zone della stessa fascia entro{" "}
+                {maxDistKm} km dalla tua sede.
+              </p>
+            </div>
+          )}
 
           {loading || provinceLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-6 h-6 border-2 border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : provinceZones.length === 0 ? (
+          ) : eligibleZones.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-sm text-[#0B1D3A]/40">
-                Nessuna zona disponibile nella tua provincia.
+                Nessuna zona disponibile nella tua area.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {sortZones(provinceZones, ownedZoneIds, activeCount, maxZones).map(
-                (zone) => (
-                  <ZoneCard
-                    key={zone.id}
-                    zone={zone}
-                    status={classifyZone(
-                      zone,
-                      ownedZoneIds,
-                      activeCount,
-                      maxZones
-                    )}
-                    actionLoading={actionLoading}
-                    onBuy={handleBuyZone}
-                  />
-                )
-              )}
+              {sortZones(
+                eligibleZones,
+                ownedZoneIds,
+                activeCount,
+                maxZones
+              ).map((zone) => (
+                <ZoneCard
+                  key={zone.id}
+                  zone={zone}
+                  status={classifyZone(
+                    zone,
+                    ownedZoneIds,
+                    activeCount,
+                    maxZones
+                  )}
+                  actionLoading={actionLoading}
+                  onBuy={handleBuyZone}
+                  agencyLat={agencyLat}
+                  agencyLng={agencyLng}
+                />
+              ))}
             </div>
           )}
         </section>
@@ -548,7 +715,7 @@ export default function TerritoriPage() {
         {/* ────────────────────────────────────────────────────────── */}
         {activeCount > 0 &&
           activeCount < maxZones &&
-          adjacentZones.length > 0 && (
+          filteredAdjacentZones.length > 0 && (
             <section className="rounded-2xl border border-[#0B1D3A]/5 bg-white p-6">
               <h2 className="text-lg font-heading text-[#0B1D3A] mb-1">
                 Espandi in zone adiacenti
@@ -559,7 +726,7 @@ export default function TerritoriPage() {
 
               <div className="space-y-3">
                 {sortZones(
-                  adjacentZones,
+                  filteredAdjacentZones,
                   ownedZoneIds,
                   activeCount,
                   maxZones
@@ -576,19 +743,20 @@ export default function TerritoriPage() {
                     actionLoading={actionLoading}
                     onBuy={handleBuyZone}
                     showProvince
+                    agencyLat={agencyLat}
+                    agencyLng={agencyLng}
                   />
                 ))}
               </div>
             </section>
           )}
-
       </div>
     </DashboardLayout>
   );
 }
 
 /* ================================================================== */
-/*  ZoneCard — Componente riutilizzabile per le card zona              */
+/*  ZoneCard                                                           */
 /* ================================================================== */
 
 function ZoneCard({
@@ -597,16 +765,24 @@ function ZoneCard({
   actionLoading,
   onBuy,
   showProvince = false,
+  agencyLat,
+  agencyLng,
 }: {
   zone: ZoneAvailable;
   status: ZoneStatus;
   actionLoading: string | null;
   onBuy: (zoneId: string, plan: string) => void;
   showProvince?: boolean;
+  agencyLat?: number;
+  agencyLng?: number;
 }) {
-  const isDisabled =
-    status === "owned" || status === "full" || status === "limit_reached";
   const slotsRemaining = zone.slots.max - zone.slots.taken;
+
+  // Calculate distance from agency
+  const distance =
+    agencyLat && agencyLng && zone.lat && zone.lng
+      ? distanceKm(agencyLat, agencyLng, zone.lat, zone.lng)
+      : null;
 
   return (
     <div
@@ -649,14 +825,20 @@ function ZoneCard({
           )}
 
           {/* Stats row */}
-          <div className="flex items-center gap-4 mt-2">
+          <div className="flex items-center gap-3 mt-2 flex-wrap">
             <span className="text-xs text-[#0B1D3A]/40">
               Score {zone.marketScore}/10
             </span>
             <span className="text-xs text-[#0B1D3A]/40">
               {zone.population.toLocaleString("it-IT")} ab.
             </span>
-            {/* Slot indicator */}
+            {distance !== null && (
+              <span className="text-xs text-[#0B1D3A]/30">
+                {distance < 1
+                  ? `${Math.round(distance * 1000)} m`
+                  : `${distance.toFixed(1)} km`}
+              </span>
+            )}
             <span
               className={`text-xs font-medium ${
                 status === "full"
@@ -668,7 +850,9 @@ function ZoneCard({
             >
               {status === "full"
                 ? "Esaurita"
-                : `${slotsRemaining} ${slotsRemaining === 1 ? "posto libero" : "posti liberi"} su ${zone.slots.max}`}
+                : `${slotsRemaining} ${
+                    slotsRemaining === 1 ? "posto libero" : "posti liberi"
+                  } su ${zone.slots.max}`}
             </span>
           </div>
         </div>
