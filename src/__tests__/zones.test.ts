@@ -16,9 +16,9 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): num
 }
 
 const RADIUS_BY_CLASS: Record<string, number> = {
-  PREMIUM: 5,
-  URBANA: 8,
-  BASE: 15,
+  PREMIUM: 1,
+  URBANA: 1,
+  BASE: 5,
 };
 
 describe("distanceKm (Haversine)", () => {
@@ -46,16 +46,16 @@ describe("distanceKm (Haversine)", () => {
 });
 
 describe("Zone radius restrictions", () => {
-  it("PREMIUM radius is 5km", () => {
-    expect(RADIUS_BY_CLASS["PREMIUM"]).toBe(5);
+  it("PREMIUM radius is 1km", () => {
+    expect(RADIUS_BY_CLASS["PREMIUM"]).toBe(1);
   });
 
-  it("URBANA radius is 8km", () => {
-    expect(RADIUS_BY_CLASS["URBANA"]).toBe(8);
+  it("URBANA radius is 1km", () => {
+    expect(RADIUS_BY_CLASS["URBANA"]).toBe(1);
   });
 
-  it("BASE radius is 15km", () => {
-    expect(RADIUS_BY_CLASS["BASE"]).toBe(15);
+  it("BASE radius is 5km", () => {
+    expect(RADIUS_BY_CLASS["BASE"]).toBe(5);
   });
 
   it("Moncalieri (URBANA) cannot reach Torino Centro (PREMIUM, ~8km)", () => {
@@ -66,15 +66,21 @@ describe("Zone radius restrictions", () => {
     expect(moncalieriClass).not.toBe(torinoClass);
   });
 
-  it("Villafranca (BASE) can reach nearby BASE zones within 15km", () => {
-    // Villafranca d'Asti to a nearby cluster ~12km away
-    const dist = distanceKm(44.9167, 8.0333, 44.85, 8.1);
+  it("Villafranca (BASE) can reach nearby BASE zones within 5km", () => {
+    // Villafranca d'Asti to a nearby cluster ~4km away
+    const dist = distanceKm(44.9167, 8.0333, 44.9000, 8.0700);
     expect(dist).toBeLessThan(RADIUS_BY_CLASS["BASE"]);
   });
 
-  it("Torino Centro (PREMIUM) cannot reach zones >5km away", () => {
-    // Torino to Rivoli ~12km
-    const dist = distanceKm(45.0703, 7.6869, 45.0714, 7.5147);
+  it("Villafranca (BASE) cannot reach zones >5km away", () => {
+    // Villafranca d'Asti to a cluster ~12km away
+    const dist = distanceKm(44.9167, 8.0333, 44.85, 8.1);
+    expect(dist).toBeGreaterThan(RADIUS_BY_CLASS["BASE"]);
+  });
+
+  it("Torino Centro (PREMIUM) cannot reach zones >1km away", () => {
+    // Torino Centro to Torino Nord ~4km
+    const dist = distanceKm(45.0703, 7.6869, 45.105, 7.665);
     expect(dist).toBeGreaterThan(RADIUS_BY_CLASS["PREMIUM"]);
   });
 });

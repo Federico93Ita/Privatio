@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { validatePartitaIva, validatePec } from "@/lib/validators";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -55,6 +56,8 @@ export default function RegistraAgenziaPage() {
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [description, setDescription] = useState("");
+  const [partitaIva, setPartitaIva] = useState("");
+  const [pec, setPec] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -66,6 +69,10 @@ export default function RegistraAgenziaPage() {
   /* Zone selection */
   const [nearbyZones, setNearbyZones] = useState<NearbyZone[]>([]);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+
+  /* Zone preview (Step 1, debounced) */
+  const [previewZones, setPreviewZones] = useState<NearbyZone[]>([]);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   /* ---- Validate token on mount ---- */
   useEffect(() => {
@@ -99,9 +106,50 @@ export default function RegistraAgenziaPage() {
     validate();
   }, [token]);
 
+  /* ---- Debounced zone preview when city+province are filled ---- */
+  useEffect(() => {
+    if (city.length < 2 || province.length !== 2) {
+      setPreviewZones([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setLoadingPreview(true);
+      try {
+        const res = await fetch(
+          `/api/zones/nearby?city=${encodeURIComponent(city)}&province=${encodeURIComponent(province)}`
+        );
+        const data = await res.json();
+        setPreviewZones(data.zones || []);
+      } catch {
+        setPreviewZones([]);
+      } finally {
+        setLoadingPreview(false);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [city, province]);
+
   /* ---- Step 1: Validate and load zones ---- */
   async function handleStep1Continue() {
     setError("");
+
+    // Validazione dati fiscali
+    if (!partitaIva.trim()) {
+      setError("La Partita IVA è obbligatoria.");
+      return;
+    }
+    if (!validatePartitaIva(partitaIva)) {
+      setError("Partita IVA non valida. Deve essere di 11 cifre con checksum corretto.");
+      return;
+    }
+    if (!pec.trim()) {
+      setError("L'indirizzo PEC è obbligatorio.");
+      return;
+    }
+    if (!validatePec(pec)) {
+      setError("Indirizzo PEC non valido.");
+      return;
+    }
 
     if (password.length < 8) {
       setError("La password deve avere almeno 8 caratteri.");
@@ -132,7 +180,17 @@ export default function RegistraAgenziaPage() {
       return;
     }
 
-    // Load nearby zones
+    // Reuse preview zones if already loaded, otherwise fetch
+    if (previewZones.length > 0) {
+      setNearbyZones(previewZones);
+      const homeZone = previewZones.find((z) => z.isHome);
+      if (homeZone && homeZone.slots.taken < homeZone.slots.max) {
+        setSelectedZoneId(homeZone.id);
+      }
+      setStep(2);
+      return;
+    }
+
     setPageState("loading-zones");
     try {
       const res = await fetch(`/api/zones/nearby?city=${encodeURIComponent(city)}&province=${encodeURIComponent(province)}`);
@@ -145,7 +203,6 @@ export default function RegistraAgenziaPage() {
       }
 
       setNearbyZones(data.zones);
-      // Pre-select home zone if available
       const homeZone = data.zones.find((z: NearbyZone) => z.isHome);
       if (homeZone && homeZone.slots.taken < homeZone.slots.max) {
         setSelectedZoneId(homeZone.id);
@@ -183,6 +240,8 @@ export default function RegistraAgenziaPage() {
           city,
           province,
           description: description || undefined,
+          partitaIva: partitaIva.trim(),
+          pec: pec.trim().toLowerCase(),
           approvalToken: token,
           selectedZoneId,
         }),
@@ -487,13 +546,48 @@ export default function RegistraAgenziaPage() {
                   <input
                     type="text"
                     value={province}
-                    onChange={(e) => setProvince(e.target.value)}
+                    onChange={(e) => setProvince(e.target.value.toUpperCase())}
                     required
                     maxLength={2}
                     className={inputClass}
                   />
                 </div>
               </div>
+
+              {/* Zone preview */}
+              {(previewZones.length > 0 || loadingPreview) && (
+                <div className="p-3 rounded-xl bg-[#F8F6F1] border border-[#C9A84C]/10">
+                  <p className="text-xs font-medium text-[#0B1D3A]/50 mb-2">
+                    Territori disponibili nella tua zona:
+                  </p>
+                  {loadingPreview ? (
+                    <div className="flex items-center gap-2 text-xs text-[#0B1D3A]/30">
+                      <div className="w-3 h-3 border border-[#C9A84C] border-t-transparent rounded-full animate-spin" />
+                      Ricerca...
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      {previewZones.slice(0, 5).map((z) => (
+                        <div key={z.id} className="flex items-center justify-between text-xs">
+                          <span className="text-[#0B1D3A]/70">{z.name}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                            z.zoneClass === "PREMIUM" ? "bg-amber-100 text-amber-800" :
+                            z.zoneClass === "URBANA" ? "bg-blue-100 text-blue-800" :
+                            "bg-green-100 text-green-800"
+                          }`}>
+                            {z.zoneClass}
+                          </span>
+                        </div>
+                      ))}
+                      {previewZones.length > 5 && (
+                        <p className="text-[10px] text-[#0B1D3A]/30 pt-1">
+                          +{previewZones.length - 5} altri territori disponibili
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Description */}
               <div>
@@ -509,7 +603,60 @@ export default function RegistraAgenziaPage() {
                 />
               </div>
 
-              {/* Divider */}
+              {/* Divider — Dati fiscali */}
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[#C9A84C]/10" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white px-3 text-[#0B1D3A]/40">Dati fiscali</span>
+                </div>
+              </div>
+
+              {/* P.IVA */}
+              <div>
+                <label className="block text-sm font-medium text-[#0B1D3A]/70 mb-1.5">
+                  Partita IVA <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={partitaIva}
+                    onChange={(e) => setPartitaIva(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                    placeholder="12345678901"
+                    maxLength={11}
+                    className={inputClass}
+                  />
+                  {partitaIva.length === 11 && (
+                    <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm ${validatePartitaIva(partitaIva) ? "text-green-500" : "text-red-400"}`}>
+                      {validatePartitaIva(partitaIva) ? "✓" : "✗"}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* PEC */}
+              <div>
+                <label className="block text-sm font-medium text-[#0B1D3A]/70 mb-1.5">
+                  PEC (Posta Elettronica Certificata) <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={pec}
+                    onChange={(e) => setPec(e.target.value)}
+                    placeholder="agenzia@pec.it"
+                    className={inputClass}
+                  />
+                  {pec.length > 5 && (
+                    <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm ${validatePec(pec) ? "text-green-500" : "text-red-400"}`}>
+                      {validatePec(pec) ? "✓" : "✗"}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Divider — Credenziali */}
               <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-[#C9A84C]/10" />

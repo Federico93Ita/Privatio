@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     }
     // Blocca se distanza fuori raggio (variabile per classe)
     if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
-      const radiusByClass: Record<string, number> = { PREMIUM: 5, URBANA: 8, BASE: 15 };
+      const radiusByClass: Record<string, number> = { PREMIUM: 1, URBANA: 1, BASE: 5 };
       const maxDist = radiusByClass[zone.zoneClass] ?? 10;
       const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
       if (dist > maxDist) {

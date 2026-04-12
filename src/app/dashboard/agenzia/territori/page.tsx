@@ -81,9 +81,9 @@ function distanceKm(
 }
 
 const RADIUS_BY_CLASS: Record<string, number> = {
-  PREMIUM: 5,
-  URBANA: 8,
-  BASE: 15,
+  PREMIUM: 1,
+  URBANA: 1,
+  BASE: 5,
 };
 
 function classifyZone(

@@ -7,6 +7,7 @@ import { applyRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 import { generateAgencySlug } from "@/lib/utils";
 import { resolveZoneForProperty } from "@/lib/zones";
 import { z } from "zod";
+import { validatePartitaIva, validatePec } from "@/lib/validators";
 
 const agencyRegisterSchema = z.object({
   agencyName: z.string().min(2, "Nome agenzia richiesto"),
@@ -23,14 +24,16 @@ const agencyRegisterSchema = z.object({
   city: z.string().min(2, "Città richiesta"),
   province: z.string().min(2, "Provincia richiesta"),
   description: z.string().optional(),
+  partitaIva: z.string().length(11, "P.IVA deve essere di 11 cifre").regex(/^\d{11}$/, "P.IVA deve contenere solo cifre"),
+  pec: z.string().email("PEC non valida"),
   approvalToken: z.string().optional(),
   selectedZoneId: z.string().min(1, "Seleziona almeno un territorio"),
 });
 
 const RADIUS_BY_CLASS: Record<string, number> = {
-  PREMIUM: 5,
-  URBANA: 8,
-  BASE: 15,
+  PREMIUM: 1,
+  URBANA: 1,
+  BASE: 5,
 };
 
 function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -133,6 +136,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Validazione checksum P.IVA server-side
+    if (!validatePartitaIva(data.partitaIva)) {
+      return NextResponse.json({ error: "Partita IVA non valida (checksum errato)." }, { status: 400 });
+    }
+    if (!validatePec(data.pec)) {
+      return NextResponse.json({ error: "Indirizzo PEC non valido." }, { status: 400 });
+    }
+
     // Create agency and admin user in a transaction
     const result = await prisma.$transaction(async (tx) => {
       const agency = await tx.agency.create({
@@ -144,6 +155,8 @@ export async function POST(req: NextRequest) {
           city: data.city,
           province: data.province,
           description: data.description,
+          partitaIva: data.partitaIva,
+          pec: data.pec.toLowerCase(),
           lat: geocodeResult.ok ? geocodeResult.lat : null,
           lng: geocodeResult.ok ? geocodeResult.lng : null,
           plan: "BASE",

@@ -144,9 +144,9 @@ export async function POST(req: NextRequest) {
       }
       if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
         const radiusByClass: Record<string, number> = {
-          PREMIUM: 5,
-          URBANA: 8,
-          BASE: 15,
+          PREMIUM: 1,
+          URBANA: 1,
+          BASE: 5,
         };
         const maxDist = radiusByClass[zone.zoneClass] ?? 10;
         const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
@@ -236,6 +236,7 @@ export async function POST(req: NextRequest) {
       tax_id_collection: { enabled: true },
       customer_update: { name: "auto", address: "auto" },
       billing_address_collection: "required",
+      payment_method_collection: "always",
       custom_fields: [
         {
           key: "codice_destinatario",
