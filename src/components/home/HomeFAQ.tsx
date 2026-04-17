@@ -39,14 +39,14 @@ export default function HomeFAQ() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="mb-16 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">
+            <span className="eyebrow text-[#C9A84C] mb-4">
               Domande frequenti
             </span>
-            <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">
-              Hai qualche dubbio?
+            <h2 className="h-section text-[#0B1D3A] mt-2">
+              Le cose che ti chiedi <span className="ink-gold">prima di iscriverti.</span>
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/50 sm:text-lg leading-relaxed">
-              Le risposte alle domande più comuni sul nostro servizio.
+            <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/60 sm:text-lg leading-relaxed">
+              Risposte nette ai dubbi più comuni. Tutte le altre su <a href="/faq" className="text-[#C9A84C] hover:text-[#D4B65E] underline-offset-2 hover:underline">pagina FAQ</a>.
             </p>
           </div>
         </ScrollReveal>

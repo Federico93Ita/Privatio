@@ -3,6 +3,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AgenzieRegistrationForm from "./AgenzieRegistrationForm";
 import AgenzieFAQ from "./AgenzieFAQ";
+import CountdownBadge from "@/components/ui/CountdownBadge";
+import { LAUNCH_CONFIG } from "@/lib/launch-config";
 import { prisma } from "@/lib/prisma";
 import type { ZoneClass } from "@prisma/client";
 
@@ -20,26 +22,26 @@ export const revalidate = 21_600;
 
 const benefits = [
   {
-    title: "Clienti garantiti senza ricerca",
-    description: "I venditori nella tua zona ti trovano direttamente. Nessun costo di acquisizione.",
+    title: "Venditori che scelgono te",
+    description: "I venditori nella tua microzona ti trovano e ti scelgono direttamente. Zero costo di acquisizione.",
     icon: "M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z",
     color: "bg-blue-500/10 text-blue-600",
   },
   {
-    title: "Lead venditori pre-qualificati",
-    description: "I venditori ti contattano direttamente. Il rapporto contrattuale lo gestisci in totale autonomia.",
+    title: "Numero chiuso per zona",
+    description: "Ogni microzona ha un numero massimo di partner. Niente gare al ribasso, niente concorrenza sleale.",
     icon: "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z",
     color: "bg-[#C9A84C]/10 text-[#C9A84C]",
   },
   {
-    title: "Dashboard gestione completa",
-    description: "Gestisci l'intera pipeline immobiliare da un'unica piattaforma.",
+    title: "Pipeline su un'unica dashboard",
+    description: "Lead, immobili, visite, KPI e fatturazione: tutto in un posto. Con report di zona mensili.",
     icon: "M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z",
     color: "bg-purple-500/10 text-purple-600",
   },
   {
-    title: "Guadagni direttamente dal cliente",
-    description: "La tua provvigione la concordi direttamente con il cliente. Privatio non trattiene commissioni.",
+    title: "100% della tua provvigione",
+    description: "La provvigione con l'acquirente la concordi tu. Privatio non trattiene nulla sulle vendite.",
     icon: "M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     color: "bg-emerald-500/10 text-emerald-600",
   },
@@ -238,31 +240,85 @@ export default async function AgenziePage() {
       <Header />
       <main id="main-content">
         {/* Hero */}
-        <section className="relative bg-[#0B1D3A] pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden grain">
-          <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.05] blur-[100px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#C9A84C]/[0.03] blur-[80px]" />
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent" />
+        <section className="relative mesh-navy pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden grain">
+          <div className="absolute top-[18%] right-[10%] w-20 h-20 border border-[#C9A84C]/15 rounded-2xl rotate-12 animate-float hidden lg:block" />
+          <div className="absolute bottom-[20%] left-[8%] w-14 h-14 border border-white/10 rounded-xl -rotate-6 animate-float-slow hidden lg:block" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8F6F1] to-transparent" />
 
-          <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#C9A84C]/20 bg-[#C9A84C]/5 px-5 py-2 backdrop-blur-sm">
-              <span className="h-2 w-2 rounded-full bg-[#C9A84C] animate-pulse" />
-              <span className="text-sm font-medium text-[#C9A84C]/90">Numero chiuso di agenzie per zona</span>
+          <div className="relative mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
+            <div className="animate-fade-in">
+              <span className="eyebrow text-[#C9A84C]/80">
+                Per agenzie immobiliari
+              </span>
             </div>
-            <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white md:text-6xl mb-6">
-              La tua zona. Zero competizione.
+
+            <h1 className="mt-5 h-display text-white animate-slide-up">
+              La tua zona. <br className="hidden sm:block" />
+              <span className="ink-gold">Zero competizione.</span>
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-white/65 md:text-xl">
-              Un numero chiuso di agenzie per microzona OMI. Nessun bidding,
-              nessuna gara al ribasso: chi arriva prima presidia la zona e
-              appare direttamente nella scelta dei venditori.
-            </p>
-            <a
-              href="#registrazione"
-              className="mt-10 group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-8 py-4 text-base font-medium text-[#0B1D3A] shadow-lg shadow-[#C9A84C]/25 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden"
+
+            <p
+              className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/70 md:text-xl animate-slide-up"
+              style={{ animationDelay: "0.15s" }}
             >
-              <span className="relative z-10">Entra in lista d&apos;attesa</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            </a>
+              Un numero chiuso di agenzie per microzona OMI. I venditori ti scelgono
+              direttamente. <strong className="text-white">Niente bidding, niente gara al ribasso.</strong>
+            </p>
+
+            <div
+              className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center animate-slide-up"
+              style={{ animationDelay: "0.3s" }}
+            >
+              <a
+                href="#registrazione"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-8 py-4 text-base font-semibold text-[#0B1D3A] shadow-xl shadow-[#C9A84C]/25 transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5 overflow-hidden"
+              >
+                <span className="relative z-10">Riserva la tua zona</span>
+                <svg className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              </a>
+              <a
+                href="#piani"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 px-7 py-3.5 text-base font-medium text-white/80 transition-all hover:text-white hover:border-white/40 hover:bg-white/5"
+              >
+                Vedi i prezzi
+              </a>
+            </div>
+
+            <p className="mt-5 text-xs text-white/50 tracking-wide animate-fade-in" style={{ animationDelay: "0.45s" }}>
+              3 mesi gratis · prezzo bloccato 12 mesi · disdici quando vuoi
+            </p>
+
+            <div className="mt-10 flex justify-center animate-fade-in" style={{ animationDelay: "0.6s" }}>
+              <CountdownBadge
+                deadline={LAUNCH_CONFIG.founderOfferDeadline}
+                label="Offerta Fondatore in scadenza"
+              />
+            </div>
+
+            {/* Key stats */}
+            <div className="mt-16 grid grid-cols-3 gap-2 sm:gap-4 max-w-xl mx-auto">
+              <div className="text-center">
+                <div className="font-heading text-3xl md:text-5xl text-[#C9A84C] leading-none">€99</div>
+                <p className="mt-2 text-[10px] sm:text-xs text-white/50 uppercase tracking-[0.15em] leading-tight">
+                  da zone<br/>base
+                </p>
+              </div>
+              <div className="text-center border-x border-white/10">
+                <div className="font-heading text-3xl md:text-5xl text-[#C9A84C] leading-none">2-7</div>
+                <p className="mt-2 text-[10px] sm:text-xs text-white/50 uppercase tracking-[0.15em] leading-tight">
+                  max agenzie<br/>per zona
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="font-heading text-3xl md:text-5xl text-[#C9A84C] leading-none">0%</div>
+                <p className="mt-2 text-[10px] sm:text-xs text-white/50 uppercase tracking-[0.15em] leading-tight">
+                  commissione<br/>sulle vendite
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -271,12 +327,12 @@ export default async function AgenziePage() {
           <div className="absolute right-[-5%] top-[20%] w-48 h-48 rounded-full bg-[#C9A84C]/[0.03] blur-[60px]" />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">I vantaggi</span>
-              <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">
-                Perch&eacute; scegliere Privatio
+              <span className="eyebrow text-[#C9A84C] mb-4">I vantaggi</span>
+              <h2 className="h-section text-[#0B1D3A] mt-2">
+                Cambia il modo <span className="ink-gold">di prendere clienti.</span>
               </h2>
-              <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/50 leading-relaxed">
-                Tutto ci&ograve; di cui la tua agenzia ha bisogno per crescere, in un&apos;unica piattaforma.
+              <p className="mx-auto mt-5 max-w-2xl text-base text-[#0B1D3A]/60 leading-relaxed">
+                Abbonamento mensile fisso per zona, lead dai venditori che ti scelgono, zero commissioni sulle vendite.
               </p>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -299,11 +355,13 @@ export default async function AgenziePage() {
         <section className="relative bg-[#F8F6F1] py-24 md:py-32" id="piani">
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/15 to-transparent" />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">Piani</span>
-              <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">Scegli la tua zona</h2>
-              <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/50 leading-relaxed">
-                Prezzo Fondatore bloccato per 12 mesi. I primi 3 mesi sono offerti da noi.
+            <div className="text-center mb-16" id="prezzi">
+              <span className="eyebrow text-[#C9A84C] mb-4">Piani mensili</span>
+              <h2 className="h-section text-[#0B1D3A] mt-2">
+                Un solo abbonamento. <span className="ink-gold">Zero sorprese.</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-2xl text-base text-[#0B1D3A]/60 leading-relaxed">
+                Prezzo mensile fisso in base alla fascia della microzona. Prezzo Fondatore bloccato 12 mesi, primi 3 mesi gratis.
               </p>
             </div>
 
@@ -398,10 +456,12 @@ export default async function AgenziePage() {
           <div className="absolute left-[-5%] top-[20%] w-48 h-48 rounded-full bg-[#C9A84C]/[0.03] blur-[60px]" />
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">Registrati</span>
-              <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">Entra in lista d&apos;attesa</h2>
-              <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/50 leading-relaxed">
-                Compila il modulo per riservare la tua zona. Ti contatteremo entro 24 ore lavorative.
+              <span className="eyebrow text-[#C9A84C] mb-4">Registrati</span>
+              <h2 className="h-section text-[#0B1D3A] mt-2">
+                Riserva la tua zona <span className="ink-gold">adesso.</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-base text-[#0B1D3A]/60 leading-relaxed">
+                Ti contattiamo entro 24 ore lavorative con disponibilità, prezzo e checklist contrattuale.
               </p>
             </div>
             <AgenzieRegistrationForm />
@@ -413,8 +473,8 @@ export default async function AgenziePage() {
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A84C]/15 to-transparent" />
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">FAQ</span>
-              <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">Domande frequenti</h2>
+              <span className="eyebrow text-[#C9A84C] mb-4">FAQ</span>
+              <h2 className="h-section text-[#0B1D3A] mt-2">Quello che ci chiedono <span className="ink-gold">le agenzie.</span></h2>
             </div>
             <AgenzieFAQ />
           </div>

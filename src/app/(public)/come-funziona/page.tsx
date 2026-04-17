@@ -60,16 +60,21 @@ export default function ComeFunzionaPage() {
       <Header />
       <main id="main-content">
         {/* Hero */}
-        <section className="relative bg-[#0B1D3A] pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden grain">
-          <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.05] blur-[100px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#C9A84C]/[0.03] blur-[80px]" />
+        <section className="relative mesh-navy pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden grain">
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8F6F1] to-transparent" />
 
-          <div className="relative max-w-4xl mx-auto px-4 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-5">Il processo</span>
-            <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white md:text-6xl mb-6">Come funziona</h1>
-            <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed md:text-xl">
-              Vendere casa senza commissioni è semplice. Ecco come Privatio rivoluziona la vendita immobiliare in Italia.
+          <div className="relative max-w-5xl mx-auto px-4 text-center">
+            <span className="eyebrow text-[#C9A84C]/80 animate-fade-in">Il processo, senza giri di parole</span>
+            <h1 className="mt-5 h-display text-white animate-slide-up">
+              Vendere casa <br className="hidden sm:block" />
+              <span className="ink-gold">è diventato semplice.</span>
+            </h1>
+            <p
+              className="mt-8 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed md:text-xl animate-slide-up"
+              style={{ animationDelay: "0.15s" }}
+            >
+              Tre passaggi netti. Nessuna esclusiva, nessun pagamento anticipato,
+              nessuna commissione al venditore.
             </p>
           </div>
         </section>

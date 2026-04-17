@@ -1559,13 +1559,13 @@ export default function VendiPage() {
         <div className="mx-auto max-w-[700px] px-4 sm:px-6">
           {/* ---- Title ---- */}
           <div className="mb-10 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-3">Inserimento gratuito</span>
-            <h1 className="font-heading text-3xl font-normal tracking-[-0.02em] text-[#0B1D3A] md:text-4xl">
-              Vendi il tuo immobile
+            <span className="eyebrow text-[#C9A84C] mb-3">Inserimento gratuito · 5 minuti</span>
+            <h1 className="font-heading text-4xl font-normal tracking-[-0.025em] text-[#0B1D3A] md:text-5xl leading-tight mt-2">
+              Mettiamo in vendita <span className="ink-gold">casa tua.</span>
             </h1>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[#0B1D3A]/50">
-              Inserisci i dati del tuo immobile. &Egrave; gratis e richiede solo
-              pochi minuti.
+            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#0B1D3A]/60">
+              5 minuti per registrare l&apos;immobile, 48 ore per scegliere
+              l&apos;agenzia della tua zona. Zero commissioni al venditore.
             </p>
           </div>
 

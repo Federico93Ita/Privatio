@@ -58,13 +58,12 @@ export default function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="mb-16 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-4">Scenari di risparmio</span>
-            <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white sm:text-5xl">
-              Quanto avresti risparmiato
+            <span className="eyebrow text-[#C9A84C]/80 mb-4">Quanto costa davvero il 3%</span>
+            <h2 className="h-section text-white mt-2">
+              Ecco cosa avresti <span className="ink-gold">nel conto corrente.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-base text-white/60 sm:text-lg leading-relaxed">
-              Esempi di commissioni evitate rispetto a un&apos;agenzia
-              tradizionale (~3% del prezzo di vendita).
+              Tre vendite reali che avvengono ogni giorno in Italia. Stesso prezzo, stesso rogito. Diverso saldo finale.
             </p>
           </div>
         </ScrollReveal>

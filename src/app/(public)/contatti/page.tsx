@@ -13,15 +13,20 @@ export default function ContattiPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="relative bg-[#0B1D3A] pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden grain">
-          <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-[#C9A84C]/[0.05] blur-[100px]" />
+        <section className="relative mesh-navy pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden grain">
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8F6F1] to-transparent" />
 
           <div className="relative max-w-4xl mx-auto px-4 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-5">Contattaci</span>
-            <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white md:text-6xl mb-6">Come possiamo aiutarti?</h1>
-            <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
-              Hai domande? Siamo qui per aiutarti. Scrivici e ti risponderemo il prima possibile.
+            <span className="eyebrow text-[#C9A84C]/80 animate-fade-in">Parliamo</span>
+            <h1 className="mt-5 h-display text-white animate-slide-up">
+              Come possiamo <span className="ink-gold">aiutarti?</span>
+            </h1>
+            <p
+              className="mt-8 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed md:text-xl animate-slide-up"
+              style={{ animationDelay: "0.15s" }}
+            >
+              Scrivici a <a href="mailto:info@privatio.it" className="text-[#C9A84C] hover:text-[#D4B65E] underline underline-offset-4">info@privatio.it</a>.
+              Rispondiamo in poche ore lavorative.
             </p>
           </div>
         </section>

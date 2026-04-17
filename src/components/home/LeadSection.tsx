@@ -19,12 +19,12 @@ export default function LeadSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="mb-16 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C] mb-4">Inizia subito</span>
-            <h2 className="font-heading text-4xl font-normal tracking-[-0.02em] text-[#0B1D3A] sm:text-5xl">
-              Inizia ora, è gratuito
+            <span className="eyebrow text-[#C9A84C] mb-4">Inizia adesso</span>
+            <h2 className="h-section text-[#0B1D3A] mt-2">
+              Pronti a vendere <span className="ink-gold">senza commissioni?</span>
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-[#0B1D3A]/50 sm:text-lg leading-relaxed">
-              Compila il form e ti guideremo nel processo di vendita. Nessun costo, nessun impegno.
+            <p className="mx-auto mt-5 max-w-2xl text-base text-[#0B1D3A]/60 sm:text-lg leading-relaxed">
+              Lascia il tuo contatto: un consulente ti guida nella registrazione dell&apos;immobile in 24 ore. Gratis, senza impegno.
             </p>
           </div>
         </ScrollReveal>

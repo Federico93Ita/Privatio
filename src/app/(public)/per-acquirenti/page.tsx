@@ -96,20 +96,23 @@ export default function PerAcquirentiPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="relative bg-[#0B1D3A] pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden grain">
-          <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.05] blur-[100px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-blue-500/[0.03] blur-[80px]" />
+        <section className="relative mesh-navy pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden grain">
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#F8F6F1] to-transparent" />
 
-          <div className="relative max-w-4xl mx-auto px-4 text-center">
-            <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-5">Per gli acquirenti</span>
-            <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white md:text-6xl mb-6">
-              Trova la casa dei tuoi sogni
+          <div className="relative max-w-5xl mx-auto px-4 text-center">
+            <span className="eyebrow text-[#C9A84C]/80 animate-fade-in">Per gli acquirenti</span>
+            <h1 className="mt-5 h-display text-white animate-slide-up">
+              Trova casa. <br className="hidden sm:block" />
+              <span className="ink-gold">Direttamente con l&apos;agenzia.</span>
             </h1>
-            <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed md:text-xl mb-10">
-              Immobili verificati, agenzie professionali selezionate e zero commissioni per il venditore. Tu scegli, noi ti guidiamo.
+            <p
+              className="mt-8 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed md:text-xl animate-slide-up"
+              style={{ animationDelay: "0.15s" }}
+            >
+              Immobili verificati da agenzie partner, commissione trasparente e negoziabile.
+              <strong className="text-white"> Niente intermediari nascosti.</strong>
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: "0.3s" }}>
               <Link
                 href="/cerca"
                 className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-8 py-4 text-base font-medium text-[#0B1D3A] shadow-lg shadow-[#C9A84C]/25 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 overflow-hidden"

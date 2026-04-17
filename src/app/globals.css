@@ -14,6 +14,12 @@
 
   --font-heading: "DM Serif Display", serif;
   --font-sans: "Inter", sans-serif;
+
+  /* Editorial scale */
+  --text-display-xl: clamp(3.5rem, 9vw, 7.5rem);  /* hero desktop */
+  --text-display-lg: clamp(2.75rem, 6vw, 5rem);
+  --text-display-md: clamp(2.25rem, 4vw, 3.5rem);
+  --text-eyebrow: 0.75rem;
 }
 
 body {
@@ -172,6 +178,104 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: none;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ---- Editorial typography utilities ---- */
+
+.h-display {
+  font-family: var(--font-heading);
+  font-size: var(--text-display-xl);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+}
+
+.h-section {
+  font-family: var(--font-heading);
+  font-size: var(--text-display-md);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: var(--text-eyebrow);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+/* Gold underline accent under editorial words */
+.ink-gold {
+  background-image: linear-gradient(90deg, #C9A84C, #E0C96A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.underline-gold {
+  position: relative;
+  display: inline-block;
+}
+.underline-gold::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.08em;
+  height: 0.12em;
+  background: #C9A84C;
+  opacity: 0.6;
+  z-index: -1;
+  border-radius: 2px;
+}
+
+/* ---- More animations ---- */
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 1.2s ease-out both;
+}
+
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+
+/* Mesh gradient background (navy theme) */
+.mesh-navy {
+  background-color: #0B1D3A;
+  background-image:
+    radial-gradient(at 20% 15%, rgba(201, 168, 76, 0.18) 0px, transparent 50%),
+    radial-gradient(at 85% 10%, rgba(201, 168, 76, 0.10) 0px, transparent 45%),
+    radial-gradient(at 75% 85%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+    radial-gradient(at 10% 90%, rgba(201, 168, 76, 0.12) 0px, transparent 55%);
+}
+
+/* Soft cream mesh */
+.mesh-cream {
+  background-color: #F8F6F1;
+  background-image:
+    radial-gradient(at 90% 10%, rgba(201, 168, 76, 0.08) 0px, transparent 50%),
+    radial-gradient(at 5% 95%, rgba(11, 29, 58, 0.04) 0px, transparent 50%);
 }
 
 /* ---- Glass card ---- */

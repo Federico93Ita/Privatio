@@ -35,15 +35,20 @@ export default function MobileStickyBar() {
       aria-hidden={!visible}
     >
       <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-sm text-white/90">
-          Vendi senza commissioni
-        </span>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium text-white leading-tight">
+            Zero commissioni.
+          </span>
+          <span className="text-[11px] text-white/50 leading-tight">
+            Gratis · 5 minuti
+          </span>
+        </div>
         <Link
           href="/vendi"
-          className="inline-flex items-center rounded-full bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-5 py-2 text-sm font-medium text-[#0B1D3A] shadow-lg shadow-[#C9A84C]/20 transition-all duration-200 hover:shadow-xl hover:shadow-[#C9A84C]/30 active:scale-[0.97]"
+          className="inline-flex items-center rounded-full bg-gradient-to-r from-[#C9A84C] to-[#D4B65E] px-5 py-2.5 text-sm font-semibold text-[#0B1D3A] shadow-lg shadow-[#C9A84C]/20 transition-all duration-200 hover:shadow-xl hover:shadow-[#C9A84C]/30 active:scale-[0.97]"
           tabIndex={visible ? 0 : -1}
         >
-          Vendi casa
+          Inserisci ora
         </Link>
       </div>
     </div>

@@ -129,16 +129,14 @@ export default function FaqPage() {
       />
 
       {/* Hero */}
-      <section className="relative bg-[#0B1D3A] py-24 md:py-32 overflow-hidden grain">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-[#C9A84C]/[0.04] blur-[100px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-[#C9A84C]/[0.03] blur-[80px]" />
-
-        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <span className="inline-block text-xs font-medium uppercase tracking-[0.2em] text-[#C9A84C]/70 mb-4">
+      <section className="relative mesh-navy py-24 md:py-32 overflow-hidden grain">
+        <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
+          <span className="eyebrow text-[#C9A84C]/80 animate-fade-in">
             Domande frequenti
           </span>
-          <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white sm:text-5xl lg:text-6xl">
-            Tutte le risposte, in un solo posto.
+          <h1 className="mt-5 h-display text-white animate-slide-up">
+            Tutte le risposte, <br className="hidden sm:block" />
+            <span className="ink-gold">in un solo posto.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base text-white/60 sm:text-lg leading-relaxed">
             Venditori, acquirenti e agenzie: trova qui la risposta alla tua
