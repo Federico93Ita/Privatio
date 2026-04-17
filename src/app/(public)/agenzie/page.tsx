@@ -3,11 +3,16 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AgenzieRegistrationForm from "./AgenzieRegistrationForm";
 import AgenzieFAQ from "./AgenzieFAQ";
+import { prisma } from "@/lib/prisma";
+import type { ZoneClass } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Diventa Partner | Privatio",
   description: "Entra nel network Privatio. I venditori nella tua zona ti trovano e ti contattano direttamente.",
 };
+
+// Rigenera i prezzi ogni 6h (ISR). I dati cambiano raramente.
+export const revalidate = 21_600;
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -40,41 +45,141 @@ const benefits = [
   },
 ];
 
-const piani = [
-  {
+/* ------------------------------------------------------------------ */
+/*  Static metadata per tier (features, CTA)                           */
+/* ------------------------------------------------------------------ */
+
+const TIER_META: Record<ZoneClass, {
+  name: string;
+  subtitle: string;
+  features: string[];
+  cta: string;
+}> = {
+  BASE: {
     name: "Zona Base",
     subtitle: "Comuni piccoli e rurali",
-    tiers: [
-      { label: "Cluster rurale (< 5.000 ab.)", price: 249, founderPrice: 224, example: "Area Monferrato Nord" },
-      { label: "Comune singolo (5k\u201320k ab.)", price: 499, founderPrice: 449, example: "Nizza Monferrato" },
+    features: [
+      "Fino a 3 zone operative",
+      "Notifica nuovi immobili 24h",
+      "Profilo agenzia in piattaforma",
+      "Dashboard di gestione completa",
+      "Max 3\u20134 agenzie per zona",
     ],
-    features: ["Fino a 3 zone operative", "Notifica nuovi immobili 24h", "Profilo agenzia in piattaforma", "Dashboard di gestione completa", "Max 3\u20134 agenzie per zona"],
     cta: "Inizia con Zona Base",
-    highlighted: false,
   },
-  {
+  URBANA: {
     name: "Zona Urbana",
     subtitle: "Centri medi e periferie citt\u00e0",
-    tiers: [
-      { label: "Comune 20k\u2013100k ab.", price: 499, founderPrice: 449, example: "Asti, Moncalieri" },
-      { label: "Quartiere periferico citt\u00e0", price: 999, founderPrice: 899, example: "Torino \u2014 Mirafiori Sud" },
+    features: [
+      "Fino a 3 zone operative",
+      "Notifica nuovi immobili 8h",
+      "Visibilit\u00e0 locale garantita",
+      "Statistiche avanzate e report",
+      "Max 4\u20136 agenzie per zona",
     ],
-    features: ["Fino a 3 zone operative", "Notifica nuovi immobili 8h", "Visibilit\u00e0 locale garantita", "Statistiche avanzate e report", "Max 4\u20136 agenzie per zona"],
     cta: "Scegli Zona Urbana",
-    highlighted: false,
   },
-  {
+  PREMIUM: {
     name: "Zona Premium",
     subtitle: "Centri storici e zone pregio",
-    tiers: [
-      { label: "Quartiere semicentrale", price: 999, founderPrice: 899, example: "Torino \u2014 San Salvario" },
-      { label: "Centro storico / zona top", price: 2600, founderPrice: 2340, example: "Torino \u2014 Centro / Crocetta" },
+    features: [
+      "Fino a 3 zone operative",
+      "Notifica istantanea immobili",
+      "Prima posizione nelle ricerche",
+      "Branding premium e supporto",
+      "Max 4\u20137 agenzie per zona",
     ],
-    features: ["Fino a 3 zone operative", "Notifica istantanea immobili", "Prima posizione nelle ricerche", "Branding premium e supporto", "Max 4\u20137 agenzie per zona"],
     cta: "Scegli Zona Premium",
-    highlighted: false,
   },
-];
+};
+
+const TIER_ORDER: ZoneClass[] = ["BASE", "URBANA", "PREMIUM"];
+
+interface PlanTier {
+  label: string;
+  price: number;
+  founderPrice: number;
+  example: string;
+}
+
+interface Plan {
+  name: string;
+  subtitle: string;
+  tiers: PlanTier[];
+  features: string[];
+  cta: string;
+  highlighted: boolean;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Query dinamica dei prezzi dal DB                                   */
+/* ------------------------------------------------------------------ */
+
+async function getPricingPlans(): Promise<Plan[]> {
+  const plans: Plan[] = [];
+
+  for (const zc of TIER_ORDER) {
+    const meta = TIER_META[zc];
+
+    // Range prezzi (p10 e p90 per evitare outliers)
+    const all = await prisma.zone.findMany({
+      where: { isActive: true, zoneClass: zc },
+      select: { monthlyPrice: true, city: true, name: true },
+      orderBy: { monthlyPrice: "asc" },
+    });
+
+    if (all.length === 0) {
+      plans.push({
+        name: meta.name,
+        subtitle: meta.subtitle,
+        tiers: [],
+        features: meta.features,
+        cta: meta.cta,
+        highlighted: zc === "URBANA",
+      });
+      continue;
+    }
+
+    // Percentili per escludere outliers
+    const p10 = all[Math.floor(all.length * 0.1)].monthlyPrice / 100;
+    const p90 = all[Math.floor(all.length * 0.9)].monthlyPrice / 100;
+
+    // 2 esempi: uno economico (vicino al min), uno premium (vicino al max)
+    const cheap = all[Math.floor(all.length * 0.1)];
+    const expensive = all[Math.floor(all.length * 0.9)];
+
+    const cheapLabel = (cheap.city || cheap.name)?.replace(/\s*—.*$/, "") ?? "Zona";
+    const expensiveLabel =
+      (expensive.city || expensive.name)?.replace(/\s*—.*$/, "") ?? "Zona";
+
+    const cheapPrice = Math.round(p10);
+    const expensivePrice = Math.round(p90);
+
+    plans.push({
+      name: meta.name,
+      subtitle: meta.subtitle,
+      tiers: [
+        {
+          label: "Dal prezzo minimo",
+          price: cheapPrice,
+          founderPrice: Math.round(cheapPrice * 0.9),
+          example: cheapLabel,
+        },
+        {
+          label: "Zone più richieste",
+          price: expensivePrice,
+          founderPrice: Math.round(expensivePrice * 0.9),
+          example: expensiveLabel,
+        },
+      ],
+      features: meta.features,
+      cta: meta.cta,
+      highlighted: zc === "URBANA",
+    });
+  }
+
+  return plans;
+}
 
 const addons = [
   { name: "Zona aggiuntiva", price: "\u201315% sulla seconda zona", description: "Espandi il tuo territorio su una zona limitrofa con sconto del 15%." },
@@ -86,17 +191,47 @@ const addons = [
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    { "@type": "Question", name: "Come funziona la lista d'attesa?", acceptedAnswer: { "@type": "Answer", text: "Compilando il modulo entri in lista d'attesa per la tua zona. Quando le iscrizioni apriranno nella tua area, sarai tra i primi a essere contattato. I posti sono limitati per ogni zona." } },
-    { "@type": "Question", name: "Quanto costa l'abbonamento?", acceptedAnswer: { "@type": "Answer", text: "Il prezzo dipende dalla zona: da €224/mese per zone rurali fino a €2.340/mese per centri storici. Prezzo Fondatore bloccato per 12 mesi con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite." } },
-    { "@type": "Question", name: "Posso disdire in qualsiasi momento?", acceptedAnswer: { "@type": "Answer", text: "Sì. L'abbonamento è mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard." } },
-  ],
-};
+function buildFaqJsonLd(plans: Plan[]) {
+  const basePlan = plans.find((p) => p.name === "Zona Base");
+  const premiumPlan = plans.find((p) => p.name === "Zona Premium");
+  const minPrice = basePlan?.tiers[0]?.founderPrice ?? 90;
+  const maxPrice = premiumPlan?.tiers[premiumPlan.tiers.length - 1]?.founderPrice ?? 2340;
 
-export default function AgenziePage() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Come funziona la lista d'attesa?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Compilando il modulo entri in lista d'attesa per la tua zona. Quando le iscrizioni apriranno nella tua area, sarai tra i primi a essere contattato. I posti sono limitati per ogni zona.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Quanto costa l'abbonamento?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Il prezzo dipende dalla zona: da \u20AC${minPrice}/mese per zone rurali fino a \u20AC${maxPrice.toLocaleString("it-IT")}/mese per centri storici. Prezzo Fondatore bloccato per 12 mesi con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Posso disdire in qualsiasi momento?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "S\u00EC. L'abbonamento \u00E8 mensile e senza vincoli. Puoi disdire in qualsiasi momento dalla dashboard.",
+        },
+      },
+    ],
+  };
+}
+
+export default async function AgenziePage() {
+  const piani = await getPricingPlans();
+  const faqJsonLd = buildFaqJsonLd(piani);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />

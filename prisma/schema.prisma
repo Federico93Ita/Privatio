@@ -514,6 +514,9 @@ model Zone {
   capCodes       String[]
   municipalities String[]
 
+  // Fascia OMI (C=centrale, B=semicentrale, D=periferica, E=suburbana, R=rurale)
+  fascia         String?
+
   // Dati di mercato (ISTAT/OMI/NTN)
   population     Int    @default(0)
   ntn            Float  @default(0)

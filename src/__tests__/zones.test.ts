@@ -1,25 +1,6 @@
 import { describe, it, expect } from "vitest";
-
-/**
- * Test the Haversine distance formula used in zone proximity calculations.
- * This is a pure function we can test without DB.
- */
-function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-const RADIUS_BY_CLASS: Record<string, number> = {
-  PREMIUM: 1,
-  URBANA: 1,
-  BASE: 5,
-};
+import { RADIUS_BY_CLASS, getZoneRadius, distanceKm } from "@/lib/zone-radius";
+import { polygonArea } from "@/lib/point-in-polygon";
 
 describe("distanceKm (Haversine)", () => {
   it("returns 0 for same point", () => {
@@ -45,42 +26,217 @@ describe("distanceKm (Haversine)", () => {
   });
 });
 
-describe("Zone radius restrictions", () => {
-  it("PREMIUM radius is 1km", () => {
+describe("RADIUS_BY_CLASS (modello unificato 1 km)", () => {
+  it("PREMIUM radius = 1 km", () => {
     expect(RADIUS_BY_CLASS["PREMIUM"]).toBe(1);
   });
 
-  it("URBANA radius is 1km", () => {
+  it("URBANA radius = 1 km", () => {
     expect(RADIUS_BY_CLASS["URBANA"]).toBe(1);
   });
 
-  it("BASE radius is 5km", () => {
-    expect(RADIUS_BY_CLASS["BASE"]).toBe(5);
+  it("BASE radius = 1 km", () => {
+    expect(RADIUS_BY_CLASS["BASE"]).toBe(1);
+  });
+});
+
+describe("getZoneRadius (1 km universale)", () => {
+  it("PREMIUM urbana (Milano) → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "PREMIUM", city: "Milano", population: 1_400_000 }),
+    ).toBe(1);
   });
 
-  it("Moncalieri (URBANA) cannot reach Torino Centro (PREMIUM, ~8km)", () => {
-    const dist = distanceKm(44.9997, 7.6828, 45.0703, 7.6869);
-    const moncalieriClass = "URBANA";
-    const torinoClass = "PREMIUM";
-    // Different class → always blocked
-    expect(moncalieriClass).not.toBe(torinoClass);
+  it("PREMIUM città media (Asti) → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "PREMIUM", city: "Asti", population: 74_000 }),
+    ).toBe(1);
   });
 
-  it("Villafranca (BASE) can reach nearby BASE zones within 5km", () => {
-    // Villafranca d'Asti to a nearby cluster ~4km away
-    const dist = distanceKm(44.9167, 8.0333, 44.9000, 8.0700);
-    expect(dist).toBeLessThan(RADIUS_BY_CLASS["BASE"]);
+  it("URBANA urbana → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "URBANA", city: "Milano", population: 1_400_000 }),
+    ).toBe(1);
   });
 
-  it("Villafranca (BASE) cannot reach zones >5km away", () => {
-    // Villafranca d'Asti to a cluster ~12km away
-    const dist = distanceKm(44.9167, 8.0333, 44.85, 8.1);
-    expect(dist).toBeGreaterThan(RADIUS_BY_CLASS["BASE"]);
+  it("Cluster PREMIUM (city=null) → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "PREMIUM", city: null, population: 4_500 }),
+    ).toBe(1);
   });
 
-  it("Torino Centro (PREMIUM) cannot reach zones >1km away", () => {
-    // Torino Centro to Torino Nord ~4km
-    const dist = distanceKm(45.0703, 7.6869, 45.105, 7.665);
-    expect(dist).toBeGreaterThan(RADIUS_BY_CLASS["PREMIUM"]);
+  it("Cluster URBANA (city=null) → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "URBANA", city: null, population: 8_000 }),
+    ).toBe(1);
+  });
+
+  it("Cluster BASE (city=null) → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "BASE", city: null, population: 3_000 }),
+    ).toBe(1);
+  });
+
+  it("Comune piccolo (Castell'Alfero) → 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "PREMIUM", city: "Castell'Alfero", population: 2_750 }),
+    ).toBe(1);
+  });
+
+  it("Population assente → 1 km (tier default)", () => {
+    expect(getZoneRadius({ zoneClass: "PREMIUM", city: "Torino" })).toBe(1);
+  });
+
+  it("Zone class sconosciuta → fallback 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "UNKNOWN", city: "Torino", population: 1_000_000 }),
+    ).toBe(1);
+  });
+});
+
+describe("Zone adjacency scenarios (raggio 1 km)", () => {
+  it("Classi diverse possono essere adiacenti — la classe determina solo il prezzo", () => {
+    const u = getZoneRadius({ zoneClass: "URBANA", city: "Asti", population: 74_000 });
+    const p = getZoneRadius({ zoneClass: "PREMIUM", city: "Asti", population: 74_000 });
+    expect(u).toBe(p);
+    expect(u).toBe(1);
+  });
+
+  it("Due centroidi a ~0.3 km sono dentro il raggio 1 km", () => {
+    const dist = distanceKm(44.9005, 8.2070, 44.9035, 8.2095);
+    expect(dist).toBeLessThan(
+      getZoneRadius({ zoneClass: "PREMIUM", city: "Asti", population: 74_000 }),
+    );
+  });
+
+  it("Due centroidi a ~3 km sono fuori dal raggio 1 km", () => {
+    const dist = distanceKm(44.9000, 8.2000, 44.9200, 8.2400);
+    expect(dist).toBeGreaterThan(
+      getZoneRadius({ zoneClass: "URBANA", city: "Asti", population: 74_000 }),
+    );
+  });
+
+  it("Cluster BASE piccolo resta a 1 km", () => {
+    expect(
+      getZoneRadius({ zoneClass: "BASE", city: null, population: 1_500 }),
+    ).toBe(1);
+  });
+});
+
+describe("polygonArea (per ranking PIP più specifico)", () => {
+  it("quadrato unitario (Polygon) → area = 1", () => {
+    const sq = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 0],
+          [1, 1],
+          [0, 1],
+          [0, 0],
+        ],
+      ],
+    };
+    expect(polygonArea(sq)).toBeCloseTo(1, 5);
+  });
+
+  it("quadrato 10x10 ha area 100", () => {
+    const sq = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [10, 0],
+          [10, 10],
+          [0, 10],
+          [0, 0],
+        ],
+      ],
+    };
+    expect(polygonArea(sq)).toBeCloseTo(100, 5);
+  });
+
+  it("poligono piccolo ha area minore di uno grande (ranking)", () => {
+    const big = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [10, 0],
+          [10, 10],
+          [0, 10],
+          [0, 0],
+        ],
+      ],
+    };
+    const small = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [4, 4],
+          [6, 4],
+          [6, 6],
+          [4, 6],
+          [4, 4],
+        ],
+      ],
+    };
+    expect(polygonArea(small)).toBeLessThan(polygonArea(big));
+  });
+
+  it("MultiPolygon: somma le aree dei poligoni", () => {
+    const mp = {
+      type: "MultiPolygon",
+      coordinates: [
+        [
+          [
+            [0, 0],
+            [1, 0],
+            [1, 1],
+            [0, 1],
+            [0, 0],
+          ],
+        ],
+        [
+          [
+            [10, 10],
+            [12, 10],
+            [12, 12],
+            [10, 12],
+            [10, 10],
+          ],
+        ],
+      ],
+    };
+    expect(polygonArea(mp)).toBeCloseTo(1 + 4, 5);
+  });
+
+  it("Polygon con hole: area outer - area hole", () => {
+    const withHole = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [10, 0],
+          [10, 10],
+          [0, 10],
+          [0, 0],
+        ],
+        [
+          [4, 4],
+          [6, 4],
+          [6, 6],
+          [4, 6],
+          [4, 4],
+        ],
+      ],
+    };
+    expect(polygonArea(withHole)).toBeCloseTo(100 - 4, 5);
+  });
+
+  it("boundary null/invalido → 0", () => {
+    expect(polygonArea(null)).toBe(0);
+    expect(polygonArea({ type: "Unknown" })).toBe(0);
+    expect(polygonArea(undefined)).toBe(0);
   });
 });

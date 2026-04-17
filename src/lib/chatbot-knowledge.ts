@@ -82,8 +82,9 @@ Quando un venditore pubblica un immobile:
 
 ## Requisiti per le agenzie
 - Massimo **3 zone** per agenzia.
-- L'espansione è consentita solo verso zone **adiacenti** della **stessa classe**
-  (un'agenzia BASE non può aggiungere zone URBANA, e viceversa).
+- L'espansione è consentita verso zone **adiacenti** entro 1 km dalla sede,
+  di **qualsiasi fascia** (BASE/URBANA/PREMIUM): la fascia determina solo il
+  prezzo mensile, non la possibilità di acquisto.
 - Firma obbligatoria del contratto con clausola zero-commissioni verso il venditore.
 
 ## Sconto fondatore

@@ -5,8 +5,10 @@ import {
   GoogleMap,
   useLoadScript,
   Polygon,
+  CircleF,
   InfoWindowF,
 } from "@react-google-maps/api";
+import { useClientGeocode } from "@/hooks/useClientGeocode";
 import {
   ZONE_TIER_SHORT,
   ZONE_MAP_COLORS,
@@ -52,6 +54,8 @@ interface ZonePreferenceSelectorProps {
   province: string;
   /** Città/comune sede agenzia — determina quali zone vengono mostrate */
   city: string;
+  /** Indirizzo stradale sede — per geolocalizzazione precisa della zona */
+  address?: string;
   selectedZones: ZonePreference[];
   onSelectionChange: (zones: ZonePreference[]) => void;
 }
@@ -192,6 +196,7 @@ const MAP_STYLES: google.maps.MapTypeStyle[] = [
 export default function ZonePreferenceSelector({
   province,
   city,
+  address,
   selectedZones,
   onSelectionChange,
 }: ZonePreferenceSelectorProps) {
@@ -211,7 +216,15 @@ export default function ZonePreferenceSelector({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
   });
 
-  // Fetch zone vicine al comune dell'agenzia
+  // Geocoding lato client usando Google Maps JS API (già caricata per la mappa)
+  const { lat: geoLat, lng: geoLng, loading: geoLoading } = useClientGeocode(
+    address ?? "",
+    city,
+    province,
+    isLoaded
+  );
+
+  // Fetch zone vicine usando coordinate geocodificate lato client
   useEffect(() => {
     const normCity = city?.trim() ?? "";
     const normProv = province?.trim().toUpperCase() ?? "";
@@ -222,11 +235,28 @@ export default function ZonePreferenceSelector({
       return;
     }
 
+    // Aspetta che il geocoding finisca
+    if (geoLoading) return;
+
+    // Se non abbiamo coordinate (indirizzo mancante o non trovato)
+    if (!geoLat || !geoLng) {
+      setZones([]);
+      setHomeZoneId(null);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     setError("");
 
-    const params = new URLSearchParams({ city: normCity, province: normProv });
+    const params = new URLSearchParams({
+      city: normCity,
+      province: normProv,
+      lat: geoLat.toString(),
+      lng: geoLng.toString(),
+    });
+
     fetch(`/api/zones/nearby?${params}`)
       .then((res) => {
         if (!res.ok) throw new Error("Errore nel caricamento zone");
@@ -249,7 +279,7 @@ export default function ZonePreferenceSelector({
     return () => {
       cancelled = true;
     };
-  }, [city, province]);
+  }, [city, province, geoLat, geoLng, geoLoading]);
 
   const isZoneSelected = useCallback(
     (zoneId: string) => selectedZones.some((z) => z.zoneId === zoneId),
@@ -274,9 +304,14 @@ export default function ZonePreferenceSelector({
 
   // Filtered zones for search
   const filteredZones = useMemo(() => {
-    if (!searchQuery.trim()) return zones;
+    // Hide full/esaurita zones — only show purchasable ones
+    const available = zones.filter((z) => {
+      const s = getSlots(z);
+      return s.taken < s.max;
+    });
+    if (!searchQuery.trim()) return available;
     const q = searchQuery.toLowerCase();
-    return zones.filter(
+    return available.filter(
       (z) =>
         z.name.toLowerCase().includes(q) ||
         z.municipalities.some((m) => m.toLowerCase().includes(q))
@@ -409,7 +444,13 @@ export default function ZonePreferenceSelector({
   // Don't render anything until both city and province are entered
   const normCity = city?.trim() ?? "";
   const normProv = province?.trim().toUpperCase() ?? "";
+  const normAddr = address?.trim() ?? "";
   if (normCity.length < 2 || normProv.length !== 2) return null;
+
+  // Show "inserisci indirizzo" message when address is missing
+  const needsAddress = normAddr.length < 3;
+  // Considera "in caricamento" sia durante geocoding che durante fetch zone
+  const isWorking = loading || geoLoading;
 
   return (
     <div className="space-y-3">
@@ -424,7 +465,23 @@ export default function ZonePreferenceSelector({
         </p>
       </div>
 
-      {loading && (
+      {needsAddress && !isWorking && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
+          <svg className="mx-auto h-8 w-8 text-amber-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <p className="text-sm font-medium text-amber-800">
+            Inserisci l&apos;indirizzo della tua sede
+          </p>
+          <p className="mt-1 text-xs text-amber-700">
+            Per visualizzare la zona di competenza, compila il campo indirizzo sopra.
+            La zona viene determinata in base alla posizione esatta della tua agenzia.
+          </p>
+        </div>
+      )}
+
+      {!needsAddress && isWorking && (
         <div className="h-[420px] animate-pulse rounded-xl bg-bg-soft flex items-center justify-center">
           <div className="flex items-center gap-2">
             <svg
@@ -447,7 +504,7 @@ export default function ZonePreferenceSelector({
               />
             </svg>
             <span className="text-sm text-text-muted">
-              Caricamento zone...
+              {geoLoading ? "Localizzazione indirizzo..." : "Caricamento zone..."}
             </span>
           </div>
         </div>
@@ -459,7 +516,7 @@ export default function ZonePreferenceSelector({
         </div>
       )}
 
-      {!loading && !error && zones.length === 0 && normCity.length >= 2 && (
+      {!needsAddress && !isWorking && !error && zones.length === 0 && normCity.length >= 2 && (
         <div className="rounded-xl border border-border bg-bg-soft p-6 text-center">
           <p className="text-sm text-text-muted">
             Nessuna zona trovata vicino a{" "}
@@ -564,8 +621,6 @@ export default function ZonePreferenceSelector({
                                 ? "bg-emerald-50 border border-emerald-200"
                                 : isHovered && !disabled
                                 ? `${config.bgColor} border border-transparent`
-                                : isFull
-                                ? "bg-gray-50 border border-transparent opacity-50"
                                 : "bg-white border border-transparent hover:bg-gray-50"
                             }`}
                           >
@@ -595,15 +650,8 @@ export default function ZonePreferenceSelector({
                                   </h4>
                                 </div>
                                 {zone.municipalities.length > 0 && (
-                                  <p className="text-[10px] text-gray-500 mt-0.5 leading-snug line-clamp-1">
-                                    {zone.municipalities.length <= 3
-                                      ? zone.municipalities.join(", ")
-                                      : zone.municipalities
-                                          .slice(0, 3)
-                                          .join(", ") +
-                                        ` +${
-                                          zone.municipalities.length - 3
-                                        }`}
+                                  <p className="text-[10px] text-gray-500 mt-0.5 leading-snug">
+                                    {zone.municipalities.join(", ")}
                                   </p>
                                 )}
                               </div>
@@ -616,18 +664,12 @@ export default function ZonePreferenceSelector({
                                     </span>
                                   </p>
                                 )}
-                                {isFull ? (
-                                  <span className="text-[9px] text-gray-400">
-                                    Esaurita
-                                  </span>
-                                ) : (
-                                  <span className="text-[9px] text-emerald-600">
-                                    {slots.max - slots.taken} post
-                                    {slots.max - slots.taken === 1
-                                      ? "o"
-                                      : "i"}
-                                  </span>
-                                )}
+                                <span className="text-[9px] text-emerald-600">
+                                  {slots.max - slots.taken} post
+                                  {slots.max - slots.taken === 1
+                                    ? "o"
+                                    : "i"}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -665,7 +707,7 @@ export default function ZonePreferenceSelector({
                   ))}
                 </div>
                 <span className="text-[10px] text-gray-400">
-                  {zones.length} zone
+                  {filteredZones.length} zone
                 </span>
               </div>
             </div>
@@ -740,7 +782,73 @@ export default function ZonePreferenceSelector({
                   );
                 })}
 
-                {/* Info window on polygon click */}
+                {/* Fallback: cerchi per zone senza boundary */}
+                {filteredZones
+                  .filter((z) => !z.boundary && z.lat != null && z.lng != null)
+                  .map((zone) => {
+                    const selected = isZoneSelected(zone.id);
+                    const isHovered = hoveredZone === zone.id;
+                    const home = isHomeZone(zone.id);
+                    const config =
+                      TIER_CONFIG[zone.zoneClass] || TIER_CONFIG.BASE;
+                    const circleRadius =
+                      zone.zoneClass === "BASE" ? 3500 : 800;
+
+                    return (
+                      <CircleF
+                        key={`circle-${zone.id}`}
+                        center={{ lat: zone.lat!, lng: zone.lng! }}
+                        radius={circleRadius}
+                        options={{
+                          fillColor: selected
+                            ? "#1d4ed8"
+                            : home
+                            ? "#10b981"
+                            : isHovered
+                            ? config.mapStroke
+                            : "#94a3b8",
+                          fillOpacity: selected
+                            ? 0.45
+                            : home
+                            ? 0.3
+                            : isHovered
+                            ? 0.35
+                            : 0.15,
+                          strokeColor: selected
+                            ? "#1d4ed8"
+                            : home
+                            ? "#059669"
+                            : isHovered
+                            ? config.mapStroke
+                            : "#94a3b8",
+                          strokeWeight: selected
+                            ? 2.5
+                            : home
+                            ? 2
+                            : isHovered
+                            ? 2
+                            : 0.8,
+                          strokeOpacity: selected ? 1 : isHovered ? 0.9 : 0.7,
+                          zIndex: selected
+                            ? 10
+                            : home
+                            ? 8
+                            : isHovered
+                            ? 5
+                            : 1,
+                          clickable: true,
+                        }}
+                        onMouseOver={() => setHoveredZone(zone.id)}
+                        onMouseOut={() => setHoveredZone(null)}
+                        onClick={() => {
+                          setInfoZone(zone);
+                          scrollToCard(zone.id);
+                        }}
+                      />
+                    );
+                  })}
+
+                {/* Info window on polygon/circle click */}
                 {infoZone && infoZone.lat && infoZone.lng && (
                   <InfoWindowF
                     position={{ lat: infoZone.lat, lng: infoZone.lng }}
@@ -776,10 +884,7 @@ export default function ZonePreferenceSelector({
                       </h4>
                       {infoZone.municipalities.length > 0 && (
                         <p className="text-[11px] text-gray-500 mt-0.5">
-                          {infoZone.municipalities.slice(0, 5).join(", ")}
-                          {infoZone.municipalities.length > 5
-                            ? ` +${infoZone.municipalities.length - 5}`
-                            : ""}
+                          {infoZone.municipalities.join(", ")}
                         </p>
                       )}
                       <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-gray-100">

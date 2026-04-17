@@ -5,6 +5,8 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { validatePartitaIva, validatePec } from "@/lib/validators";
+import { GoogleMap, useJsApiLoader, CircleF, Polygon, MarkerF } from "@react-google-maps/api";
+import { useClientGeocode } from "@/hooks/useClientGeocode";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -24,10 +26,34 @@ interface NearbyZone {
   name: string;
   slug: string;
   zoneClass: string;
+  city: string | null;
+  lat: number | null;
+  lng: number | null;
+  boundary?: { type: string; coordinates: number[][][] | number[][][][] } | null;
   municipalities: string[];
   price: number;
   slots: { taken: number; max: number };
   isHome: boolean;
+}
+
+/** Convert GeoJSON boundary to Google Maps Polygon paths.
+ *  GeoJSON uses [lng, lat]; Google Maps uses {lat, lng}. */
+function boundaryToPaths(
+  boundary: { type: string; coordinates: number[][][] | number[][][][] }
+): { lat: number; lng: number }[][] {
+  if (boundary.type === "Polygon") {
+    const coords = boundary.coordinates as number[][][];
+    return coords.map((ring) =>
+      ring.map(([lng, lat]) => ({ lat, lng }))
+    );
+  }
+  if (boundary.type === "MultiPolygon") {
+    const coords = boundary.coordinates as number[][][][];
+    return coords.map((poly) =>
+      poly[0].map(([lng, lat]) => ({ lat, lng }))
+    );
+  }
+  return [];
 }
 
 type PageState = "loading" | "invalid" | "form" | "loading-zones" | "submitting" | "success";
@@ -40,6 +66,10 @@ export default function RegistraAgenziaPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
+
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
+  });
 
   const [pageState, setPageState] = useState<PageState>("loading");
   const [lead, setLead] = useState<LeadData | null>(null);
@@ -69,10 +99,16 @@ export default function RegistraAgenziaPage() {
   /* Zone selection */
   const [nearbyZones, setNearbyZones] = useState<NearbyZone[]>([]);
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null);
 
   /* Zone preview (Step 1, debounced) */
   const [previewZones, setPreviewZones] = useState<NearbyZone[]>([]);
   const [loadingPreview, setLoadingPreview] = useState(false);
+
+  /* Client-side geocoding */
+  const { lat: geoLat, lng: geoLng, loading: geoLoading } = useClientGeocode(
+    address, city, province, mapsLoaded
+  );
 
   /* ---- Validate token on mount ---- */
   useEffect(() => {
@@ -106,28 +142,31 @@ export default function RegistraAgenziaPage() {
     validate();
   }, [token]);
 
-  /* ---- Debounced zone preview when city+province are filled ---- */
+  /* ---- Zone preview using client-side geocoded coordinates ---- */
   useEffect(() => {
     if (city.length < 2 || province.length !== 2) {
       setPreviewZones([]);
       return;
     }
-    const timer = setTimeout(async () => {
-      setLoadingPreview(true);
-      try {
-        const res = await fetch(
-          `/api/zones/nearby?city=${encodeURIComponent(city)}&province=${encodeURIComponent(province)}`
-        );
-        const data = await res.json();
-        setPreviewZones(data.zones || []);
-      } catch {
-        setPreviewZones([]);
-      } finally {
-        setLoadingPreview(false);
-      }
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [city, province]);
+    if (geoLoading) return;
+    if (!geoLat || !geoLng) {
+      setPreviewZones([]);
+      return;
+    }
+
+    setLoadingPreview(true);
+    const params = new URLSearchParams({
+      city,
+      province,
+      lat: geoLat.toString(),
+      lng: geoLng.toString(),
+    });
+    fetch(`/api/zones/nearby?${params}`)
+      .then((res) => res.json())
+      .then((data) => setPreviewZones(data.zones || []))
+      .catch(() => setPreviewZones([]))
+      .finally(() => setLoadingPreview(false));
+  }, [city, province, geoLat, geoLng, geoLoading]);
 
   /* ---- Step 1: Validate and load zones ---- */
   async function handleStep1Continue() {
@@ -193,7 +232,7 @@ export default function RegistraAgenziaPage() {
 
     setPageState("loading-zones");
     try {
-      const res = await fetch(`/api/zones/nearby?city=${encodeURIComponent(city)}&province=${encodeURIComponent(province)}`);
+      const res = await fetch(`/api/zones/nearby?city=${encodeURIComponent(city)}&province=${encodeURIComponent(province)}&address=${encodeURIComponent(address)}`);
       const data = await res.json();
 
       if (!data.zones || data.zones.length === 0) {
@@ -567,23 +606,25 @@ export default function RegistraAgenziaPage() {
                     </div>
                   ) : (
                     <div className="space-y-1">
-                      {previewZones.slice(0, 5).map((z) => (
-                        <div key={z.id} className="flex items-center justify-between text-xs">
-                          <span className="text-[#0B1D3A]/70">{z.name}</span>
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                            z.zoneClass === "PREMIUM" ? "bg-amber-100 text-amber-800" :
-                            z.zoneClass === "URBANA" ? "bg-blue-100 text-blue-800" :
-                            "bg-green-100 text-green-800"
-                          }`}>
-                            {z.zoneClass}
-                          </span>
+                      {previewZones.map((z) => (
+                        <div key={z.id} className="text-xs py-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#0B1D3A]/70 font-medium">{z.name}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                              z.zoneClass === "PREMIUM" ? "bg-amber-100 text-amber-800" :
+                              z.zoneClass === "URBANA" ? "bg-blue-100 text-blue-800" :
+                              "bg-green-100 text-green-800"
+                            }`}>
+                              {z.zoneClass}
+                            </span>
+                          </div>
+                          {z.municipalities.length > 0 && (
+                            <p className="text-[10px] text-[#0B1D3A]/30 mt-0.5">
+                              {z.city ? z.municipalities.join(", ") : `Comuni: ${z.municipalities.join(", ")}`}
+                            </p>
+                          )}
                         </div>
                       ))}
-                      {previewZones.length > 5 && (
-                        <p className="text-[10px] text-[#0B1D3A]/30 pt-1">
-                          +{previewZones.length - 5} altri territori disponibili
-                        </p>
-                      )}
                     </div>
                   )}
                 </div>
@@ -784,23 +825,95 @@ export default function RegistraAgenziaPage() {
                 I primi 90 giorni sono gratuiti.
               </p>
 
-              {/* Zone cards */}
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                {nearbyZones.map((zone) => {
-                  const isFull = zone.slots.taken >= zone.slots.max;
+              {/* Mappa + Zone cards */}
+              <div className="flex flex-col lg:flex-row gap-4">
+                {/* Mappa zona */}
+                {mapsLoaded && nearbyZones.length > 0 && (() => {
+                  const availableZones = nearbyZones.filter((z) => z.slots.taken < z.slots.max && z.lat && z.lng);
+                  const homeZone = availableZones.find((z) => z.isHome) || availableZones[0];
+                  if (!homeZone?.lat || !homeZone?.lng) return null;
+                  const circleRadius = homeZone.zoneClass === "BASE" ? 3500 : 800;
+                  return (
+                    <div className="lg:w-1/2 h-[280px] lg:h-[420px] rounded-2xl overflow-hidden border border-[#0B1D3A]/10 shrink-0">
+                      <GoogleMap
+                        mapContainerStyle={{ width: "100%", height: "100%" }}
+                        center={{ lat: homeZone.lat, lng: homeZone.lng }}
+                        zoom={homeZone.zoneClass === "BASE" ? 11 : 13}
+                        options={{
+                          disableDefaultUI: true,
+                          zoomControl: true,
+                          styles: [
+                            { featureType: "poi", stylers: [{ visibility: "off" }] },
+                            { featureType: "transit", stylers: [{ visibility: "off" }] },
+                          ],
+                        }}
+                      >
+                        {/* Zone con boundary → Poligoni reali */}
+                        {availableZones.filter((z) => z.boundary).map((z) => {
+                          const isSelected = selectedZoneId === z.id;
+                          const isHovered = hoveredZoneId === z.id;
+                          const isHome = z.isHome;
+                          return (
+                            <Polygon
+                              key={z.id}
+                              paths={boundaryToPaths(z.boundary!)}
+                              options={{
+                                fillColor: isSelected ? "#C9A84C" : isHome ? "#059669" : isHovered ? "#3B82F6" : "#94A3B8",
+                                fillOpacity: isSelected ? 0.4 : isHovered ? 0.3 : 0.15,
+                                strokeColor: isSelected ? "#C9A84C" : isHome ? "#059669" : isHovered ? "#3B82F6" : "#94A3B8",
+                                strokeWeight: isSelected || isHovered ? 3 : 1,
+                                clickable: true,
+                              }}
+                              onClick={() => setSelectedZoneId(z.id)}
+                            />
+                          );
+                        })}
+                        {/* Fallback: cerchi per zone senza boundary */}
+                        {availableZones.filter((z) => !z.boundary && z.lat && z.lng).map((z) => {
+                          const isSelected = selectedZoneId === z.id;
+                          const isHovered = hoveredZoneId === z.id;
+                          const isHome = z.isHome;
+                          return (
+                            <CircleF
+                              key={z.id}
+                              center={{ lat: z.lat!, lng: z.lng! }}
+                              radius={circleRadius}
+                              options={{
+                                fillColor: isSelected ? "#C9A84C" : isHome ? "#059669" : isHovered ? "#3B82F6" : "#94A3B8",
+                                fillOpacity: isSelected ? 0.4 : isHovered ? 0.3 : 0.15,
+                                strokeColor: isSelected ? "#C9A84C" : isHome ? "#059669" : isHovered ? "#3B82F6" : "#94A3B8",
+                                strokeWeight: isSelected || isHovered ? 3 : 1,
+                                clickable: true,
+                              }}
+                              onClick={() => setSelectedZoneId(z.id)}
+                            />
+                          );
+                        })}
+                        {/* Marker sede agenzia */}
+                        <MarkerF
+                          position={{ lat: homeZone.lat!, lng: homeZone.lng! }}
+                          title="La tua sede"
+                        />
+                      </GoogleMap>
+                    </div>
+                  );
+                })()}
+
+                {/* Lista zone */}
+                <div className="flex-1 space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                {nearbyZones.filter((z) => z.slots.taken < z.slots.max).map((zone) => {
                   const isSelected = selectedZoneId === zone.id;
 
                   return (
                     <button
                       key={zone.id}
                       type="button"
-                      disabled={isFull}
                       onClick={() => setSelectedZoneId(zone.id)}
+                      onMouseEnter={() => setHoveredZoneId(zone.id)}
+                      onMouseLeave={() => setHoveredZoneId(null)}
                       className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-200 ${
                         isSelected
                           ? "border-[#C9A84C] bg-[#C9A84C]/[0.05] shadow-md"
-                          : isFull
-                          ? "border-[#0B1D3A]/5 bg-gray-50 opacity-50 cursor-not-allowed"
                           : "border-[#0B1D3A]/10 bg-white hover:border-[#C9A84C]/40 hover:bg-[#C9A84C]/[0.02]"
                       }`}
                     >
@@ -817,18 +930,19 @@ export default function RegistraAgenziaPage() {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[#0B1D3A]/40 mt-1 truncate">
-                            {zone.municipalities.slice(0, 5).join(", ")}
-                            {zone.municipalities.length > 5 && ` +${zone.municipalities.length - 5}`}
-                          </p>
+                          {zone.municipalities.length > 0 && (
+                            <p className="text-xs text-[#0B1D3A]/40 mt-1">
+                              {zone.city ? zone.municipalities.join(", ") : `Comuni: ${zone.municipalities.join(", ")}`}
+                            </p>
+                          )}
                         </div>
 
                         <div className="text-right shrink-0">
                           <div className="text-lg font-semibold text-[#0B1D3A]">
                             {(zone.price / 100).toFixed(0)}<span className="text-xs font-normal text-[#0B1D3A]/40">/mese</span>
                           </div>
-                          <div className={`text-xs mt-0.5 ${isFull ? "text-red-500" : "text-[#0B1D3A]/40"}`}>
-                            {isFull ? "Completo" : `${zone.slots.taken}/${zone.slots.max} agenzie`}
+                          <div className="text-xs mt-0.5 text-[#0B1D3A]/40">
+                            {`${zone.slots.taken}/${zone.slots.max} agenzie`}
                           </div>
                         </div>
                       </div>
@@ -845,12 +959,13 @@ export default function RegistraAgenziaPage() {
                           )}
                         </div>
                         <span className="text-xs text-[#0B1D3A]/50">
-                          {isSelected ? "Selezionato" : isFull ? "Non disponibile" : "Seleziona questo territorio"}
+                          {isSelected ? "Selezionato" : "Seleziona questo territorio"}
                         </span>
                       </div>
                     </button>
                   );
                 })}
+                </div>
               </div>
 
               {/* Trial info */}

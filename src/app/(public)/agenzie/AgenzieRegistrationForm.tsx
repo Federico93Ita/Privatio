@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Component, type ReactNode } from "react";
+import { validatePartitaIva } from "@/lib/validators";
 import ZonePreferenceSelector, {
   type ZonePreference,
 } from "@/components/agency/ZonePreferenceSelector";
@@ -35,6 +36,7 @@ export default function AgenzieRegistrationForm() {
     contactName: "",
     email: "",
     phone: "",
+    partitaIva: "",
     address: "",
     city: "",
     province: "",
@@ -70,6 +72,7 @@ export default function AgenzieRegistrationForm() {
           ...form,
           agentCount: form.agentCount ? parseInt(form.agentCount) : undefined,
           preferredZones: preferredZones.length > 0 ? preferredZones : undefined,
+          partitaIva: form.partitaIva,
         }),
       });
 
@@ -148,12 +151,29 @@ export default function AgenzieRegistrationForm() {
         </div>
       </div>
 
+      {/* Partita IVA */}
+      <div>
+        <label className="mb-1 block text-sm font-medium text-text">Partita IVA *</label>
+        <div className="relative">
+          <input type="text" required value={form.partitaIva}
+            onChange={(e) => setForm({ ...form, partitaIva: e.target.value.replace(/\D/g, "").slice(0, 11) })}
+            placeholder="12345678901"
+            className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
+          {form.partitaIva.length === 11 && (
+            <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm ${validatePartitaIva(form.partitaIva) ? "text-green-500" : "text-red-400"}`}>
+              {validatePartitaIva(form.partitaIva) ? "\u2713" : "\u2717"}
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* Indirizzo sede */}
       <div>
-        <label className="mb-1 block text-sm font-medium text-text">Indirizzo sede</label>
-        <input type="text" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
+        <label className="mb-1 block text-sm font-medium text-text">Indirizzo sede *</label>
+        <input type="text" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
           placeholder="Via Roma 1"
           className="w-full rounded-lg border border-border px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-1 focus:ring-primary/30" />
+        <p className="mt-1 text-xs text-text-muted">Necessario per determinare la zona di competenza</p>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-3">
@@ -182,6 +202,7 @@ export default function AgenzieRegistrationForm() {
         <ZonePreferenceSelector
           province={form.province}
           city={form.city}
+          address={form.address}
           selectedZones={preferredZones}
           onSelectionChange={setPreferredZones}
         />

@@ -8,6 +8,7 @@ import { generateAgencySlug } from "@/lib/utils";
 import { resolveZoneForProperty } from "@/lib/zones";
 import { z } from "zod";
 import { validatePartitaIva, validatePec } from "@/lib/validators";
+import { getZoneRadius, distanceKm } from "@/lib/zone-radius";
 
 const agencyRegisterSchema = z.object({
   agencyName: z.string().min(2, "Nome agenzia richiesto"),
@@ -29,24 +30,6 @@ const agencyRegisterSchema = z.object({
   approvalToken: z.string().optional(),
   selectedZoneId: z.string().min(1, "Seleziona almeno un territorio"),
 });
-
-const RADIUS_BY_CLASS: Record<string, number> = {
-  PREMIUM: 1,
-  URBANA: 1,
-  BASE: 5,
-};
-
-function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -113,21 +96,23 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate zone is geographically reachable from agency address
-    const homeZoneId = await resolveZoneForProperty(data.city, data.province, "");
+    const homeZoneId = await resolveZoneForProperty(data.city, data.province, "", data.address);
     if (homeZoneId) {
       const homeZone = await prisma.zone.findUnique({
         where: { id: homeZoneId },
-        select: { lat: true, lng: true, zoneClass: true },
+        select: {
+          lat: true,
+          lng: true,
+          zoneClass: true,
+          city: true,
+          population: true,
+        },
       });
 
       if (homeZone?.lat && homeZone?.lng) {
-        // Check same class
-        if (selectedZone.zoneClass !== homeZone.zoneClass) {
-          return NextResponse.json({ error: "Puoi scegliere solo territori della stessa classe della tua zona" }, { status: 400 });
-        }
-        // Check distance
+        // Check distance (vale per TUTTE le zone, qualsiasi classe — la classe determina solo il prezzo)
         if (selectedZone.lat && selectedZone.lng && selectedZone.id !== homeZoneId) {
-          const maxDist = RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10;
+          const maxDist = getZoneRadius(homeZone);
           const dist = distanceKm(homeZone.lat, homeZone.lng, selectedZone.lat, selectedZone.lng);
           if (dist > maxDist) {
             return NextResponse.json({ error: "Territorio selezionato troppo lontano dalla tua sede" }, { status: 400 });

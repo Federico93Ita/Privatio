@@ -10,17 +10,7 @@ import {
 import type { PlanKey } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { resolveZoneForProperty } from "@/lib/zones";
-
-function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+import { getZoneRadius, distanceKm } from "@/lib/zone-radius";
 
 /**
  * Garantisce che una Zone abbia uno stripePriceId. Se manca (p.es. zona
@@ -125,30 +115,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Restrizione geografica + stessa classe
+    // Restrizione geografica: la zona acquistata deve essere entro il raggio operativo della home zone (qualsiasi classe)
     const homeZoneId = await resolveZoneForProperty(
       user.agency.city,
       user.agency.province,
-      ""
+      "",
+      user.agency.address || ""
     );
     if (homeZoneId && homeZoneId !== zoneId) {
       const homeZone = await prisma.zone.findUnique({
         where: { id: homeZoneId },
-        select: { lat: true, lng: true, zoneClass: true },
+        select: {
+          lat: true,
+          lng: true,
+          zoneClass: true,
+          city: true,
+          population: true,
+        },
       });
-      if (homeZone?.zoneClass && zone.zoneClass !== homeZone.zoneClass) {
-        return NextResponse.json(
-          { error: "Puoi presidiare solo zone della tua stessa classe" },
-          { status: 403 }
-        );
-      }
+      // Blocca se distanza fuori raggio (vale per TUTTE le zone, qualsiasi classe)
       if (homeZone?.lat && homeZone?.lng && zone.lat && zone.lng) {
-        const radiusByClass: Record<string, number> = {
-          PREMIUM: 1,
-          URBANA: 1,
-          BASE: 5,
-        };
-        const maxDist = radiusByClass[zone.zoneClass] ?? 10;
+        const maxDist = getZoneRadius(homeZone);
         const dist = distanceKm(homeZone.lat, homeZone.lng, zone.lat, zone.lng);
         if (dist > maxDist) {
           return NextResponse.json(

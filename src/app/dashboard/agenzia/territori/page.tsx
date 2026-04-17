@@ -8,6 +8,7 @@ import {
   ZONE_CLASS_LABELS,
   ZONE_CLASS_COLORS,
 } from "@/lib/zone-constants";
+import { getZoneRadius, distanceKm } from "@/lib/zone-radius";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -62,29 +63,7 @@ function formatPrice(cents: number): string {
   }).format(cents / 100);
 }
 
-/** Haversine distance in km — same formula used server-side */
-function distanceKm(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-const RADIUS_BY_CLASS: Record<string, number> = {
-  PREMIUM: 1,
-  URBANA: 1,
-  BASE: 5,
-};
+/* getZoneRadius e distanceKm importati da @/lib/zone-radius */
 
 function classifyZone(
   zone: ZoneAvailable,
@@ -205,11 +184,13 @@ export default function TerritoriPage() {
 
       let province = "";
       let city = "";
+      let agAddress = "";
       if (agRes.ok) {
         const agData = await agRes.json();
         const ag = agData?.agency || agData;
         province = ag?.province || "";
         city = ag?.city || "";
+        agAddress = ag?.address || "";
         setAgencyProvince(province);
         setAgencyCity(city);
         setAgencyLat(ag?.lat || 0);
@@ -223,7 +204,7 @@ export default function TerritoriPage() {
         setProvinceLoading(true);
         try {
           const zRes = await fetch(
-            `/api/zones/nearby?city=${encodeURIComponent(city)}&province=${province}`
+            `/api/zones/nearby?city=${encodeURIComponent(city)}&province=${province}&address=${encodeURIComponent(agAddress)}`
           );
           if (zRes.ok) {
             const data = await zRes.json();
@@ -275,9 +256,9 @@ export default function TerritoriPage() {
     if (!homeZone || !agencyLat) return [];
     return adjacentZones.filter((z) => {
       if (nearbyIds.has(z.id)) return false;
-      if (z.zoneClass !== homeZone.zoneClass) return false;
+      // Cross-tier: la classe determina solo il prezzo, non la possibilità di acquisto
       if (z.lat && z.lng) {
-        const maxDist = RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10;
+        const maxDist = getZoneRadius(homeZone);
         const dist = distanceKm(agencyLat, agencyLng, z.lat, z.lng);
         if (dist > maxDist) return false;
       }
@@ -393,9 +374,7 @@ export default function TerritoriPage() {
   /*  Render                                                          */
   /* ================================================================ */
 
-  const maxDistKm = homeZone
-    ? RADIUS_BY_CLASS[homeZone.zoneClass] ?? 10
-    : 10;
+  const maxDistKm = homeZone ? getZoneRadius(homeZone) : 10;
 
   return (
     <DashboardLayout role="agency">
@@ -579,12 +558,15 @@ export default function TerritoriPage() {
                 />
               </svg>
               <p className="text-xs text-[#0B1D3A]/50">
-                La tua agenzia si trova in una{" "}
-                <strong className="text-[#0B1D3A]/70">
+                La tua sede è nella microzona{" "}
+                <strong className="text-[#0B1D3A]/70">{homeZone.name}</strong>{" "}
+                (
+                <span className="text-[#0B1D3A]/60">
                   {ZONE_CLASS_LABELS[homeZone.zoneClass]?.toLowerCase()}
-                </strong>
-                . Puoi operare solo in zone della stessa fascia entro{" "}
-                {maxDistKm} km dalla tua sede.
+                </span>
+                ). Puoi acquistare qualsiasi zona entro {maxDistKm} km dalla tua
+                sede: il prezzo mensile varia in base alla fascia della zona
+                scelta.
               </p>
             </div>
           )}
