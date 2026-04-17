@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: "Quanto costa l'abbonamento?",
-    a: "Il prezzo dipende dalla zona: da \u20AC224/mese per zone rurali fino a \u20AC2.340/mese per i centri storici. Questi sono i Prezzi Fondatore, riservati a chi si iscrive durante il lancio, bloccati per il primo anno con uno sconto del 10%. In pi\u00F9, i primi 3 mesi sono completamente gratuiti. Nessun costo aggiuntivo sulle vendite.",
+    a: "Il prezzo dipende dalla zona: da \u20AC99/mese per piccoli comuni BASE fino a \u20AC2.990/mese per i centri storici PREMIUM delle grandi citt\u00E0. I Prezzi Fondatore, riservati a chi si iscrive durante il lancio, sono bloccati per il primo anno con uno sconto del 10%. In pi\u00F9, i primi 3 mesi sono completamente gratuiti. Nessun costo aggiuntivo sulle vendite.",
   },
   {
     q: "Cosa succede dopo i 3 mesi gratuiti?",
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "Posso scegliere piu zone?",
-    a: "Si, puoi attivare fino a 3 zone contemporaneamente. Dopo la prima zona (quella della tua sede), puoi espanderti solo su zone limitrofe \u2014 cosi la tua copertura territoriale rimane coerente e efficace.",
+    a: "Si, puoi attivare fino a 3 zone contemporaneamente. Dopo la prima zona (quella della tua sede), puoi espanderti su qualsiasi zona entro 1 km dalla tua sede, di qualsiasi fascia (BASE/URBANA/PREMIUM): la fascia determina solo il prezzo mensile, non la possibilit\u00E0 di acquisto.",
   },
   {
     q: "Il posto e garantito?",

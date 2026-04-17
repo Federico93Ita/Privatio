@@ -60,7 +60,7 @@ const TIER_META: Record<ZoneClass, {
     subtitle: "Comuni piccoli e rurali",
     features: [
       "Fino a 3 zone operative",
-      "Notifica nuovi immobili 24h",
+      "Visibilit\u00e0 garantita nella zona",
       "Profilo agenzia in piattaforma",
       "Dashboard di gestione completa",
       "Max 3\u20134 agenzie per zona",
@@ -72,9 +72,9 @@ const TIER_META: Record<ZoneClass, {
     subtitle: "Centri medi e periferie citt\u00e0",
     features: [
       "Fino a 3 zone operative",
-      "Notifica nuovi immobili 8h",
-      "Visibilit\u00e0 locale garantita",
+      "Visibilit\u00e0 prioritaria nella zona",
       "Statistiche avanzate e report",
+      "Badge zona urbana",
       "Max 4\u20136 agenzie per zona",
     ],
     cta: "Scegli Zona Urbana",
@@ -84,7 +84,7 @@ const TIER_META: Record<ZoneClass, {
     subtitle: "Centri storici e zone pregio",
     features: [
       "Fino a 3 zone operative",
-      "Notifica istantanea immobili",
+      "Profilo in evidenza + massima visibilit\u00e0",
       "Prima posizione nelle ricerche",
       "Branding premium e supporto",
       "Max 4\u20137 agenzie per zona",
@@ -184,7 +184,7 @@ async function getPricingPlans(): Promise<Plan[]> {
 const addons = [
   { name: "Zona aggiuntiva", price: "\u201315% sulla seconda zona", description: "Espandi il tuo territorio su una zona limitrofa con sconto del 15%." },
   { name: "Badge \"Agenzia verificata\"", price: "+\u20AC75/mese", description: "Badge visibile sui listing assegnati alla tua agenzia." },
-  { name: "Priority boost", price: "+\u20AC100/mese", description: "Appari prima nelle notifiche ai venditori della tua zona." },
+  { name: "Priority boost", price: "+\u20AC100/mese", description: "Appari in cima alla lista mostrata ai venditori della tua zona." },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -214,7 +214,7 @@ function buildFaqJsonLd(plans: Plan[]) {
         name: "Quanto costa l'abbonamento?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Il prezzo dipende dalla zona: da \u20AC${minPrice}/mese per zone rurali fino a \u20AC${maxPrice.toLocaleString("it-IT")}/mese per centri storici. Prezzo Fondatore bloccato per 12 mesi con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite.`,
+          text: `Il prezzo dipende dalla zona: da \u20AC${minPrice}/mese per piccoli comuni BASE fino a \u20AC${maxPrice.toLocaleString("it-IT")}/mese per i centri storici PREMIUM delle grandi citt\u00E0. Prezzo Fondatore bloccato per 12 mesi con -10%. I primi 3 mesi sono gratuiti. Nessun costo aggiuntivo sulle vendite.`,
         },
       },
       {
@@ -246,13 +246,15 @@ export default async function AgenziePage() {
           <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#C9A84C]/20 bg-[#C9A84C]/5 px-5 py-2 backdrop-blur-sm">
               <span className="h-2 w-2 rounded-full bg-[#C9A84C] animate-pulse" />
-              <span className="text-sm font-medium text-[#C9A84C]/90">Posti limitati per zona</span>
+              <span className="text-sm font-medium text-[#C9A84C]/90">Numero chiuso di agenzie per zona</span>
             </div>
             <h1 className="font-heading text-4xl font-normal tracking-[-0.02em] text-white md:text-6xl mb-6">
-              Assicurati l&apos;esclusivit&agrave; nella tua zona
+              La tua zona. Zero competizione.
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-white/50 md:text-xl">
-              Solo un numero limitato di agenzie per zona. Una volta assegnata, nessun altro pu&ograve; toglierti il posto.
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-white/65 md:text-xl">
+              Un numero chiuso di agenzie per microzona OMI. Nessun bidding,
+              nessuna gara al ribasso: chi arriva prima presidia la zona e
+              appare direttamente nella scelta dei venditori.
             </p>
             <a
               href="#registrazione"

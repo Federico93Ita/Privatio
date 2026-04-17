@@ -36,17 +36,17 @@ export default function HeroSection() {
         </div>
 
         <h1 className="font-heading text-5xl font-normal leading-[1.05] tracking-[-0.03em] text-white sm:text-6xl lg:text-[5.5rem]">
-          Vendi casa.
+          Tu scegli l&apos;agenzia.
           <br />
           <span className="bg-gradient-to-r from-[#C9A84C] via-[#E0C96A] to-[#C9A84C] bg-clip-text text-transparent animate-gradient">
-            Zero commissioni.
+            Non il contrario.
           </span>
         </h1>
 
-        <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-white/50 sm:text-xl">
-          Perché pagare migliaia di euro di provvigioni? Su Privatio il
-          venditore non paga nulla. Scegli tu l&apos;agenzia della tua zona,
-          lei gestisce tutto e tu incassi il 100%.
+        <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-white/60 sm:text-xl">
+          Pubblica il tuo immobile gratis e scegli tu l&apos;agenzia partner
+          della tua zona. Lei gestisce visite, trattativa e rogito: tu incassi
+          il 100%. Zero commissioni per il venditore.
         </p>
 
         <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -71,6 +71,11 @@ export default function HeroSection() {
             </svg>
           </a>
         </div>
+
+        {/* CTA reassurance microcopy */}
+        <p className="mt-5 text-xs text-white/45 tracking-wide">
+          Gratis · 5 minuti · nessuna carta richiesta
+        </p>
 
         {/* Value badges */}
         <div className="mt-20 grid grid-cols-3 gap-4 sm:gap-8 max-w-xl mx-auto">

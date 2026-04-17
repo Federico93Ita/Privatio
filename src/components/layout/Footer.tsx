@@ -12,6 +12,7 @@ const footerColumns = [
       { href: "/cerca", label: "Cerca Casa" },
       { href: "/vendi", label: "Vendi Casa" },
       { href: "/per-acquirenti", label: "Per gli Acquirenti" },
+      { href: "/faq", label: "FAQ" },
     ],
   },
   {

@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/cerca", label: "Cerca Casa" },
   { href: "/come-funziona", label: "Come Funziona" },
   { href: "/agenzie", label: "Per le Agenzie" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 /** Returns the dashboard path based on the user's role */

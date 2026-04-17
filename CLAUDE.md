@@ -9,19 +9,23 @@ Marketplace immobiliare italiano dove i venditori pubblicano immobili gratis e l
 - **Acquirenti**: accesso gratuito. Eventuale commissione agenzia (2-2.5%) negoziata direttamente con l'agenzia
 - **Agenzie**: pagano per presidiare zone geografiche (max 3 zone, max agenzie per zona). Devono firmare contratto zero-commissioni
 
-## Territori (Modello V2)
-3 tier non sovrapposti, copertura totale Italia:
-- **BASE** (€249-499/mese): comuni <20k abitanti, max 3-4 agenzie, notifiche 24h
-- **URBANA** (€499-999/mese): città 20k-100k, max 4-6 agenzie, notifiche 8h
-- **PREMIUM** (€999-2.600/mese): centri storici/zone prestigio, max 4-7 agenzie, notifiche instant
-- Formula prezzo: 30% popolazione + 40% NTN + 30% €/m²
-- Le agenzie possono espandersi solo a zone adiacenti della stessa classe
+## Territori (Modello V3 — Microzone OMI)
+Zone basate su microzone OMI (Osservatorio Mercato Immobiliare), stile immobiliare.it.
+~490+ microzone per ~80+ città, con classificazione per fascia OMI (C/B/D/E/R).
 
-## Matchmaking (assegnazione automatica 48h)
-1. Geolocalizza immobile → trova zona
-2. Filtra agenzie attive in quella zona
-3. Ranking: piano più alto → minor carico di lavoro → rating più alto
-4. Notifica automatica ad agenzia e venditore
+3 tier non sovrapposti, copertura totale Italia:
+- **BASE** (€99-249/mese): comuni <20k abitanti, max 2-4 agenzie, visibilità standard
+- **URBANA** (€299-699/mese): zone D/E in città >20k, max 3-6 agenzie, visibilità prioritaria
+- **PREMIUM** (€699-2.990/mese): zone C/B in città >20k, max 4-7 agenzie, profilo in evidenza
+- Formula prezzo: basePrice(pop) × moltFascia(OMI) × boostPrezzo(€/m²) × boostNTN
+- Le agenzie possono espandersi a qualsiasi zona entro 1 km dalla sede (la fascia determina solo il prezzo)
+- Point-in-polygon per assegnazione precisa con boundary GeoJSON
+
+## Matchmaking — scelta venditore + fallback 48h
+1. Durante il caricamento dell'immobile il venditore sceglie direttamente l'agenzia tra quelle attive nella zona
+2. Se entro 48h nessuna scelta: geolocalizza immobile → trova zona → filtra agenzie attive
+3. Ranking di fallback: piano più alto → minor carico di lavoro → rating più alto
+4. Assegnazione automatica all'agenzia top-ranking con email notifica
 
 ## Stack Tecnico
 - **Framework**: Next.js 15 (App Router) + TypeScript

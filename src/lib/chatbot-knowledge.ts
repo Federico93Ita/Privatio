@@ -16,11 +16,12 @@ per presidiare zone geografiche specifiche.
 
 ## Flusso venditore
 1. Il venditore pubblica gratuitamente il suo immobile su /vendi.
-2. Entro **48 ore** Privatio assegna automaticamente l'immobile a un'agenzia
-   partner della zona, oppure il venditore può scegliere l'agenzia tra quelle
-   disponibili nella propria area.
-3. L'agenzia segue la vendita: visite, trattativa, documenti, rogito.
-4. Il venditore **non paga nulla** all'agenzia (0% commissioni). Incassa il 100%
+2. Durante il caricamento **sceglie direttamente** l'agenzia partner con cui
+   vuole essere seguito tra quelle attive nella sua zona.
+3. Se il venditore non effettua una scelta entro 48 ore, il sistema assegna
+   automaticamente l'immobile all'agenzia con il ranking più alto della zona.
+4. L'agenzia segue la vendita: visite, trattativa, documenti, rogito.
+5. Il venditore **non paga nulla** all'agenzia (0% commissioni). Incassa il 100%
    del prezzo di vendita.
 
 ## Flusso agenzia
@@ -28,8 +29,8 @@ per presidiare zone geografiche specifiche.
 2. Firma il contratto che include la **clausola zero-commissioni** verso il
    venditore (l'agenzia non può chiedere commissioni a chi vende tramite Privatio).
 3. Paga un abbonamento mensile per ogni zona attiva (Stripe).
-4. Riceve in modo automatico gli immobili pubblicati nelle sue zone, in base al
-   sistema di matchmaking.
+4. Viene mostrata ai venditori della zona durante la pubblicazione: quando un
+   venditore la sceglie, riceve la segnalazione nella dashboard (con email).
 
 ## Modello zero-commissioni — perché un'agenzia accetta?
 - L'agenzia **non incassa** dal venditore, ma può negoziare una commissione
@@ -44,41 +45,41 @@ per presidiare zone geografiche specifiche.
 Italia coperta da 3 tier non sovrapposti. Le fasce di prezzo sono indicative
 e dipendono dalla zona specifica.
 
-### Tier BASE — €249–499 / mese
+### Tier BASE — €99–249 / mese
 - Comuni con popolazione inferiore a ~20.000 abitanti.
 - Massimo 3-4 agenzie per zona.
-- Notifiche nuovi immobili: entro 24 ore.
+- Visibilità standard del profilo agenzia nella scelta venditore.
 
-### Tier URBANA — €499–999 / mese
+### Tier URBANA — €299–699 / mese
 - Città medio-piccole (~20.000 – 100.000 abitanti).
 - Massimo 4-6 agenzie per zona.
-- Notifiche nuovi immobili: entro 8 ore.
+- Visibilità prioritaria nella zona.
 
-### Tier PREMIUM — €999–2.600 / mese
+### Tier PREMIUM — €699–2.990 / mese
 - Centri storici, capoluoghi e zone di prestigio.
 - Massimo 4-7 agenzie per zona.
-- Notifiche nuovi immobili: istantanee.
+- Profilo in evidenza e massima visibilità.
 
-### Formula di pricing
-Il prezzo della singola zona viene calcolato pesando tre fattori:
-- **30%** popolazione del comune
-- **40%** NTN (numero di transazioni normalizzate registrate dall'Agenzia
-  delle Entrate — quanto è "viva" quella zona dal punto di vista delle vendite)
-- **30%** prezzo medio €/m² della zona
+### Come si calcola il prezzo della zona
+Il prezzo della singola zona tiene conto di: popolazione del comune, fascia OMI
+(Osservatorio Mercato Immobiliare), quotazione media €/m² e volume di
+compravendite (NTN dell'Agenzia delle Entrate). In pratica: più la zona è
+grande e attiva, più costa; più è piccola e meno richiesta, meno costa.
+Il prezzo esatto della zona scelta viene mostrato in fase di registrazione
+su /registra-agenzia.
 
-In pratica: una zona con tante compravendite e prezzi al m² alti costa di più,
-una zona meno attiva costa meno. Il prezzo esatto della zona scelta viene
-mostrato in fase di registrazione su /registra-agenzia.
+## Scelta dell'agenzia e assegnazione di backup (48 ore)
+Il flusso standard è: **il venditore sceglie direttamente l'agenzia** durante
+il caricamento dell'immobile, tra quelle attive nella sua zona ordinate per
+rating e visibilità del piano.
 
-## Matchmaking automatico (48 ore)
-Quando un venditore pubblica un immobile:
+Se il venditore non effettua una scelta entro 48 ore:
 1. Il sistema geolocalizza l'immobile e identifica la zona.
 2. Filtra le agenzie attive in quella zona.
 3. Le ordina per: piano di abbonamento più alto → minor carico di lavoro →
    rating più alto.
-4. Notifica automaticamente l'agenzia in cima al ranking.
-5. Se entro 48 ore il venditore non sceglie manualmente, l'assegnazione diventa
-   definitiva sull'agenzia in cima al ranking.
+4. Assegna automaticamente l'immobile all'agenzia in cima al ranking.
+5. L'agenzia vede la segnalazione nella dashboard e riceve un'email.
 
 ## Requisiti per le agenzie
 - Massimo **3 zone** per agenzia.
@@ -97,24 +98,26 @@ dopo 12 mesi il prezzo torna al listino standard della zona.
   vendere. Zero commissioni, zero costi nascosti.
 - **Chi paga allora?** Le agenzie immobiliari partner, tramite un abbonamento
   mensile. Eventuali commissioni vengono concordate solo tra agenzia e acquirente.
-- **Posso scegliere l'agenzia?** Sì, entro 48 ore puoi selezionare tu l'agenzia
-  tra quelle attive nella tua zona. Se non scegli, viene assegnata in automatico
-  in base al ranking.
-- **Cosa succede dopo 48 ore?** L'immobile viene assegnato all'agenzia che il
-  sistema ha messo in cima al ranking. Continui comunque a controllare tu il prezzo
-  e le decisioni sulla vendita.
+- **Posso scegliere l'agenzia?** Sì, durante il caricamento dell'immobile scegli
+  direttamente l'agenzia partner tra quelle attive nella tua zona.
+- **Cosa succede se non scelgo?** Se entro 48 ore non hai selezionato nessuna
+  agenzia, il sistema assegna automaticamente l'immobile a quella in cima al
+  ranking della tua zona. Continui comunque a controllare tu il prezzo e le
+  decisioni sulla vendita.
 - **Devo firmare un'esclusiva?** Le condizioni esatte di mandato sono regolate
   dal contratto agenzia-venditore. Per i dettagli legali contatta ${CONTACT_EMAIL}.
 
 ## FAQ Agenzie
-- **Perché dovrei firmare zero-commissioni?** Perché in cambio ricevi flusso
-  costante di immobili nelle tue zone senza dover fare acquisizione, e mantieni
-  comunque la possibilità di concordare una commissione con l'acquirente.
+- **Perché dovrei firmare zero-commissioni?** Perché in cambio vieni mostrata
+  come opzione ai venditori delle tue zone durante la pubblicazione, senza
+  dover fare acquisizione, e mantieni comunque la possibilità di concordare
+  una commissione con l'acquirente.
 - **Come guadagno?** Tipicamente con una commissione concordata direttamente
   con l'acquirente (mediamente 2-2,5%), oltre al valore di un portafoglio
   immobili più ampio gestito a costo fisso.
-- **Posso avere più zone?** Sì, fino a 3 zone, purché siano adiacenti e dello
-  stesso tier (BASE, URBANA o PREMIUM).
+- **Posso avere più zone?** Sì, fino a 3 zone purché siano entro 1 km dalla
+  tua sede: la fascia (BASE/URBANA/PREMIUM) determina solo il prezzo mensile,
+  non la possibilità di acquisto.
 - **Cosa succede se in una zona ci sono già abbastanza agenzie?** La zona viene
   marcata come piena e devi attendere o scegliere una zona limitrofa.
 - **Posso annullare l'abbonamento?** Sì, le condizioni sono nel contratto.
@@ -155,8 +158,9 @@ export const CHATBOT_SYSTEM_PROMPT = `Sei l'Assistente Privatio, un chatbot in i
 4. Non dare **valutazioni di immobili specifici**, **consulenza legale o fiscale**,
    **stime di mercato puntuali**: rimanda sempre a ${CONTACT_EMAIL}.
 5. Se l'utente chiede del prezzo di una zona specifica, ricorda che dipende dal
-   tier (BASE / URBANA / PREMIUM) e si calcola con la formula 30% popolazione +
-   40% NTN + 30% €/m². Per il prezzo esatto rimanda a /registra-agenzia o al
+   tier (BASE €99–249 / URBANA €299–699 / PREMIUM €699–2.990) e si calcola
+   combinando popolazione del comune, fascia OMI, quotazione €/m² e volume
+   di compravendite. Per il prezzo esatto rimanda a /registra-agenzia o al
    contatto umano.
 6. Quando ha senso, suggerisci la pagina pertinente del sito (/come-funziona,
    /vendi, /per-acquirenti, /registra-agenzia).

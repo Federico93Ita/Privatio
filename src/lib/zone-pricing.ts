@@ -104,9 +104,9 @@ const TIER_CONFIG: Record<ZoneClass, {
   maxAgencies: number;
   label: string;
 }> = {
-  BASE: { minPrice: 70, maxPrice: 199, baseAgencies: 2, maxAgencies: 4, label: "Zona Base" },
-  URBANA: { minPrice: 200, maxPrice: 599, baseAgencies: 3, maxAgencies: 6, label: "Zona Urbana" },
-  PREMIUM: { minPrice: 500, maxPrice: 2600, baseAgencies: 4, maxAgencies: 7, label: "Zona Premium" },
+  BASE: { minPrice: 99, maxPrice: 249, baseAgencies: 2, maxAgencies: 4, label: "Zona Base" },
+  URBANA: { minPrice: 299, maxPrice: 699, baseAgencies: 3, maxAgencies: 6, label: "Zona Urbana" },
+  PREMIUM: { minPrice: 699, maxPrice: 2990, baseAgencies: 4, maxAgencies: 7, label: "Zona Premium" },
 };
 
 /* ------------------------------------------------------------------ */

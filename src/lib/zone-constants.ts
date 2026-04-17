@@ -30,11 +30,11 @@ export const ZONE_MAP_COLORS: Record<string, { fill: string; stroke: string }> =
   PREMIUM: { fill: "#e9456040", stroke: "#e94560" },   // rose
 };
 
-/** Price ranges for display on public page */
+/** Price ranges for display on public page (EUR/mese, allineati a TIER_CONFIG in zone-pricing.ts) */
 export const ZONE_PRICE_RANGES: Record<string, { min: number; max: number }> = {
-  BASE: { min: 249, max: 499 },
-  URBANA: { min: 499, max: 999 },
-  PREMIUM: { min: 999, max: 2600 },
+  BASE: { min: 99, max: 249 },
+  URBANA: { min: 299, max: 699 },
+  PREMIUM: { min: 699, max: 2990 },
 };
 
 /** Max agencies per zone tier */

@@ -16,7 +16,7 @@ export const PLANS = {
     features: [
       "Comuni < 20k abitanti",
       "Max 3-4 agenzie per zona",
-      "Notifica nuovi immobili 24h",
+      "Visibilita standard nella zona",
       "Profilo agenzia completo",
       "Dashboard gestione",
     ],
@@ -28,9 +28,9 @@ export const PLANS = {
     features: [
       "Comuni 20k-100k o quartieri periferici",
       "Max 4-6 agenzie per zona",
-      "Notifica nuovi immobili 8h",
-      "Visibilita locale garantita",
+      "Visibilita prioritaria nella zona",
       "Statistiche avanzate",
+      "Badge zona urbana",
     ],
   },
   PREMIUM: {
@@ -40,7 +40,7 @@ export const PLANS = {
     features: [
       "Centri storici e quartieri pregiati",
       "Max 4-7 agenzie per zona",
-      "Notifica istantanea immobili",
+      "Profilo in evidenza + massima visibilita",
       "Prima posizione ricerche",
       "Branding premium e supporto",
     ],
